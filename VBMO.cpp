@@ -1,7 +1,8 @@
 /**
- * VBMO IMPLEMENTAION IN C++ 
+ * VBMO and VBMO* implementation in C++
  * CREDITS: Raj Korpan, Daniel Merino
 */
+#include <numeric>
 #include <vector>           // vectors
 #include <string>           // getline() and reading files
 #include <iostream>         // input and output functionality
@@ -9,11 +10,11 @@
 #include <unordered_map>    // for lookup tabled 
 #include <cmath>            // sqrt(), abs(), and other basic math functions
 #include <queue>            // using priority_queue as the openSet for A*
-#include <algorithm>        // ???
 #include <list>             // shortest path are put into lists for their quick emplace_front() feature
 #include <chrono>           // for timing and random number generator seed
 #include <random>           // using the mersenne_twister_engine for random numbers
 #include <iterator>         // ostream iterator 
+#include <filesystem>       // for filesystem iterators
 
 /**
  * ===========================================
@@ -22,21 +23,53 @@
 */
 
 /**
- * @details an inplace method of normalzing a one-dimensional vector
- * @param path_cost is a 1-d vector
-*/
-void normalize_vector(std::vector<std::vector<double>>& path_costs){
-    for(int i = 0; i < path_costs.size(); i++){
-        double magnitude;
-        for(int j = 0; j < path_costs[0].size(); j++){
-            magnitude += path_costs[i][j] * path_costs[i][j];
-        }
-        magnitude = sqrt(magnitude);
+ * @brief Normalize paths with respect to the objectives across the path (i.e. normalize objectives across  paths) 
+ * @param path_costs is a n x n matrix.
+ * @return a n x n matrix that is normalized.
+ */
+std::vector<std::vector<double>> normalize_matrix(std::vector<std::vector<double>> path_costs){
+    double min, max;
+    std::vector<std::vector<double>> normalized_matrix(path_costs.size(), std::vector<double>(path_costs[0].size(), 0));
 
-        for(int k = 0; k < path_costs[0].size(); k++){
-            path_costs[i][k] /= magnitude;
+    for(int j = 0; j < path_costs[0].size(); j++){
+        //find min and max value of an objective cross all paths
+        min = INT_MAX;
+        max = -1;
+        //find min and max of the column (multiple max and mins are allowed)
+        for(int i = 0; i < path_costs.size(); i++){
+            if(path_costs[i][j] > max) {
+                max = path_costs[i][j];
+            } 
+            if(path_costs[i][j] < min) {
+                min = path_costs[i][j];
+            }
+        }
+
+        for(int i = 0; i < path_costs.size(); i++){
+            normalized_matrix[i][j] = (path_costs[i][j] - min) / (max - min);
         }
     }
+    
+    return normalized_matrix;
+}
+
+/**
+ * @brief a metric used for evaluting a pareto set approximation
+ *
+ */
+double sparcity_metric(const std::vector<std::vector<double>>&  normalized_path_costs){ 
+        int m = normalized_path_costs[0].size(); // the number of objectives
+        int n = normalized_path_costs.size(); //the size of the pareto oproximation (number of paths we have)
+        double sum = 0;
+        for(int j = 0; j < m; j++){
+            for(int i = 0; i < n - 1; i++){
+                  sum += pow(normalized_path_costs[i][j] - normalized_path_costs[i + 1][j], 2);
+            }
+        }
+
+        sum *= 1.0/(n-1);
+
+        return sum;
 }
 
 /**
@@ -46,7 +79,20 @@ void display_vector(std::vector<double> normalized_path_cost) {
     if(normalized_path_cost.size() > 0) {
         std::cout << "{" << normalized_path_cost[0];
         for(int i = 1; i < normalized_path_cost.size(); i++) {
-            std::cout << ", " << normalized_path_cost[i];
+            std::cout << ", " << std::fixed << normalized_path_cost[i];
+        }
+        std::cout << "}" << std::endl;
+    } 
+    else { // the vecetor is empty
+        std::cout << "{}" << std::endl;
+    }
+}
+
+void display_vector(std::vector<int> normalized_path_cost) {
+    if(normalized_path_cost.size() > 0) {
+        std::cout << "{" << normalized_path_cost[0];
+        for(int i = 1; i < normalized_path_cost.size(); i++) {
+            std::cout << ", " << std::fixed << normalized_path_cost[i];
         }
         std::cout << "}" << std::endl;
     } 
@@ -59,6 +105,10 @@ void display_vector(std::vector<double> normalized_path_cost) {
  * @details is a n x n matrix of the (what should be normalized) path objective costs
 */
 void display_matrix(std::vector<std::vector<double>> normalized_path_costs) {
+    if(normalized_path_costs.size() == 0){
+        std::cout << "{}" << std::endl;
+        return;
+    }
     for(int i = 0; i < normalized_path_costs.size(); i++) {
         std::cout << "P_" << i << ": "; display_vector(normalized_path_costs[i]);
     }
@@ -88,7 +138,7 @@ int findMin(std::vector<double> list) {
         return -2;
     }
 
-    double min = std::numeric_limits<double>::max(); //
+    double min = std::numeric_limits<double>::max(); //why is this needed?
     double minIndex;
     bool doubleMin = false;
 
@@ -169,7 +219,7 @@ std::vector<double> condorcet_voting(std::vector<std::vector<double>> normalized
     std::vector<double> condorcet_scores(normalized_path_costs.size());;
 
     for(int i = 0; i < normalized_path_costs[0].size(); i++) {
-//            std::cout << "Objective " << i << std:: endl;         //debug
+    //            std::cout << "Objective " << i << std:: endl;         //debug
         for(int j = 0; j < normalized_path_costs.size(); j++) {
 
             for(int k = j; k < normalized_path_costs.size(); k++) {
@@ -219,10 +269,10 @@ std::vector<double> borda_voting(std::vector<std::vector<double>> normalized_pat
                 borda_results[top.second] += rank;
             }
         //              <Objective cost>      <path number>      <rank assigned>
-            std::cout << top.first << " " << top.second << " " << rank << std::endl;
+            // std::cout << top.first << " " << top.second << " " << rank << std::endl;     //debug
             pq.pop();
         }
-        std::cout << "----" << std::endl;     //debug
+        // std::cout << "----" << std::endl;     //debug
     }
 
     return borda_results;
@@ -249,22 +299,33 @@ std::vector<double> combined_aproval_voting(std::vector<std::vector<double>> nor
     return combined_approval_sum;
 }
 
+/** 
+ * @details find the euclidean distance in n-dimension space for a normalized path 
+ * 
+*/
+double path_d_score(const std::vector<double>& normalized_path_cost){
+    double d_score;
+    for(int i = 0; i < normalized_path_cost.size(); i++){
+        d_score += std::pow(normalized_path_cost[i], 2);
+    }
+    d_score = std::sqrt(d_score);
+
+    return d_score;
+}
+
 /**
  * @details When a tie is detected in a voting scheme, we pick the candidate that is closest to the Pareto space origin ({0, 0, 0, ..., 0}).
  * @return a n sized vector where vector[i] is the euclidean distance in Pareto space between path i and the origin.
 */
 std::vector<double> d_score(std::vector<std::vector<double>> normalized_path_costs) {
-    std::vector<double> d_score = {};
-    for(int i =0; i < normalized_path_costs.size(); i++) {
-        double path_squared_sum = 0;
-        for(int j = 0; j < normalized_path_costs[i].size(); j++){
-            path_squared_sum += std::pow(normalized_path_costs[i][j],2);
-        }
-        d_score.emplace_back(std::sqrt(path_squared_sum));
+    std::vector<double> d_score;
+    for(int i = 0; i < normalized_path_costs.size(); i++) {
+        d_score.emplace_back(path_d_score(normalized_path_costs[i]));
     }
 
     return d_score;
 }
+
 
 /**
  * @param voting_method determins which voting methods, options are:
@@ -276,9 +337,8 @@ std::vector<double> d_score(std::vector<std::vector<double>> normalized_path_cos
  * @details If a tie was archieved in the voting stage, compares the paths "d_scores" (see d_score for details)
  * @return the index of the path that wins
 */
-std::vector<double> VOTE(std::vector<std::vector<double>>& normalized_path_score, const std::string voting_method) {
+int VOTE(std::vector<std::vector<double>>& normalized_path_score, const std::string voting_method) {
     std::vector<double> results;
-    std::vector<double> d_scores;
     int winner; 
 
     if(voting_method == "range") {
@@ -295,8 +355,7 @@ std::vector<double> VOTE(std::vector<std::vector<double>>& normalized_path_score
         //lowest win
     } else if(voting_method == "condorcet") {
         results = condorcet_voting(normalized_path_score);
-        winner = findMax(results);
-        //highest win
+        winner = findMax(results);        //highest win
     } else {
         std::cout << "Invalid voting method" << std::endl;
         return {};
@@ -305,68 +364,120 @@ std::vector<double> VOTE(std::vector<std::vector<double>>& normalized_path_score
     // display_vector(results);
     if(winner == -1) {
         std::cout << "Tie detected" << std::endl;
-        d_scores = d_score(normalized_path_score);
+        std::vector<double> d_scores = d_score(normalized_path_score);;
+
         // display_vector(d_scores);
         winner = findMin(d_scores);
+        if(winner == -1){
+            std::cout << "TIE in d_score!" << std::endl;
+            return 0;
+        }
     }
-    std::cout << "===============" << std::endl;
+    std::cout << "====================" << std::endl;
     std::cout << "Winner is P_" << winner << ": "; display_vector(normalized_path_score[winner]);
+    std::cout << "====================" << std::endl;
 
-    return normalized_path_score[winner];
+    return winner;
+}
+
+// return a vector of ints where the value of v[i] is the ranked value of path_scores[i] decreasing
+// std::vector<int> rank_decreasing_order(std::vector<double> path_scores){
+//     std::priority_queue<int, std::vector<int>, std::less<int>> temp;
+//     for(int i : path_scores){
+//         temp.push(i);
+//     }
+//     std::vector<int> order;
+//     while(!temp.empty()){
+//         order.push_back(temp.top());
+//         temp.pop();
+//     }
+
+//     return order;
+// }
+std::vector<int> rank_decreasing_order(std::vector<double> path_scores){
+    std::priority_queue<std::pair<double,int>, std::vector<std::pair<double,int>>, std::less<std::pair<double,int>>> temp;
+    for(int i = 0; i < path_scores.size(); i++){
+        temp.push({path_scores[i], i});
+    }
+    std::vector<int> order;
+    while(!temp.empty()){
+        order.push_back(temp.top().second);
+        temp.pop();
+    }
+
+    return order;
+}
+
+
+// std::vector<int> rank_increasing_order(std::vector<double> path_scores){
+//     std::priority_queue<int, std::vector<int>, std::greater<int>> temp;
+//     for(int i : path_scores){
+//         temp.push(i);
+//     }
+//     std::vector<int> order;
+//     while(!temp.empty()){
+//         order.push_back(temp.top());
+//         temp.pop();
+//     }
+
+//     return order;
+    
+// }
+
+std::vector<int> rank_increasing_order(std::vector<double> path_scores){
+    std::priority_queue<std::pair<double,int>, std::vector<std::pair<double,int>>, std::greater<std::pair<double,int>>> temp;
+    for(int i = 0; i < path_scores.size(); i++){
+        temp.push({path_scores[i], i});
+    }
+    std::vector<int> order;
+    while(!temp.empty()){
+        order.push_back(temp.top().second);
+        temp.pop();
+    }
+
+    return order;
 }
 
 /**
- * @details For testing and troubleshooting for vistualizing all the current voting methods.
+ * @param voting_method determins which voting methods, options are:
+ *                                      "range",
+ *                                      "combined_approval",
+ *                                      "borda", and, 
+ *                                      "condorent".
+ * @param normalized_path_score is a n x n matrix containing the normalized path scores produced by the n single objective optimized A* shortest paths.
+ * @details If a tie was archieved in the voting stage, compares the paths "d_scores" (see d_score for details)
+ * @return the index of the path that wins
 */
-void test_voting(std::vector<std::vector<double>> normalized_path_scores) {
-    int winner;
+std::vector<int> vote(std::vector<std::vector<double>>& normalized_path_score, std::string voting_method){
+    std::vector<double> results;
+    std::vector<int> order;
 
-    std::vector<double> range_results = range_voting(normalized_path_scores);
-    std::cout << "range voting results:" << std::endl;
-    display_vector(range_results);
-    winner = findMin(range_results);
-    std::cout << "Winner is path " << winner << std::endl;
+    if(voting_method == "range") {
+        results = range_voting(normalized_path_score);
+        order = rank_increasing_order(results);
+        //lowest wins
+    } else if(voting_method == "combined_approval")  {
+        results = combined_aproval_voting(normalized_path_score);
+        order = rank_decreasing_order(results);
+        //highest win
+    } else if(voting_method == "borda") {
+        results = borda_voting(normalized_path_score);
+        order = rank_increasing_order(results);
+        //lowest win
+    } else if(voting_method == "condorcet") {
+        results = condorcet_voting(normalized_path_score);
+        order = rank_decreasing_order(results);
+        // highest win
+    } else {
+        std::cout << "Invalid voting method" << std::endl;
+        order = {};
+    }
+    // all voting schemes return a verctor where v[i] is the score of the path i is the cost of path i. 
+    // dealing with tied, put the one with the lower d-score first
 
-
-    std::cout << "-----" << std::endl;
-
-
-    std::cout << "combined voting result:" << std::endl;
-    std::vector<double> combined_results = combined_aproval_voting(normalized_path_scores);
-    display_vector(combined_results);
-    winner = findMin(combined_results);
-    std::cout << "Winner is path " << winner << std::endl;
-
-
-    std::cout << "-----" << std::endl;
-
-
-    std::cout << "condorcet voting results:" << std::endl;
-    std::vector<double> condorcet_results = condorcet_voting(normalized_path_scores);
-    display_vector(condorcet_results);
-    winner = findMax(condorcet_results);
-    std::cout << "Winner is path " << winner << std::endl;
-
-
-
-    std::cout << "-----" << std::endl;
-
-
-    std::cout << "borda voting results:" << std::endl;
-    std::vector<double> borda_results = borda_voting(normalized_path_scores);
-    display_vector(borda_results);
-    winner = findMax(borda_results);
-    std::cout << "Winner is path " << winner << std::endl;
-
-
-    std::cout << "-----" << std::endl; 
-
-    std::cout << "d scores:" << std::endl;
-    std::vector<double> d_scores = d_score(normalized_path_scores);
-    display_vector(d_scores);
-
-    std::cout << "-----" << std::endl;
-    
+    //return a vector of ints where the value at v[i] is the path in the i+1th place 
+    // e.g. the value at index 0 is the winner, index 1 has the 2nd place, etc.
+    return order;
 }
 
 /**
@@ -401,11 +512,6 @@ class node {
         weight = rhs.weight;
     };
 
-    bool operator<(const node& rhs) {
-        return x ^ y < rhs.x ^ y;
-    }
-
-
     node& operator=(const node& rhs) {
         x = rhs.x;
         y = rhs.y;
@@ -434,6 +540,10 @@ class node {
         return (x == rhs.x) && (y == rhs.y);
     };
 
+    bool operator!=(const node& rhs) const {
+        return (x != rhs.x) || (y != rhs.y);
+    };
+
     void setWeight(double W){
         weight = W;
     };
@@ -457,7 +567,6 @@ class HEURISTIC {
         int state = 0;
 
     public:
-
     HEURISTIC(int a){
         state = a;
     }
@@ -473,9 +582,9 @@ class HEURISTIC {
 
     double operator()(const node& origin, const node& target) {
         //EUCLIDEAN 
-        if(state = 0){
+        if(state == 0){
             return sqrt( pow((origin.getX() - target.getX()), 2) + pow((origin.getY() - target.getY()), 2) );
-        } else if(state = 1){
+        } else if(state == 1){
             return abs(origin.getX() - target.getX()) + abs(origin.getY() - target.getY());
         } else {
             return -1;
@@ -483,9 +592,10 @@ class HEURISTIC {
     }
 };
 
+
+
 // Use this for when the order of nodes does not mater (e.g. unordered_map & look up tables)
 struct NodeHash {
-
     size_t operator()(const node& key) const {
         return key.getX() ^ key.getY();
     }
@@ -505,82 +615,7 @@ typedef std::unordered_map<node, std::unordered_map<node, double, NodeHash>, Nod
 typedef std::priority_queue<node, std::vector<node>, PQNodeHash>                                    node_priority_queue; 
 typedef std::unordered_map<node,std::unordered_map<node, std::vector<double>, NodeHash>, NodeHash>  MO_adjacency_matrix;     
 
-// std::list<node> TESTING_A_STAR(const node& start, const node& target, const SO_adjacency_matrx& graph, int& duration, double& score){
-
-//     auto starTime = std::chrono::steady_clock::now();
-
-//     /**
-//      * BOOK KEEPING 
-//     */
-//     node_priority_queue openSet;
-//     node start_copy = start;
-//     start_copy.setWeight(euclidean_distance(start, target));
-//     openSet.push(start_copy); //initially the openSet has the start node.
-
-
-//     std::unordered_map<node, node, NodeHash> descendentList; //track the immediate predecesor of each node explored.
-
-//     std::unordered_map<node, double, NodeHash> scoreList; //tracks the best found distance to each node explored
-//     scoreList[start_copy] = 0;
-
-//     std::unordered_map<node,bool, NodeHash> visitList; // marks all nodes whos children have been added to the openSet I don't relly care for the bool, it is just a look up table.
-
-//     /**
-//      * GRAPH SEARCHING SECTION
-//     */
-//     while(!openSet.empty()){
-
-//         /**
-//          * This version uses lazy deletion, so there is a chance that nodes can be in the openSet multiple times, so we must remove those that already have been explored (by explore we mean that we've added their children to the openSet)
-//         */
-//         while(visitList.find(openSet.top()) != visitList.end()){  //Since we are using lazy deletion, we ignore nodes that we have been explored / visisted / had their childrens added
-//             openSet.pop();
-//         }
-
-//         node top = openSet.top();   //get the node with the shortest weight fron the openSet
-
-//         if(top == target){
-//             auto finishTime = std::chrono::steady_clock::now();
-//             duration = std::chrono::duration_cast<std::chrono::milliseconds>(finishTime - starTime).count();
-//             //add top to the search region and backtrack via the desecneant list to find the path from the target back to the start.
-//             std::list<node> path;   // using list since we are constructing the path backwards, we are always inserting in the front.
-//             path.emplace_front(top);   
-//             while(descendentList.find(top) != descendentList.end()){    //while there are still decendents (i.e. not reached the start, <- use that definition, its much more clearn)
-//                 top = descendentList.at(top);
-//                 path.emplace_front(top);
-//             }
-//             return path;
-
-//         } else {
-//             openSet.pop();
-//             //iterate through all the neighbors of top, calculate their their tentative score which is the best distance to get to top and then the distance to get to the neighbor.
-//             for(auto iter = graph.at(top).begin(); iter != graph.at(top).end(); iter++){
-//                 node copy = iter->first;
-//                 double tenativeScore = scoreList[top] + graph.at(top).at(copy); // the tenatives score is the distance from the start to node we popped, and its distance from this node to one of its neighbors
-//                 if(scoreList.find(copy) == scoreList.end() || tenativeScore < scoreList.at(copy)){    //if this node has not been explored, or if it had, and the tenative distance is shorted then the previously discovered distance
-//                     descendentList[copy] = top;     //update its decendent
-//                     scoreList[copy] = tenativeScore;    //update its score
-//                     //where a weight set would be applied.
-//                     copy.setWeight(tenativeScore + euclidean_distance(copy, target));   //give this node its estimated score..
-//                     openSet.push(copy);
-//                 } else {
-//                     //ignore
-//                 }
-//             }
-//         }
-//     }
-//     //END OF MAIN LOOP
-
-//     /**
-//      * THIS SECTION IS ONLY REACHED IF THE openSet IS EMPTIED AND THE TARGET NODE WAS NEVER REACHED...
-//     */
-
-//    return {}; //return an empty list.
-
-// }
-
 /**
- * ===========================================
  * A* METHOD THAT GENERATES THE SHORTEST PATH WITH RESPECT TO ONLY ONE OBJECTIVE OF A MULTI OBJECTIVE ADJACENCY MATRIX 
  * @param origin, target are the start and end point for the search algorithm.
  * @param graph is a n objective adjacency matrix.
@@ -588,7 +623,6 @@ typedef std::unordered_map<node,std::unordered_map<node, std::vector<double>, No
  * @param objective is the objective {0, 1, ..., n-1} that A* will find the shortest path with respect to.
  * @return a vector of all of the objective cost 
  * @return {} if no path from the origin and target exist.
- * ===========================================
 */
 std::vector<double> SINGLE_OBJECTIVE_A_STAR(node origin, node target, const MO_adjacency_matrix& graph, HEURISTIC& h, const int objective){
     auto startTime = std::chrono::high_resolution_clock::now();
@@ -615,8 +649,6 @@ std::vector<double> SINGLE_OBJECTIVE_A_STAR(node origin, node target, const MO_a
             int n = graph.begin()->second.begin()->second.size();   // find the number of objectives in the graph.
             std::vector<double> path_costs(n);
             node prev;
-            std::list<node> shortest_path;
-            shortest_path.emplace_front(top);                                           //comment in for path visualization
 
             while(!(top == origin)){   //begin back tracking the descendentList until we reach the origin.
                 prev = descendentList[top];
@@ -624,7 +656,6 @@ std::vector<double> SINGLE_OBJECTIVE_A_STAR(node origin, node target, const MO_a
                     path_costs[i] += graph.at(prev).at(top)[i];
                 }
                 top = prev;
-                shortest_path.emplace_front(top);                                       //comment in for path visualization
             } 
             
             return path_costs;
@@ -651,7 +682,6 @@ std::vector<double> SINGLE_OBJECTIVE_A_STAR(node origin, node target, const MO_a
 }
 
 /**
- * ===========================================
  * VBMO OPPONENT, A NAIVE APPROACH VIA SUMMING THE OBJECIVES INTO A SINGLE OBJECTIVE
  * @param origin, target are the start and end point for the search algorithm.
  * @param graph is a n objective adjacency matrix.
@@ -659,25 +689,28 @@ std::vector<double> SINGLE_OBJECTIVE_A_STAR(node origin, node target, const MO_a
  * @details the first step is to iteratore through the entire adjacency matrix and sum all the objective cost into one objective. Then run A* with the sole objective
  * @return a vector with the shorest path with respect to the combined objective.
  * @return {} if no path from the orgigin and target exist.
- * ===========================================
 */
 std::vector<double> COMBINED_MO_A_STAR(node origin, node target, const MO_adjacency_matrix graph, HEURISTIC& h, int& duration){
     //sum the objective costs into one objective
     auto startTime = std::chrono::high_resolution_clock::now();
 
-    MO_adjacency_matrix single_MO_matrix;
-    for(auto& iter: graph){
-        for(auto& jter: iter.second){
-            single_MO_matrix[iter.first][jter.first].emplace_back(std::accumulate(jter.second.begin(), jter.second.end(),0));
+    MO_adjacency_matrix copy_graph = graph;
+
+    for(auto& iter : copy_graph){
+        for(auto& jter : iter.second){
+            jter.second.emplace_back(std::accumulate(jter.second.begin(), jter.second.end(), 0));
         }
     }
-
-    std::vector<double> result = SINGLE_OBJECTIVE_A_STAR(origin, target, single_MO_matrix, h, 0); 
+    
+    int n = copy_graph.begin()->second.begin()->second.size();   
+    std::vector<double> result = SINGLE_OBJECTIVE_A_STAR(origin, target, copy_graph, h, n-1);
 
     duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - startTime).count();
 
     return result;
 }
+
+
 
 /**
  * ===========================================
@@ -687,7 +720,7 @@ std::vector<double> COMBINED_MO_A_STAR(node origin, node target, const MO_adjace
  * @param h, 
  * @param duration
  * @param visualization 
- * @details "breaking up" the multo objective graph is implemented by conducting the A* search with respect to a single objective, i.e. SINGLE_OBJECTIVE_A_STAR() 
+ * @details "breaking up" the multi objective graph is implemented by conducting the A* search with respect to a single objective, i.e. SINGLE_OBJECTIVE_A_STAR() 
  * @return an n x n vector containing the objective cost of all singly optimized A* paths (path i is optimized for objective i).
  * @return {{}, {}, ..., {}} if no path connecting the origin and target exist.
  * ===========================================
@@ -707,23 +740,23 @@ std::vector<std::vector<double>> VBMO_A_STAR(const node origin, const node targe
 
 /**
  * ===========================================
- * TURNING DOA MAP INTO MATRIX
- * @param DOAmap is the file name of a map from the DOA director (or any map file that follows its ASCI encoding)
+ * TURNING DAO MAP INTO MATRIX
+ * @param DAO map is the file name of a map from the DAO director (or any map file that follows its ASCI encoding)
  * @details Reads the inpute file and constructs a multi-objectie graph with the following objectives:
  *              1. Euclidian distance,
  *              2. Uniform distance (1.5),
- *              3. Ranodmm (range between 0 - 20),
+ *              3. Random (range between 0 - 20),
  *              4. Safety (average of the nodes degree, nodes with fewer edges (i.e. those near walls) are higher), and 
  *              5. Danger (nodes at randomy are selected to have expensive incoming and outcoming edges, non selected nodes have a uniform cost of 1.5).
- * @return a 5 objective adjacecny matrix based off the DOAmap.
+ * @return a 5 objective adjacecny matrix based off the DAOmap.
  * ===========================================
 */
-MO_adjacency_matrix DOA_MAP_TO_MO_ADJ_MATRIX(std::string DOAmap){
+MO_adjacency_matrix DAO_MAP_TO_MO_ADJ_MATRIX(std::string DAOmap){
     auto begin = std::chrono::high_resolution_clock::now();
 
     std::ifstream ifs;
-    DOAmap = "dao-map/" + DOAmap+ ".map";
-    ifs.open(DOAmap, std::ifstream::in);
+    DAOmap = "dao-map/" + DAOmap;
+    ifs.open(DAOmap, std::ifstream::in);
 
     std::string x;
     std::getline(ifs,x);// remove "type ..."
@@ -821,38 +854,497 @@ MO_adjacency_matrix DOA_MAP_TO_MO_ADJ_MATRIX(std::string DOAmap){
     return AdjMatrix;
 }
 
+
 /**
- * 
+ * WEIGHT SET GENERATORS
+ * GTO = Greater then one.
 */
-void VBMO(const node& origin, const node& target, const MO_adjacency_matrix& graph, int& duration) {
-
-}
-
-std::vector<double> generate_weight_set(const std::vector<double>& normalized_path_cost){
+std::vector<double> complement_weight_set(const std::vector<double>& normalized_path_cost){
     // using complement for now, new version of weight sets are planned 
     std::vector<double> weight_set(normalized_path_cost.size());
     for(int i = 0; i < normalized_path_cost.size(); i++){
-        weight_set[i] = 1 - normalized_path_cost[i];
+        weight_set[i] = (1 - normalized_path_cost[i]);
     }
 
     return weight_set;
 }
 
+/**
+ * Select the smalest and largest objective cost and seek to "Compress" them by increasing the weight for path of the objective that has a weaker score to boast it, and a wieght less then one.
+ * By how much? 1.5? 1.3? Complement?
+ * Better way to deal with multiple mins/maxes?
+ */
+std::vector<double> increase_target_weight_set(const std::vector<double>& normalized_path_cost){
+    std::vector<double> weight_set(normalized_path_cost.size(),1);
+    double max = 0;
+    double min = 0;
+    for(int i = 0; i < normalized_path_cost.size(); i++){
+        if(normalized_path_cost[i] < normalized_path_cost[min]) {
+            min = i;
+        } else if(normalized_path_cost[i] > normalized_path_cost[max]){
+            max = i;
+        }
+    }
+
+    weight_set[min] = .75;
+    weight_set[max] = 1.25;
+
+    return weight_set;
+}
+
+//Randomize GTO weighted
 std::vector<double> randomized_weight_set(const std::vector<double>& normalized_path_cost){
-    //in progress
+    auto a = std::chrono::high_resolution_clock::now();
+    int b = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - a).count();
+
+    std::mt19937 RNG(b);
+
+    std::vector<double> weight_set(normalized_path_cost.size());
+    for(int i = 0; i < normalized_path_cost.size(); i++){
+        weight_set[i] = 1 + (float)(rand())/ (float)(RAND_MAX);
+    }
+
+    return weight_set;
 }
 
-std::vector<double> WEIGHTED_VBMO_A_STAR(){
-    //in progress
+/**
+ * ITERATIVE SELF-REINFORCING 
+ */
+
+/**
+ * WEIGHTED A* METHOD
+ * @param origin, target 
+ * @param graph
+ * @param weight_set is a weight set by which nodes weight are motified to induce certain search behavior
+ * @param h 
+ * @param duration
+ * @details "breaking up" the multo objective graph is implemented by conducting the A* search with respect to a single objective, i.e. SINGLE_OBJECTIVE_A_STAR() 
+ * @return an n x n vector containing the objective cost of all singly optimized A* paths (path i is optimized for objective i).
+ * @return {{}, {}, ..., {}} if no path connecting the origin and target exist.
+*/
+std::vector<double> WEIGHTED_SINGLE_OBJECTIVE_A_STAR(node origin, node target, const MO_adjacency_matrix& graph, const std::vector<double> weight_set , const int objective, HEURISTIC& h){
+    auto startTime = std::chrono::high_resolution_clock::now();
+
+    //BOOK KEEPING 
+    node_priority_queue                         openSet;
+    origin.setWeight(h(origin, target));
+    openSet.push(origin);
+
+    std::unordered_map<node, node, NodeHash>    descendentList;     // maintain a list of immedaiate descendent that follow the shortest path.
+    std::unordered_map<node, double, NodeHash>  scoreList;          // maintaned the shortest distance found to a node from the origin of the search.
+    scoreList[origin] = 0;
+    std::unordered_map<node, bool, NodeHash>    visitList;          // keeps track of nodes that we have "explpred" i.e. added its neighbors to the openSet.
+
+    //SEARCHING
+    while(!openSet.empty()){
+        //since this implementation uses lazy deletion, we must discard nodoes that we have already explored.
+        while(visitList.find(openSet.top()) != visitList.end()){
+            openSet.pop();
+        }
+
+        node top = openSet.top();
+        if(top == target){      // target is reached, begin tracing steps back towards the origin.
+            int n = graph.begin()->second.begin()->second.size();   // find the number of objectives in the graph.
+            std::vector<double> path_costs(n);
+            node prev;
+            std::list<node> shortest_path;
+            shortest_path.emplace_front(top);                                           //comment in for path visualization
+
+            while(!(top == origin)){   //begin back tracking the descendentList until we reach the origin.
+                prev = descendentList[top];
+                for(int i = 0; i < n; i++){
+                    path_costs[i] += graph.at(prev).at(top)[i];
+                }
+                top = prev;
+                shortest_path.emplace_front(top);                                       //comment in for path visualization
+            } 
+            
+            return path_costs;
+        } else {
+            openSet.pop();
+            //iterate throgh all of tops neighbors and calculate their tenative score: the distance to get to top and then to its neighbor
+            for(auto& iter: graph.at(top)){
+                node neighbor = iter.first;
+                double tenativeScore = scoreList[top] + iter.second[objective];
+                // if this neighbor has never been seen, or if this path is cheaper then a previously found path
+                if(scoreList.find(neighbor) == scoreList.end() || tenativeScore < scoreList[neighbor]){
+                    descendentList[neighbor] = top;         // update/set the decedant of neighbor
+                    scoreList[neighbor] = tenativeScore;    // update/set the estimate score of neigbor
+                    neighbor.setWeight(tenativeScore + (h(neighbor, target) * weight_set[objective]));    //update/set the nodes weight in the openSet (A weight of >1 would disenstivise exploration, a weight of <1 would speed up searchy)
+                    openSet.push(neighbor);                                     //note we are using lazy deletion so the updated/better score will appear first in the open set)
+                }
+            }
+        }
+    }
+
+    //return empty set if no path exist
+    return {};
 }
 
-int main() {
-    //example
+std::vector<std::vector<double>> WEIGHTED_VBMO_A_STAR(node origin, node target, const MO_adjacency_matrix graph, const std::vector<double>& weight_set, HEURISTIC& h, int& duration){
+    auto startTime = std::chrono::high_resolution_clock::now();
+    int n = graph.begin()->second.begin()->second.size();
+    std::vector<std::vector<double>> path_costs;
+
+    for(int i = 0; i < n; i++){
+        path_costs.push_back(WEIGHTED_SINGLE_OBJECTIVE_A_STAR(origin, target, graph, weight_set, i, h));
+    }
+
+    duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - startTime).count();
+    return path_costs;
+}
+
+//add duration to subtract from algorithms...
+std::list<node> trace_shortest_path(node origin, node target, const std::unordered_map<node, node, NodeHash>& descendentList){
+    std::list<node> shortest_path;
+    shortest_path.push_front(target);
+    node temp = target;
+    while(descendentList.find(temp) != descendentList.end()){   //while there are still decedants i.e. we are not at origin
+        temp = descendentList.at(temp);
+        shortest_path.push_front(temp);
+    }
+    //fix offset since the origin has no starting
+    shortest_path.push_front(origin);
+
+    return shortest_path;
+
+}
+
+std::vector<double> difference(std::vector<double>& before, std::vector<double>& after){
+    std::vector<double> diff(before.size());
+    for(int i = 0; i < before.size(); i++){
+        diff[i] = before[i] - after[i];
+    }
+    return diff;
+}
+
+/**
+ * Format will be the same as the order of the paramaters 
+ */
+void SAVE(node origin, node target, std::vector<double> VMBOresult, int VBMOduration){
+
+    std::ofstream results_file("./VBMO_RESULTS.txt");
+
+    
+    results_file.close();
+}
+
+/**
+ * @brief updates the graph with the weighted cost of the objective of those edgeb
+ * @param graph is the graph taht we wish to add
+ * @param winner is the winning path from VBMO 
+ */
+void COMBINED_WEIGHTED_UPDATE(MO_adjacency_matrix& graph, const std::vector<double> weight_set){
+    for(auto& iter: graph){
+        for(auto& jter: iter.second){
+            double weighted_sum = 0;
+            for(int i = 0; i < jter.second.size(); i++){
+                weighted_sum += weight_set[i]*jter.second[i];
+            }
+            jter.second.push_back(weighted_sum);
+        }
+    }
+}
+
+std::vector<double> IMPLICIT_WEIGHTED_COMBINED(node origin, node target, const MO_adjacency_matrix& graph, const std::vector<double> weight_set, HEURISTIC h, int& duration){
+    auto startTime = std::chrono::high_resolution_clock::now();
+
+    //BOOK KEEPING
+    node_priority_queue                     openSet;
+    origin.setWeight(h(origin, target));
+    openSet.push(origin);
+
+    std::unordered_map<node, node, NodeHash>    descendentList;     // maintain a list of immedaiate descendent that follow the shortest path.
+    std::unordered_map<node, double, NodeHash>  scoreList;          // maintaned the shortest distance found to a node from the origin of the search.
+    scoreList[origin] = 0;
+    std::unordered_map<node, bool, NodeHash>    visitList;          // keeps track of nodes that we have "explpred" i.e. added its neighbors to the openSet.
+
+    while(!openSet.empty()){
+        while(visitList.find(openSet.top()) != visitList.end()){
+            openSet.pop();
+        }
+        node top = openSet.top();
+
+        if(top == target){      // target is reached, begin tracing steps back towards the origin.
+            int n = graph.begin()->second.begin()->second.size();   // find the number of objectives in the graph.
+            std::vector<double> path_costs(n);
+            node prev;
+
+            while(!(top == origin)){   //begin back tracking the descendentList until we reach the origin.
+                prev = descendentList[top];
+                for(int i = 0; i < n; i++){                         //add the the objective costs (using the graphs metrics)
+                    path_costs[i] += graph.at(prev).at(top)[i];
+                }
+                top = prev;
+            } 
+            
+            duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - startTime).count();
+            return path_costs;       
+        } else {
+            openSet.pop();
+            for(auto &iter: graph.at(top)){
+                node neighbor = iter.first;
+                double tenative_score = scoreList[top];
+                for(int i = 0; i < iter.second.size(); i++){
+                    tenative_score += weight_set[i] * iter.second[i];
+                } 
+
+                if(scoreList.find(neighbor) == scoreList.end() || tenative_score < scoreList[neighbor]){ // IF the neighbor has never been discovered, or if a shorter path to the neighbor node has been found
+                    descendentList[neighbor] = top;                                 // update/set the decedant of neighbor
+                    scoreList[neighbor] = tenative_score;                           // update/set the estimate score of neigbor
+                    neighbor.setWeight(tenative_score + h(neighbor, target));       // update/set the nodes weight in the openSet
+                    openSet.push(neighbor);                                         // note we are using lazy deletion so the updated/better score will appear first in the open set)
+                
+                }
+            }
+        }
+    }
+
+    return {};
+}
+
+/**
+ * @param focus is the objective that we focus on but don't
+ */
+std::vector<double> CONSCIOUS_SINGLE_OBJECTIVE_A_STAR(node origin, node target, const MO_adjacency_matrix& graph, const std::vector<double>& weight_set, const int focus, HEURISTIC h, int& duration){
+    auto startTime = std::chrono::high_resolution_clock::now();
+
+    //BOOK KEEPING 
+    node_priority_queue                         openSet;
+    origin.setWeight(h(origin, target));
+    openSet.push(origin);
+
+    std::unordered_map<node, node, NodeHash>    descendentList;     // maintain a list of immedaiate descendent that follow the shortest path.
+    std::unordered_map<node, double, NodeHash>  scoreList;          // maintaned the shortest distance found to a node from the origin of the search.
+    scoreList[origin] = 0;
+    std::unordered_map<node, bool, NodeHash>    visitList;          // keeps track of nodes that we have "explpred" i.e. added its neighbors to the openSet.
+
+    //SEARCHING
+    while(!openSet.empty()){
+        //since this implementation uses lazy deletion, we must discard nodoes that we have already explored.
+        while(visitList.find(openSet.top()) != visitList.end()){
+            openSet.pop();
+        }
+
+        node top = openSet.top();
+        if(top == target){      // target is reached, begin tracing steps back towards the origin.
+            int n = graph.begin()->second.begin()->second.size();   // find the number of objectives in the graph.
+            std::vector<double> path_costs(n);
+            node prev;
+
+            while(!(top == origin)){   //begin back tracking the descendentList until we reach the origin.
+                prev = descendentList[top];
+
+                for(int i = 0; i < n; i++){                         //add the the objective costs (using the graphs metrics)
+                    path_costs[i] += graph.at(prev).at(top)[i];
+                }
+
+                top = prev;
+            } 
+            
+            duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - startTime).count();
+            return path_costs;
+        } else {
+            openSet.pop();
+            //iterate throgh all of tops neighbors and calculate their tenative score: the distance to get to top and then to its neighbor
+            for(auto& iter: graph.at(top)){
+                node neighbor = iter.first; 
+
+                double tenativeScore = scoreList[top] + iter.second[focus];
+
+                std::vector<double> neighborScores = iter.second;
+                for(int i = 0; i < neighborScores.size(); i++){
+                    if(i != focus){
+                        tenativeScore += weight_set[i]*neighborScores[i];       //tenative score is the distance to the 
+                    }
+                }
+
+                // if this neighbor has never been seen, or if this path is cheaper then a previously found path
+                if(scoreList.find(neighbor) == scoreList.end() || tenativeScore < scoreList[neighbor]){
+
+                    descendentList[neighbor] = top;                             // update/set the decedant of neighbor
+                    scoreList[neighbor] = tenativeScore;                        // update/set the estimate score of neigbor
+                    neighbor.setWeight(tenativeScore + h(neighbor, target));    //update/set the nodes weight in the openSet
+                    openSet.push(neighbor);                                     //note we are using lazy deletion so the updated/better score will appear first in the open set)
+
+                }
+            }
+        }
+    }
+
+    //return empty set if no path exist
+    return {};
+}
+
+
+void VBMO_2(const node& origin, const node& target, MO_adjacency_matrix& graph, HEURISTIC h, std::string voteScheme, int& duration){
+    int time0, time1, time2, timeN;
+
+    std::vector<std::vector<double>> path_costs = VBMO_A_STAR(origin, target, graph, h, time0);
+    std::vector<std::vector<double>> norm_path_costs = normalize_matrix(path_costs);
+
+    if(path_costs[0].size() == 0){
+        std::cout << "NO PATH FOUND" << std::endl;
+        return;
+    }
+    
+    display_matrix(path_costs);
+    std::cout << "===============" << std::endl;
+    display_matrix(norm_path_costs);
+
+    
+    std::vector<int> path_ranking = vote(path_costs, voteScheme);
+    display_vector(path_ranking);
+
+    std::cout << "===============" << std::endl;    
+
+    for(int i = 0; i < 2; i++){
+        std::cout << "-------" << i << "--------" << std::endl;    
+        
+        std::vector<double> norm_selected_path = norm_path_costs[path_ranking[i]];
+        display_vector(norm_selected_path);
+        std::vector<double> selected_path = path_costs[path_ranking[i]];    // NOT NEEDED
+        std::vector<double> weight_set = complement_weight_set(norm_selected_path);
+        
+        std::cout << "Weight set             : "; display_vector(weight_set);
+        
+        
+        std::vector<double> conscious_path, combined_weighted;
+
+        int focus = 0;
+        for(int i = 0; i < selected_path.size(); i++){
+            if(selected_path[i] < selected_path[i]){
+                focus = i;
+            }
+        }
+
+        
+        conscious_path = CONSCIOUS_SINGLE_OBJECTIVE_A_STAR(origin, target, graph, weight_set, focus, h, time1);
+        combined_weighted = IMPLICIT_WEIGHTED_COMBINED(origin, target, graph, weight_set, h, time2);
+
+        
+        std::cout << i <<  "th place candidate    : "; display_vector(selected_path);
+        std::cout << "conscious path         : ";      display_vector(conscious_path);
+        std::cout << "combined weighted      : ";      display_vector(combined_weighted);
+
+        std::cout << std::endl;
+        std::cout << "d-score (smaller is better)" << std::endl;
+        std::cout << i <<  "th place candidate    : " <<  path_d_score(selected_path) << std::endl;
+        std::cout << "conscious path         : " <<       path_d_score(conscious_path) << std::endl;
+        std::cout << "combined weighted      : " <<       path_d_score(combined_weighted) << std::endl;
+             
+        std::cout << std::endl;
+        std::cout << "VBMO time              : " << time0 << " ms" << std::endl;
+        std::cout << "conscious time         : " << time1 << " ms" <<  std::endl;
+        std::cout << "combined weighted time : " << time2 << " ms" <<  std::endl;
+        std::cout << "TOTAL                  : " << time0 + time1 + time2 << " ms " << std::endl;
+
+    }
+
+    //RUNING ADVERSITY
+    std::cout << "------naive-----" << std::endl;
+    int timec;
+    std::vector<double> naive_path_cost = COMBINED_MO_A_STAR(origin, target, graph, h, timec);   
+
+    naive_path_cost.pop_back();
+    std::cout << "naive combined         : "; display_vector(naive_path_cost);
+    std::cout << "naive combined time    : " << timec << std::endl;
+    std::cout << "naive d-score          : " << path_d_score(naive_path_cost) << std::endl;
+}
+
+/**
+ *  SINGLE ITERATION 
+ */
+// void VBMO(const node& origin, const node& target, MO_adjacency_matrix& graph, HEURISTIC& h, std::string voteScheme, int& duration) {
+//     int time0 = 0, time1 = 0, time2 = 0;
+//     std::vector<std::vector<double>> results; // will contain the winning VBMO 
+    
+//     std::vector<std::vector<double>> raw_path_costs = VBMO_A_STAR(origin, target, graph, h, time0);
+//     std::vector<std::vector<double>> norm_path_costs = normalize_matrix(raw_path_costs);
+
+//     std::cout << "RAW PATH COSTS:" << std::endl;
+//     display_matrix(raw_path_costs);
+//     std::cout << "NORMALIZED COSTS:" << std::endl;
+//     display_matrix(norm_path_costs);
+//     std::cout << "VBMO time: " << time0 << " ms" << std::endl;
+//     std::cout << "VBMO SPARCITY: " << sparcity_metric(raw_path_costs) << std::endl;
+    
+//     int winner = VOTE(norm_path_costs, voteScheme);
+//     std::vector<double> norm_winning_path = norm_path_costs[winner];
+//     std::vector<double> raw_winning_path = raw_path_costs[winner];
+//     results.push_back(raw_winning_path);
+
+//     // GENERATING WEIGHT SET
+//     std::vector<double> weight_set = complement_weight_set(norm_winning_path);
+//     std::cout << "WEIGHT SET GENERATED" << std::endl;
+//     display_vector(weight_set);  
+
+//     // Which objective to we choose to be conscious of in the first place? 
+//     int focus = 0;
+//     for(int i = 0; i < norm_winning_path.size(); i++) {
+//         if(norm_winning_path[i] < norm_winning_path[focus]){
+//             focus = i;
+//         }
+//     }
+
+//     //CONSCIOUS RUN
+//     std::vector<double> conscious_path_cost = CONSCIOUS_SINGLE_OBJECTIVE_A_STAR(origin, target, graph, weight_set, 1, h, time1);
+//     std::cout << "=========================" << std::endl;   
+//     std::cout << "CONSCIOUS PATH:" << std::endl;
+//     std::cout << "time: " << time1 << " ms" << std::endl;
+
+//     //add the conscious path to the pool of possible answers
+  
+//     results.push_back(conscious_path_cost);
+//     display_vector(conscious_path_cost); 
+
+//     //COMBINED WEIGHTED OBJECTIVE RUN
+//     auto combinedStart = std::chrono::high_resolution_clock::now(); //timing should also include the time it takes to update the graph.
+//     COMBINED_WEIGHTED_UPDATE(graph, weight_set);
+//     std::cout << "=========================" << std::endl;
+//     std::cout << "COMBINED WEGHTED PATH:" << std::endl;
+//     //run A* but on the last objective
+//     std::vector<double> combined_path_cost = SINGLE_OBJECTIVE_A_STAR(origin, target, graph, h, graph.begin()->second.begin()->second.size()-1);
+//     display_vector(combined_path_cost);   
+//     combined_path_cost.pop_back();  //remove the combined weighted objective
+//     time2 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - combinedStart).count();
+//     std::cout << "time: " << time2 << std::endl;
+
+//     //add combined weighted path to pool of possible answers
+//     results.push_back(combined_path_cost);     
+//     display_vector(combined_path_cost);
+
+//     std::vector<std::vector<double>> norm_results = normalize_matrix(results);
+
+//     std::cout << "=========================" << std::endl;
+//     std::cout << "original:  "; display_vector(results[0]);
+//     std::cout << "conscious: "; display_vector(results[1]);
+//     std::cout << "combined:  "; display_vector(results[2]);
+    
+//     std::cout << "=========================" << std::endl;
+//     std::cout << "normalized original  : "; display_vector(norm_results[0]);
+//     std::cout << "normalized conscious : "; display_vector(norm_results[1]);
+//     std::cout << "normalized combined  : "; display_vector(norm_results[2]);
+    
+//     std::vector<double> results_d_score = d_score(results);
+//     std::cout << "=========================" << std::endl; 
+//     std::cout << "original d-score:   " << results_d_score[0] << std::endl;
+//     std::cout << "conscious d-score:  " << results_d_score[1] << std::endl;
+//     std::cout << "combined d-score:   " << results_d_score[2] << std::endl;
+
+//     std::cout << "Total Time: " << time1 + time2 << std::endl;
+//     std::cout << "New Sparcity metric: " << sparcity_metric(results) << std::endl;
+// }
+
+
+
+void VBMO_RANDOM_POINT_RUNNER(std::string file_name){
+
     auto begin = std::chrono::high_resolution_clock::now();
-
-    MO_adjacency_matrix graph = DOA_MAP_TO_MO_ADJ_MATRIX("brc202d");
-
-    std::mt19937 rand(std::chrono::high_resolution_clock::duration(std::chrono::high_resolution_clock::now() - begin).count()); 
+    
+    MO_adjacency_matrix graph = DAO_MAP_TO_MO_ADJ_MATRIX(file_name);
+    
+    std::mt19937 (std::chrono::high_resolution_clock::duration(std::chrono::high_resolution_clock::now() - begin).count()); 
 
     int m = graph.size();
     int a(rand() % m), b(rand() % m);
@@ -860,29 +1352,74 @@ int main() {
     node origin = std::next(graph.begin(), a)->first;
     node target = std::next(graph.begin(), b)->first;
 
+    
+    // node origin = graph.begin()->first;
+    // node target = graph.begin()++->first;
+    
+    origin.display(); std::cout << " to "; target.display(); std::cout << std::endl;
+
     HEURISTIC h;
-
     int duration;
-    std::vector<std::vector<double>> test = VBMO_A_STAR(origin, target, graph, h, duration);
 
-    normalize_vector(test);
-    display_matrix(test);
+    VBMO_2(origin, target, graph, h, "borda", duration);
 
-    std::vector<double> winner = VOTE(test, "range");
-    std::cout << "time: " << duration << "ms" << std::endl;
+        
+}
 
-    std::vector<double> weight_set = generate_weight_set(winner);
 
-    std::cout << "WEIGHT SET GENERATED:" << std::endl;
-    display_vector(weight_set);
+// IN PROGRESS
+void VMBO_RANDOM_POINT_RUNNER_MULTI(std::string file_name, int trials){
+    auto begin = std::chrono::high_resolution_clock::now();
+    
+    std::vector<std::string> RESULTS;
+    MO_adjacency_matrix graph = DAO_MAP_TO_MO_ADJ_MATRIX(file_name);
 
-    std::cout << "===============" << std::endl;
+    for(int i = 0; i < trials; i++){
+        std::mt19937 (std::chrono::high_resolution_clock::duration(std::chrono::high_resolution_clock::now() - begin).count()); 
+                
+        int m = graph.size();
+        int a(rand() % m), b(rand() % m);
 
-    std::vector<double> combined_results = COMBINED_MO_A_STAR(origin, target, graph, h, duration);
+        node origin = std::next(graph.begin(), a)->first;
+        node target = std::next(graph.begin(), b)->first;
 
-    display_vector(combined_results);
+        // node origin = graph.begin()->first;
+        // node target = graph.begin()->first;
 
-    std::cout << "time: " << duration << "ms" << std::endl;
+        std::cout << "trial " << i << std::endl;
+        origin.display(); std::cout << " to "; target.display(); std::cout << std::endl;
+    
+        HEURISTIC h;
+        int duration;
+        
+        VBMO_2(origin, target, graph, h, "borda", duration);
+    }
 
+
+
+}
+
+void VBMORUNNER(){
+    //iterators through all the files 
+    std::string dir = "dao-map";
+    std::ifstream ifs;
+    std::string x;
+
+    //while not at the end of the directory
+    for(auto& file_iter: std::filesystem::directory_iterator(dir)){
+        std::string file_name = file_iter.path().filename().string();
+        std::cout << "============================================================" << std::endl;
+        std::cout << file_name << std::endl;
+        VBMO_RANDOM_POINT_RUNNER(file_name);
+    }
+}
+
+void DOTRUNNER(){
+    
+}
+
+
+int main() {
+    VBMORUNNER();
     return 0;
 }
