@@ -54,9 +54,9 @@ std::vector<std::vector<double>> normalize_matrix(std::vector<std::vector<double
 }
 
 /**
- * @brief a metric used for evaluting a pareto set approximation
- *
+ * @brief metric for evaluating a pareto-front approxination
  */
+// Does it need to be normalized?
 double sparcity_metric(const std::vector<std::vector<double>>&  normalized_path_costs){ 
         int m = normalized_path_costs[0].size(); // the number of objectives
         int n = normalized_path_costs.size(); //the size of the pareto oproximation (number of paths we have)
@@ -101,18 +101,50 @@ void display_vector(std::vector<int> normalized_path_cost) {
     }
 }
 
+// same as above but does not create a new line
+void alt_display_vector(std::vector<int> vec){
+     if(vec.size() == 0) {
+        std::cout << "{}" << std::endl;
+    } else {
+        std::cout << "{" << vec[0];
+        for(int i = 1; i < vec.size(); i++){
+            std::cout << ", " << vec[i];
+        }
+    }
+    std::cout << "}"; // not end;
+}
+
+void alt_display_vector(std::vector<double> vec){
+     if(vec.size() == 0) {
+        std::cout << "{}" << std::endl;
+    } else {
+        std::cout << "{" << vec[0];
+        for(int i = 1; i < vec.size(); i++){
+            std::cout << ", " << vec[i];
+        }
+    }
+    std::cout << "}"; // not end;
+}
+
+
 /**
- * @details is a n x n matrix of the (what should be normalized) path objective costs
+ * @details Used for printng the paths
 */
-void display_matrix(std::vector<std::vector<double>> normalized_path_costs) {
-    if(normalized_path_costs.size() == 0){
+void display_matrix(std::vector<std::vector<double>> matrix) {
+    if(matrix.size() == 0){
         std::cout << "{}" << std::endl;
         return;
     }
-    for(int i = 0; i < normalized_path_costs.size(); i++) {
-        std::cout << "P_" << i << ": "; display_vector(normalized_path_costs[i]);
+    for(int i = 0; i < matrix.size(); i++) {
+            if(i >= 10) {
+                std::cout << "P_" << i << ": ";   
+            } else {
+                std::cout << "P_" << i << " : ";
+            }
+         display_vector(matrix[i]);
     }
 }
+
 
 /**
  * @details a method for summing a vector of doubles
@@ -326,6 +358,23 @@ std::vector<double> d_score(std::vector<std::vector<double>> normalized_path_cos
     return d_score;
 }
 
+// display vector and their D-score
+void alt_display_matrix(std::vector<std::vector<double>> matrix){
+    if(matrix.size() == 0){
+        std::cout << "{{}}" << std::endl;
+        return;
+    } else {
+        for(int i = 0; i < matrix.size(); i++){
+            if(i >= 10) {
+                std::cout << "P_" << i << ": ";   
+            } else {
+                std::cout << "P_" << i << " : ";
+            }
+            alt_display_vector(matrix[i]); std::cout << " " << path_d_score(matrix[i]) << std::endl;
+        }
+    }
+    
+}
 
 /**
  * @param voting_method determins which voting methods, options are:
@@ -337,48 +386,48 @@ std::vector<double> d_score(std::vector<std::vector<double>> normalized_path_cos
  * @details If a tie was archieved in the voting stage, compares the paths "d_scores" (see d_score for details)
  * @return the index of the path that wins
 */
-int VOTE(std::vector<std::vector<double>>& normalized_path_score, const std::string voting_method) {
-    std::vector<double> results;
-    int winner; 
+// int VOTE(std::vector<std::vector<double>>& normalized_path_score, const std::string voting_method) {
+//     std::vector<double> results;
+//     int winner; 
 
-    if(voting_method == "range") {
-        results = range_voting(normalized_path_score);
-        winner = findMin(results);
-        //lowest wins
-    } else if(voting_method == "combined_approval")  {
-        results = combined_aproval_voting(normalized_path_score);
-        winner = findMax(results);
-        //highest win
-    } else if(voting_method == "borda") {
-        results = borda_voting(normalized_path_score);
-        winner = findMin(results);
-        //lowest win
-    } else if(voting_method == "condorcet") {
-        results = condorcet_voting(normalized_path_score);
-        winner = findMax(results);        //highest win
-    } else {
-        std::cout << "Invalid voting method" << std::endl;
-        return {};
-    }
+//     if(voting_method == "range") {
+//         results = range_voting(normalized_path_score);
+//         winner = findMin(results);
+//         //lowest wins
+//     } else if(voting_method == "combined_approval")  {
+//         results = combined_aproval_voting(normalized_path_score);
+//         winner = findMax(results);
+//         //highest win
+//     } else if(voting_method == "borda") {
+//         results = borda_voting(normalized_path_score);
+//         winner = findMin(results);
+//         //lowest win
+//     } else if(voting_method == "condorcet") {
+//         results = condorcet_voting(normalized_path_score);
+//         winner = findMax(results);        //highest win
+//     } else {
+//         std::cout << "Invalid voting method" << std::endl;
+//         return {};
+//     }
 
-    // display_vector(results);
-    if(winner == -1) {
-        std::cout << "Tie detected" << std::endl;
-        std::vector<double> d_scores = d_score(normalized_path_score);;
+//     // display_vector(results);
+//     if(winner == -1) {
+//         std::cout << "Tie detected" << std::endl;
+//         std::vector<double> d_scores = d_score(normalized_path_score);;
 
-        // display_vector(d_scores);
-        winner = findMin(d_scores);
-        if(winner == -1){
-            std::cout << "TIE in d_score!" << std::endl;
-            return 0;
-        }
-    }
-    std::cout << "====================" << std::endl;
-    std::cout << "Winner is P_" << winner << ": "; display_vector(normalized_path_score[winner]);
-    std::cout << "====================" << std::endl;
+//         // display_vector(d_scores);
+//         winner = findMin(d_scores);
+//         if(winner == -1){
+//             std::cout << "TIE in d_score!" << std::endl;
+//             return 0;
+//         }
+//     }
+//     std::cout << "====================" << std::endl;
+//     std::cout << "Winner is P_" << winner << ": "; display_vector(normalized_path_score[winner]);
+//     std::cout << "====================" << std::endl;
 
-    return winner;
-}
+//     return winner;
+// }
 
 // return a vector of ints where the value of v[i] is the ranked value of path_scores[i] decreasing
 // std::vector<int> rank_decreasing_order(std::vector<double> path_scores){
@@ -394,6 +443,8 @@ int VOTE(std::vector<std::vector<double>>& normalized_path_score, const std::str
 
 //     return order;
 // }
+
+
 std::vector<int> rank_decreasing_order(std::vector<double> path_scores){
     std::priority_queue<std::pair<double,int>, std::vector<std::pair<double,int>>, std::less<std::pair<double,int>>> temp;
     for(int i = 0; i < path_scores.size(); i++){
@@ -424,8 +475,25 @@ std::vector<int> rank_decreasing_order(std::vector<double> path_scores){
     
 // }
 
+
+/**
+ * @detail: 
+ *
+ */
+struct path_greater{
+    bool operator()(const std::pair<double, int> a, std::pair<double, int> b, std::vector<std::vector<double>> path_costs) const {
+        if(a.first == b.first){
+            return path_d_score(path_costs[a.second]) < path_d_score(path_costs[b.second]);
+        } else{
+            return a < b;
+        }
+    }
+};
+
+//
 std::vector<int> rank_increasing_order(std::vector<double> path_scores){
-    std::priority_queue<std::pair<double,int>, std::vector<std::pair<double,int>>, std::greater<std::pair<double,int>>> temp;
+    path_greater COMP;
+    std::priority_queue<std::pair<std::pair<double,int>, int>, std::vector<std::pair<double,int>>, std::less<std::pair<double,int>>> temp;
     for(int i = 0; i < path_scores.size(); i++){
         temp.push({path_scores[i], i});
     }
@@ -772,10 +840,13 @@ MO_adjacency_matrix DAO_MAP_TO_MO_ADJ_MATRIX(std::string DAOmap){
     /**
      * TURNING THE MAP INTO GRID
     */
+
+    // proble in loop or 
     std::vector<std::vector<char>> map (height, std::vector<char> (width));
     for(int i = 0; i < height; i++){
         std::getline(ifs,x);
-        for(int j = 0; j < x.size(); j++){
+        for(int j = 0;j < width; j++){
+            // std::cout << i << " " << j << std::endl;
             map[i][j] = x[j];
         }
     }
@@ -1338,37 +1409,69 @@ void VBMO_2(const node& origin, const node& target, MO_adjacency_matrix& graph, 
 
 
 
-void VBMO_RANDOM_POINT_RUNNER(std::string file_name){
+bool VBMO_MAX(const node& origin, const node& target, MO_adjacency_matrix& graph, HEURISTIC h, std::string voteScheme, int& duration){
+    int time0, time1, time2, timeN;
 
-    auto begin = std::chrono::high_resolution_clock::now();
-    
-    MO_adjacency_matrix graph = DAO_MAP_TO_MO_ADJ_MATRIX(file_name);
-    
-    std::mt19937 (std::chrono::high_resolution_clock::duration(std::chrono::high_resolution_clock::now() - begin).count()); 
+    std::vector<std::vector<double>> path_costs = VBMO_A_STAR(origin, target, graph, h, time0);
+    std::vector<std::vector<double>> norm_path_costs = normalize_matrix(path_costs);
+    if(path_costs[0].size() == 0){
+        // std::cout << "NO PATH FOUND" << std::endl;
+        return false;
+    }
+    // display_matrix(path_costs);
+    // std::cout << "===============" << std::endl;
+    // display_matrix(norm_path_costs);
+    // will hold all generated paths in the following order:
+    // 1, originakl
+    // 2. conscious 
+    // 3. weighted combined
+    std::vector<std::vector<double>> FRONT;
+    for(int i = 0; i < path_costs.size(); i++){
+        // std::cout << "P_" << i << " : "; display_vector(path_costs[i]);
+        // std::cout << "norm: "; display_vector(norm_path_costs[i]);
+        std::vector<double> weight_set = complement_weight_set(norm_path_costs[i]);
+        // std::cout << "w   : "; display_vector(weight_set);
+        int focus = 0; 
+        for(int j = 0; j < path_costs[0].size(); j++){
+            if(path_costs[i][j] < path_costs[i][focus]){
+                focus = j;
+            }
+        }
+        std::vector<double> conscious_path_cost = CONSCIOUS_SINGLE_OBJECTIVE_A_STAR(origin, target, graph, weight_set, focus, h, time0);
+         
+        std::vector<double> weighted_combined_cost = IMPLICIT_WEIGHTED_COMBINED(origin, target, graph, weight_set, h, time1);
 
-    int m = graph.size();
-    int a(rand() % m), b(rand() % m);
+        // std::cout << "c   : "; display_vector(conscious_path_cost);
+        // std::cout << "wc  : "; display_vector(weighted_combined_cost);
 
-    node origin = std::next(graph.begin(), a)->first;
-    node target = std::next(graph.begin(), b)->first;
+        // std::cout << "=============" << std::endl;
 
-    
-    // node origin = graph.begin()->first;
-    // node target = graph.begin()++->first;
-    
-    origin.display(); std::cout << " to "; target.display(); std::cout << std::endl;
+        FRONT.push_back(path_costs[i]);
+        FRONT.push_back(conscious_path_cost);
+        FRONT.push_back(weighted_combined_cost);
+        // timeN += time0 + time1 + time2;
+    }
 
-    HEURISTIC h;
-    int duration;
+    alt_display_matrix(FRONT);
+    // std::cout << timeN << " ms or " << timeN / 1000 << " seconds" <<  std::endl;
 
-    VBMO_2(origin, target, graph, h, "borda", duration);
+    std::vector<std::vector<double>> NORM_FRONT = normalize_matrix(FRONT);
 
-        
+    std::cout << "---------------" << std::endl;
+    display_matrix(NORM_FRONT);
+
+    std::cout << "---------------" << std::endl;
+    std::vector<int> voting_results = vote(NORM_FRONT, voteScheme);
+    for(int i = 0; i < 3; i++){
+        std::cout << i + 1 << "th place : "; alt_display_vector(FRONT[voting_results[i]]); std::cout << ", d-score: " << path_d_score(FRONT[voting_results[i]]) << std::endl;
+    }
+
+    return true;
 }
 
 
-// IN PROGRESS
-void VMBO_RANDOM_POINT_RUNNER_MULTI(std::string file_name, int trials){
+
+void VBMO_RANDOM_POINT_RUNNER_MULTI(std::string file_name, int trials){
     auto begin = std::chrono::high_resolution_clock::now();
     
     std::vector<std::string> RESULTS;
@@ -1383,20 +1486,23 @@ void VMBO_RANDOM_POINT_RUNNER_MULTI(std::string file_name, int trials){
         node origin = std::next(graph.begin(), a)->first;
         node target = std::next(graph.begin(), b)->first;
 
-        // node origin = graph.begin()->first;
-        // node target = graph.begin()->first;
-
-        std::cout << "trial " << i << std::endl;
-        origin.display(); std::cout << " to "; target.display(); std::cout << std::endl;
-    
         HEURISTIC h;
         int duration;
         
-        VBMO_2(origin, target, graph, h, "borda", duration);
+        // VBMO_1(origin, target, graph, h, "borda", duration);
+        std::cout << "trial " << i << std::endl;
+        origin.display(); std::cout << " to "; target.display(); std::cout << std::endl;
+        
+        if(!VBMO_MAX(origin, target, graph, h, "borda", duration)){
+            i--; // redoo
+            continue;
+        }
+
+        // node origin = graph.begin()->first;
+        // node target = graph.begin()->first;
+
+    
     }
-
-
-
 }
 
 void VBMORUNNER(){
@@ -1410,12 +1516,9 @@ void VBMORUNNER(){
         std::string file_name = file_iter.path().filename().string();
         std::cout << "============================================================" << std::endl;
         std::cout << file_name << std::endl;
-        VBMO_RANDOM_POINT_RUNNER(file_name);
+        // VBMO_RANDOM_POINT_RUNNER(file_name);
+        VBMO_RANDOM_POINT_RUNNER_MULTI(file_name, 1);
     }
-}
-
-void DOTRUNNER(){
-    
 }
 
 
