@@ -20,7 +20,7 @@ NodePtr AStar::operator()(size_t source, size_t target, Heuristic &heuristic, No
     std::vector<NodePtr> open;
     std::make_heap(open.begin(), open.end(), more_than);
 
-    auto node = std::make_shared<Node>(source, std::vector<size_t>({0,0}), heuristic(source));
+    auto node = std::make_shared<Node>(source, std::vector<double>({0,0}), heuristic(source));
     open.push_back(node);
     std::push_heap(open.begin(), open.end(), more_than);
 
@@ -44,8 +44,8 @@ NodePtr AStar::operator()(size_t source, size_t target, Heuristic &heuristic, No
         const std::vector<Edge> &outgoing_edges = adj_matrix[node->id];
         for(auto p_edge = outgoing_edges.begin(); p_edge != outgoing_edges.end(); p_edge++) {
             size_t next_id = p_edge->target;
-            std::vector<size_t> next_g = {node->g[0]+p_edge->cost[0], node->g[1]+p_edge->cost[1]};
-            std::vector<size_t> next_h = heuristic(next_id);
+            std::vector<double> next_g = {node->g[0]+p_edge->cost[0], node->g[1]+p_edge->cost[1]};
+            std::vector<double> next_h = heuristic(next_id);
 
             if (closed.find(next_id) != closed.end()){
                 continue;

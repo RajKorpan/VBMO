@@ -57,8 +57,8 @@ ApexPathPair::ApexPathPair(const ApexPathPairPtr parent, const Edge&  edge): h(p
   size_t next_id = edge.target;
   id =next_id;
 
-  std::vector<size_t> new_apex_g(parent->apex->g);
-  std::vector<size_t> new_g(parent->path_node->g);
+  std::vector<double> new_apex_g(parent->apex->g);
+  std::vector<double> new_g(parent->path_node->g);
 
   for (int i = 0; i < new_apex_g.size(); i ++){
     new_apex_g[i] += edge.cost[i];

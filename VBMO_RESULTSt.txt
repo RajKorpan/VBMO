@@ -1,4 +1,0 @@
-RESULTS FROM <int> trials of VBMO on <ENVIORNMENT_NAME> with <NUMBER OF OBJECTIVES>. 
-format is: 
-<starting position>, <end position>, <VBMO shortest path>, <VBMOs duration in ms>, <weight method>, <weight set generated>, <weighted path>, <weighted duration>
-(1, -13), (12, -13), {1.3, 13.514, 1.5}, 113

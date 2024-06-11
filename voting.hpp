@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cmath>
 #include <queue>
+#include <string>
 
 /**
  * ===========================================
@@ -65,7 +66,6 @@ std::vector<double> d_score(std::vector<std::vector<double>> normalized_path_cos
  * @return the index of the path that wins
 */
 
-enum voting_method {range, combined_approval, borda, condornet};
 
-std::vector<int> vote(std::vector<std::vector<double>>& normalized_path_score, voting_method scheme);
+std::vector<int> vote(std::vector<std::vector<double>>& normalized_path_score, const std::string scheme);
 #endif

@@ -57,7 +57,7 @@ std::vector<std::vector<double>> normalize_matrix(std::vector<std::vector<double
  * @brief metric for evaluating a pareto-front approxination
  */
 // Does it need to be normalized?
-double sparcity_metric(const std::vector<std::vector<double>>&  normalized_path_costs){ 
+double sparsity_metric(const std::vector<std::vector<double>>&  normalized_path_costs){ 
         int m = normalized_path_costs[0].size(); // the number of objectives
         int n = normalized_path_costs.size(); //the size of the pareto oproximation (number of paths we have)
         double sum = 0;
@@ -941,7 +941,7 @@ std::vector<double> complement_weight_set(const std::vector<double>& normalized_
 }
 
 /**
- * Select the smalest and largest objective cost and seek to "Compress" them by increasing the weight for path of the objective that has a weaker score to boast it, and a wieght less then one.
+ * Select the smallest and largest objective cost and seek to "Compress" them by increasing the weight for path of the objective that has a weaker score to boast it, and a wieght less then one.
  * By how much? 1.5? 1.3? Complement?
  * Better way to deal with multiple mins/maxes?
  */

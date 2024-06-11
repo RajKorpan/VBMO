@@ -1,5 +1,6 @@
 #include "voting.hpp"
 #include <algorithm>
+#include <cstdlib>
 #include <vector>           // vectors
 #include <iostream>         // input and output functionality
 #include <cmath>            // sqrt(), abs(), and other basic math functions
@@ -353,7 +354,7 @@ std::vector<double> d_score(std::vector<std::vector<double>> normalized_path_cos
 */
 
 // updated to account for d-score tie breaking 
-std::vector<int> vote(std::vector<std::vector<double>>& path_scores, voting_method scheme){
+std::vector<int> vote(std::vector<std::vector<double>>& path_scores, const std::string scheme){
     std::vector<double> voting_results;    // ith paths score w.r.s.t the voting method
     std::vector<int> rank;                 // index corresponds to values ranking, v[i] = j means path j is in ith place
 
@@ -361,28 +362,27 @@ std::vector<int> vote(std::vector<std::vector<double>>& path_scores, voting_meth
     std::vector<double> d_scores = d_score(path_scores); // using d-score of the raw cost as it yiled more precision
     std::vector<int> order;
 
-    switch(scheme){
-        case range:
-            voting_results = range_voting(norm_path_scores);
-            order = rank_increasing(voting_results, d_scores);
-            break;
-            
-        case borda:
-            voting_results = borda_voting(norm_path_scores);
-            order = rank_increasing(voting_results, d_scores);
-            break;
 
-        case combined_approval:
-            voting_results = combined_aproval_voting(norm_path_scores);
-            order = rank_decreasing(voting_results, d_scores);
-            break;
+    if(scheme == "range"){
+        voting_results = range_voting(norm_path_scores);
+        order = rank_increasing(voting_results, d_scores);        
 
-        case condornet:
-           voting_results = condorcet_voting(norm_path_scores);
-            order = rank_decreasing(voting_results, d_scores);
-            break;
+    } else if(scheme == "combined_approval"){
+        voting_results = combined_aproval_voting(norm_path_scores);
+        order = rank_decreasing(voting_results, d_scores);
+        
+    } else if(scheme == "borda"){
+        voting_results = borda_voting(norm_path_scores);
+        order = rank_increasing(voting_results, d_scores);
+        
+    } else if(scheme == "condorent"){
+       voting_results = condorcet_voting(norm_path_scores);
+       order = rank_decreasing(voting_results, d_scores);
+        
+    } else {
+        exit(1);
     }
-
+    
     return order;
 }
 

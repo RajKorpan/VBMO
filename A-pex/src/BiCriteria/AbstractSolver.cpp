@@ -1,10 +1,12 @@
+#include <iostream>
+#include <ostream>
 #include "AbstractSolver.h"
 
-std::ostream& operator <<(std::ostream &stream, const std::vector<double> &vec){
+std::ostream& operator <<(std::iostream &stream, const std::vector<double> &eps){
     stream << "[";
-    for (size_t i = 0 ;  i < vec.size(); i ++){
-        stream << vec[i];
-        if (i + 1 <vec.size()){
+    for (size_t i = 0 ;  i < eps.size(); i ++){
+        stream << eps[i];
+        if (i + 1 <eps.size()){
             stream << ", ";
         }
     }
@@ -12,7 +14,33 @@ std::ostream& operator <<(std::ostream &stream, const std::vector<double> &vec){
     return stream;
 }
 
+// std::ostream& display(std::ostream &stream, const std::vector<double> &vec){
+//     stream << "[";
+//     for(size_t = i = 0; i < vec.size(); i++){
+//         stream << vec[i];
+//         if(i + 1 < vec.size()){
+//             stream << ", ";
+//         }
+//     }
+//     stream << "]";
+//     return stream;
+// }
 
+
+
+// void AbstractSolver::start_logging(size_t source, size_t target) {
+//     // All logging is done in JSON format
+//     std::stringstream start_info_json;
+//     start_info_json
+//         << "{\n"
+//         <<      "\t\"name\": \"" << get_solver_name() << "\",\n"
+//         <<      "\t\"eps\": " << (this->eps << start_info_json << "\n"
+//         << "}";
+
+//     if (this->logger != nullptr) {
+//         LOG_START_SEARCH(*this->logger, source, target, start_info_json.str());
+//     }
+// }
 
 void AbstractSolver::start_logging(size_t source, size_t target) {
     // All logging is done in JSON format
@@ -20,13 +48,22 @@ void AbstractSolver::start_logging(size_t source, size_t target) {
     start_info_json
         << "{\n"
         <<      "\t\"name\": \"" << get_solver_name() << "\",\n"
-        <<      "\t\"eps\": " << this->eps << "\n"
+        <<      "\t\"eps\": ";
+
+        for (size_t i = 0 ;  i < this->eps.size(); i++){
+        start_info_json << this->eps[i];
+            if (i + 1 < this->eps.size()){
+                start_info_json << ", ";
+            }
+        }
+        start_info_json << "]" << "\n"
         << "}";
 
     if (this->logger != nullptr) {
         LOG_START_SEARCH(*this->logger, source, target, start_info_json.str());
     }
 }
+
 
 
 void AbstractSolver::end_logging(SolutionSet &solutions, bool succ) {

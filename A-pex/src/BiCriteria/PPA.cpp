@@ -74,7 +74,7 @@ void PPA::operator()(size_t source, size_t target, Heuristic &heuristic, Solutio
     // Init open heap
     PPQueue open(this->adj_matrix.size()+1);
 
-    NodePtr source_node = std::make_shared<Node>(source, std::vector<size_t>({0,0}), heuristic(source));
+    NodePtr source_node = std::make_shared<Node>(source, std::vector<double>({0,0}), heuristic(source));
     pp = std::make_shared<PathPair>(source_node, source_node);
     open.insert(pp);
 
@@ -121,9 +121,9 @@ void PPA::operator()(size_t source, size_t target, Heuristic &heuristic, Solutio
         for(auto p_edge = outgoing_edges.begin(); p_edge != outgoing_edges.end(); p_edge++) {
             // Prepare extension of path pair
             size_t next_id = p_edge->target;
-            std::vector<size_t> top_left_next_g = {pp->top_left->g[0]+p_edge->cost[0],
+            std::vector<double> top_left_next_g = {pp->top_left->g[0]+p_edge->cost[0],
                                             pp->top_left->g[1]+p_edge->cost[1]};
-            std::vector<size_t> bottom_right_next_g = {pp->bottom_right->g[0]+p_edge->cost[0],
+            std::vector<double> bottom_right_next_g = {pp->bottom_right->g[0]+p_edge->cost[0],
                                                 pp->bottom_right->g[1]+p_edge->cost[1]};
             auto next_h = heuristic(next_id);
 

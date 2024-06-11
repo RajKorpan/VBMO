@@ -6,6 +6,7 @@
 #include <array>
 #include <list>
 #include <iostream>
+#include <ostream>
 #include <limits>
 #include <functional>
 #include <memory>
@@ -19,7 +20,7 @@
 #endif
 
 
-const size_t MAX_COST = std::numeric_limits<size_t>::max();
+const double MAX_COST = std::numeric_limits<double>::max();
 
 
 template<typename T>
@@ -32,15 +33,15 @@ std::ostream& operator<<(std::ostream &stream, const Pair<T> pair) {
 }
 
 
-using Heuristic = std::function<std::vector<size_t>(size_t)>;
+using Heuristic = std::function<std::vector<double>(size_t)>; //updated to work with doubles
 
 // Structs and classes
 struct Edge {
     size_t          source;
     size_t          target;
-    std::vector<size_t>    cost;
+    std::vector<double>    cost;
 
-    Edge(size_t source, size_t target, std::vector<size_t> cost) : source(source), target(target), cost(cost) {}
+    Edge(size_t source, size_t target, std::vector<double> cost) : source(source), target(target), cost(cost) {}
     Edge inverse() {
         return Edge(this->target, this->source, this->cost);
     }
@@ -81,12 +82,12 @@ using EPS = std::vector<double>;
 
 struct Node {
     size_t          id;
-    std::vector<size_t>    g;
-    std::vector<size_t>    h;
-    std::vector<size_t>    f;
+    std::vector<double>    g;
+    std::vector<double>    h;
+    std::vector<double>    f;
     NodePtr         parent;
 
-    Node(size_t id, std::vector<size_t> g, std::vector<size_t> h, NodePtr parent=nullptr)
+    Node(size_t id, std::vector<double> g, std::vector<double> h, NodePtr parent=nullptr)
         : id(id), g(g), h(h), f(g.size()), parent(parent) {
         for (int i = 0; i < g.size(); i++){
             f[i] = g[i] + h[i];
@@ -212,6 +213,8 @@ std::ostream& operator<<(std::ostream& os, const Interval& interval);
 using IntervalList   = std::vector<Interval>;
 
 typedef boost::heap::priority_queue<NodePtr , boost::heap::compare<Node::compare_lex1> > heap_open_t;
+
+double sparsity_metric(const std::vector<std::vector<double>> &front_approximation);
 
 
 #endif //UTILS_DEFINITIONS_H

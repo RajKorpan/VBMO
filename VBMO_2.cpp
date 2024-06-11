@@ -16,574 +16,16 @@
 #include <memory>
 #include <cmath>
 
-
-
 #include "voting.hpp"
 #include "utili.hpp"
-
-/**
- * Edge class
-*/
-struct Edge {
-  size_t                source;
-  size_t                target;
-  std::vector<double>   cost;
-
-  Edge(size_t source_, size_t target_, std::vector<double> cost_): source(source_), target(target_), cost(cost_) {}
-
-  Edge inverse(){
-    return Edge(this->target, this->source, this->cost);
-  }
-};
-
-// overide for edge oprator that prints it in JSON format
-std::ostream& operator<<(std::ostream &stream, const Edge &edge) {
-  stream
-     << "{"
-     <<  "\"edge_source\": " << edge.source << ", "
-     <<  "\"edge_target\": " << edge.target << ", "
-     <<  "\"edge_cost\": ";
-
-  stream << "{" << edge.cost[0];
-  for(int i = 1; i < edge.cost.size(); i++){
-    stream << ", " << edge.cost[i];   
-  }
-  stream << "}";
-
-  return stream;
-}
-
-// struct Edge {
-//   size_t                source;
-//   size_t                target;
-//   std::vector<size_t>   cost;
-
-//   Edge(size_t source_, size_t target_, std::vector<size_t> cost_): source(source_), target(target_), cost(cost_) {}
-
-//   Edge inverse(){
-//     return Edge(this->target, this->source, this->cost);
-//   }
-// };
-
-// // overide for edge oprator that prints it in JSON format
-// std::ostream& operator<<(std::ostream &stream, const Edge &edge) {
-//   stream
-//      << "{"
-//      <<  "\"edge_source\": " << edge.source << ", "
-//      <<  "\"edge_target\": " << edge.target << ", "
-//      <<  "\"edge_cost\": ";
-
-//   stream << "{" << edge.cost[0];
-//   for(int i = 1; i < edge.cost.size(); i++){
-//     stream << ", " << edge.cost[i];   
-//   }
-//   stream << "}";
-
-//   return stream;
-// }
+#include "graph.hpp"
+#include "search.hpp"
+#include "logger.hpp"
 
 
-
-/**
- *  Adjacency Matrix Class
- *  
-*/
-class AdjMatrix {
-  private:
-  std::vector<std::vector<Edge>>   matrix;      // [i] will return a reference to a vector of edges with source i. (thus checking for a particular entry is O(|V|)) not O(1) which is the deifntion of a Adj Matrix)
-  size_t                           graph_size;  // the number of nodes (vertices) in the graph
-  size_t                           obj_count = 0;
-
-  public:
-
-  AdjMatrix() = default;
-
-  AdjMatrix(size_t graph_size_, std::vector<Edge> &edges, bool inverse=false)
-  : matrix((graph_size_ + 1), std::vector<Edge>()), graph_size(graph_size_) { // graph_size + 1 is because vertices id's start at 1.
-    obj_count = edges[0].cost.size();
-
-    for(auto iter = edges.begin(); iter != edges.end(); ++iter){ // turn the edge list into an adacency list
-      if(inverse) {
-        this->add(iter->inverse());
-      } else {
-        this->add(*iter);
-      }
-    }      
-  }
-
-  void add(Edge e){
-    (this->matrix[e.source]).push_back(e);
-  }
-
-  size_t size(void) const {
-    return this->graph_size;
-  }
-  size_t get_obj_count() const{
-     return obj_count;
-  }
-  const std::vector<Edge>& operator[](size_t vertex_id) const{
-    return this->matrix.at(vertex_id);
-  }
-    
-  friend std::ostream& operator<<(std::ostream &stream, const AdjMatrix &adj_matrix) {
-      size_t  i = 0;
-  
-      stream << "{\n";
-      for (auto vertex_iter = adj_matrix.matrix.begin(); vertex_iter != adj_matrix.matrix.end(); ++vertex_iter) {
-          stream << "\t\"" << i++ << "\": [";
-  
-          std::vector<Edge> edges = *vertex_iter;
-          for (auto edge_iter = edges.begin(); edge_iter != edges.end(); ++edge_iter) {
-              stream << "\"" << edge_iter->source << "->" << edge_iter->target << "\", ";
-          }
-  
-          stream << "],\n";
-      }
-      stream << "}";
-      return stream;
-  }
-};
-
-/**
- * Node (vertex) Class
-*/
-struct Node;
-
-using NodePtr = std::shared_ptr<Node>;
-
-// each node as a respective f, g, and h score for each objectice?
-struct Node {
-  size_t                id;
-  std::vector<double>   g;  // the best current score from the source node for each objective cost ()
-
-
-  
-  //h originally had a vector of size_t, but for most applications, specifically graph searching, a spatial heuristic is sufficent
-  double                h; // seperate heuristic for the objectives? only need one?
-  std::vector<double>   f;
-  NodePtr               parent;
-
-  // interpreted as lng, lat. Or as x,y cordinate in the case of 
-  double                 x,y;
-
-
-  Node(): id(-1), g({}), h(0), f({}), parent(nullptr), x(-1.0), y(-1.0) {}
-
-  Node(double x_, double y_, size_t id_)
-  : x(x_), y(y_), id(id_) {}
-
-  // constructor used for adding to the open set in default A* open set
-  Node(double x_, double y_, size_t id_, std::vector<double> g_, double h_, NodePtr parent_ = nullptr)
-  : x(x_), y(y_), id(id_), g(g_), h(h_), f({}), parent(parent_){
-    for(int i = 0; i < g.size(); i++){
-      f.push_back(g[i] + h);
-    }
-  }
-
-  // constructor used for weighted combined A* open set
-  Node(double x_, double y_, size_t id_, std::vector<double> g_, double h_, const std::vector<double> &weight_set,  NodePtr parent_ )
-  : x(x_), y(y_), id(id_), g(g_), h(h_), f({}), parent(parent_){
-    double weighted_sum = 0;
-    for(int i = 0; i < g.size(); i++){        // in the weighted combined, there is only one objective (the weighted sum)
-      weighted_sum += (g[i] * weight_set[i]);
-    }
-    f.push_back(weighted_sum + h);
-  }
-
-  //constructor used for weighted conscious A* open set
-  Node(double x_, double y_, size_t id_, std::vector<double> g_, double h_, const std::vector<double> &weight_set, const int focus, NodePtr parent_ )
-  : x(x_), y(y_), id(id_), g(g_), h(h_), f({}), parent(parent_){
-    double focused_sum= 0;
-    for(int i = 0; i < g.size(); i++){        // in the weighted combined, there is only one objective (the weighted sum)
-      if(i == focus){
-        focused_sum += g[i];
-      } else {
-        focused_sum += g[i] * weight_set[i];
-      }
-    }
-    f.push_back(focused_sum + h);
-  }
-
-  Node(const Node& rhs):
-    x(rhs.x), y(rhs.y), id(rhs.y), h(rhs.h), f(rhs.f), parent(rhs.parent){}
-
-  Node(Node&& rhs):
-    x(rhs.x), y(rhs.y), id(rhs.y), h(rhs.h), f(rhs.f), parent(rhs.parent){}
-  
-  Node& operator=(const Node& rhs) {
-    id = rhs.id;
-    g = rhs.g;
-    h = rhs.h;   
-    f = rhs.f;
-    parent= rhs.parent;
-    x = rhs.x;
-    y = rhs.y;
-
-    return *this;
-  }
-  
-  Node& operator=(Node&& rhs){
-    id = rhs.id;
-    g = rhs.g;
-    h = rhs.h;   
-    f = rhs.f;
-    parent= rhs.parent;
-    x = rhs.x;
-    y = rhs.y;
-
-    return *this;
-  }
-
-  ~Node(){}
-
-  // RECALL:
-  // each node is has three values
-  // g: the current best found to the node from the start node
-  // h: the heuristic for the node
-  // f: the current "guess" distance from the node to the end node, calcuated by g + h
-
-  //comparitor where we want to look at the hueristic with respect to a specific cost 
-  //however, we will always the same heuristic for each objective
-
-  friend std::ostream& operator<<(std::ostream &stream, const Node &node) {
-    stream << std::fixed;
-    stream << "{id: " << node.id << ", x: " << std::setprecision(4) << node.x << ", y: " << std::setprecision(4) << node.y <<  "}";
-
-    return stream;
-  }
-
-  void display(){
-    std::cout << "{" << std::endl;
-    std::cout << "  " << *this << std::endl;
-    std::cout 
-              << "  f-score: " << this->f << '\n'
-              << "  g-score: " << this->g << '\n'
-              << "  h      : " << this->h << '\n'
-              << "}" << std::endl;
-  }
-};
-
-struct pair_hash{
-  template<class t1, class t2>
-  size_t operator()(const std::pair<t1, t2>& p) const {
-    auto h1 = std::hash<t1>{}(p.first);
-    auto h2 = std::hash<t2>{}(p.second);
-    if(h1 != h2){
-      return h1 ^ h2;
-    } else {
-      return h1;
-    }
-  }
-};
-
-
-/**
- * functor for selecting which f-score to use for the open set for decomposing the multiobjective search problem  
-*/
-struct more_than_specific{
-  const size_t cost_idx; 
-
-  more_than_specific(const size_t cost_idx_): cost_idx(cost_idx_) {};
-  
-  bool operator()(const NodePtr &a, const NodePtr &b) const {
-    return (a->f[cost_idx] > b->f[cost_idx]);
-  }
-};
-
-// state can take 2 takes {0,1} for euclidean, or haversine distance.
-struct h_functor {
-  size_t state;
-
-  h_functor(size_t ver): state(ver) {}
-
-  double operator()(const NodePtr &a, const NodePtr &b){
-
-    if(state == 0){           // EUCLIDEAN DISTANCE
-      return sqrt(pow((a.get()->x - b.get()->x), 2) + pow((a.get()->y - b.get()->y), 2) );
-      
-    } else if ( state == 1){  // HAVERSINE DISTANCE (using kilometers)
-
-      double Lata = a.get()->x, //lat
-             Latb = b.get()->x, 
-             Lnga = a.get()->y, //lng
-             Lngb = b.get()->y;
-
-      double delta_lat = (Latb - Lata) * M_PI / 180.0;
-      double delta_lng = (Lngb - Lnga) * M_PI / 180.0;
-
-      double lat_1 = Lata * M_PI / 180.0;
-      double lat_2 = Latb * M_PI / 180.0;
-
-      double a = pow(sin(delta_lat / 2), 2) +
-                 pow(sin(delta_lng / 2), 2) * 
-                 cos(lat_1) * cos(lat_2);
-
-      double rad = 6371;     // aprox radius of the earth in km 
-      double c = 2 * asin(sqrt(a));
-      return rad * c;
-    } else {
-      return -1;
-      }
-  }
-};
-
-// These will be the placeholder for the fuctor object that we for either for node ordersing in the open set, and to calculate the heuristic
 using heuristic = std::function<double (const NodePtr&, const NodePtr&)>;
 using node_order = std::function<bool(const NodePtr&, const NodePtr&)>;
-
-//
-// A* and weighted A* objects
-//
-
-class ASTAR{
-  private:
-  const AdjMatrix            &adj_matrix;
-  const std::vector<NodePtr> &node_list;
-
-  public:
-  ASTAR(const AdjMatrix &adj_matrix_, const std::vector<NodePtr> &node_list_): adj_matrix(adj_matrix_), node_list(node_list_) {}
-
-  // version that the paper uses. Not optimal?
-  NodePtr operator()(const size_t source, const size_t target, heuristic &h, node_order &order){
-
-    std::unordered_set<size_t> closed;    // the CLOSED set, incusuion <-> visted 
-
-    std::vector<NodePtr> open;            // the OPEN set (priority queue)
-    std::make_heap(open.begin(), open.end(), order);
-
-    int b = adj_matrix.get_obj_count();   // the number of objectives present in the graph    
-    
-    NodePtr node = std::make_shared<Node>(node_list[source]->x,
-                                          node_list[source]->y,
-                                          node_list[source]->id,
-                                          std::vector<double>(adj_matrix.get_obj_count(), 0), // the g-score
-                                          h(node_list[source],node_list[target]));
-
-    open.push_back(node); // add source node to open set
-    std::push_heap(open.begin(), open.end(), order);
-
-
-    while(open.empty() == false){       // MAIN LOOP
-
-      // Retrive the node with te lowest f-sccore according to the selected objective (paramater order) (called node hence)
-      std::pop_heap(open.begin(), open.end(), order);
-      node = open.back();
-      open.pop_back();
-      
-      // Check if node has already been visited
-      if(closed.find(node->id) != closed.end()){ // This is not how its typically done!
-        continue;
-      }
-      // Else add it too closed list
-      closed.insert(node->id);
-
-      // Check if the node is our target
-      if( node->id == target){
-        return node;
-      }
-
-      // iterating over nodes neighbors
-      const std::vector<Edge> &outgoing = adj_matrix[node->id];                 // Get all nodes adjacent to node
-      for(auto p_edge = outgoing.begin(); p_edge != outgoing.end(); p_edge++){  // iterating over all neighbors
-        
-        size_t next_id = p_edge->target;
-        std::vector<double> next_g = node->g;
-        for(int i = 0; i < p_edge->cost.size(); i++){
-          next_g[i] += p_edge->cost[i];
-        }
-
-        // std::cout << "edge cost: " << p_edge->cost;
-        double next_h = h(node,node_list[next_id]);
-
-        // ignore neighboring nodes if they were visted
-        if(closed.find(next_id) != closed.end()){
-          continue;
-        }
-
-        auto next = std::make_shared<Node>(node_list[next_id]->x,
-                                           node_list[next_id]->y, 
-                                           next_id, 
-                                           next_g, 
-                                           next_h, 
-                                           node);
-
-
-        open.push_back(next);
-        std::push_heap(open.begin(), open.end(), order);
-      }
-    }       // END MAIN LOOP
-
-    //only reached if there is no path
-    return nullptr;
-  }
-
-};
-
-class WEIGHTED_ASTAR {
-  private:
-  const AdjMatrix             &adj_matrix;
-  const std::vector<NodePtr>  &node_list;
-  const std::vector<double>   &weight_set;
-
-  public:
-
-  WEIGHTED_ASTAR(const AdjMatrix &adj_matrix_, const std::vector<NodePtr> &node_list_, const std::vector<double> &weight_set_)  
-  : adj_matrix(adj_matrix_), node_list(node_list_), weight_set(weight_set_) {}
-
-  // WEIGHTED COMBINED VERSION
-  NodePtr operator()(const size_t source, const size_t target, heuristic &h, node_order &order){
-
-    std::unordered_set<size_t> closed;    // the CLOSED set, incusuion -> visted 
-
-    std::vector<NodePtr> open;            // the OPEN set (priority queue)
-    std::make_heap(open.begin(), open.end(), order);
-
-    int b = adj_matrix.get_obj_count();   // the number of objectives present in the graph    
-    
-    NodePtr node = std::make_shared<Node>(node_list[source]->x,
-                                          node_list[source]->y,
-                                          node_list[source]->id,
-                                          std::vector<double>(adj_matrix.get_obj_count(), 0), // the g-score
-                                          h(node_list[source],node_list[target]));
-
-
-    open.push_back(node); // add source node
-    std::push_heap(open.begin(), open.end(), order);
-
-
-    while(open.empty() == false){       // MAIN LOOP
-
-      // Retrive the node with te lowest f-sccore according to the selected objective (paramater order) (called node hence)
-      std::pop_heap(open.begin(), open.end(), order);
-      node = open.back();
-      open.pop_back();
-      
-      // Check if node has already been visited
-      if(closed.find(node->id) != closed.end()){ // This is not how its typically done!
-        continue;
-      }
-      // Else add it too closed list
-      closed.insert(node->id);
-
-      // Check if the node is our target
-      if( node->id == target){
-        return node;
-      }
-
-      // iterating over nodes neighbors
-      const std::vector<Edge> &outgoing = adj_matrix[node->id];                 // Get all nodes adjacent to node
-      for(auto p_edge = outgoing.begin(); p_edge != outgoing.end(); p_edge++){  // iterating over all neighbors
-        
-        size_t next_id = p_edge->target;
-        std::vector<double> next_g = node->g;
-        for(int i = 0; i < p_edge->cost.size(); i++){
-          next_g[i] += p_edge->cost[i];
-        }
-
-        // std::cout << "edge cost: " << p_edge->cost;
-        double next_h = h(node,node_list[next_id]);
-
-        // ignore neighboring nodes if they were visted
-        if(closed.find(next_id) != closed.end()){
-          continue;
-        }
-
-        auto next = std::make_shared<Node>(node_list[next_id]->x,
-                                           node_list[next_id]->y, 
-                                           next_id, 
-                                           next_g, 
-                                           next_h, // must pass a weight set for the weighted sum
-                                           weight_set,
-                                           node);
-
-
-        open.push_back(next);
-        std::push_heap(open.begin(), open.end(), order);
-      }
-    }      // END MAIN LOOP
-
-    //only reached if there is no path
-    return nullptr;
-  }
-
-  // WEIGHTED CONSCIOUS VERSION
-  NodePtr operator()(const size_t source, const size_t target, heuristic &h, node_order &order, const int focus){
-
-    std::unordered_set<size_t> closed;    // the CLOSED set, incusuion -> visted 
-
-    std::vector<NodePtr> open;            // the OPEN set (priority queue)
-    std::make_heap(open.begin(), open.end(), order);
-
-    int b = adj_matrix.get_obj_count();   // the number of objectives present in the graph    
-    
-    NodePtr node = std::make_shared<Node>(node_list[source]->x,
-                                          node_list[source]->y,
-                                          node_list[source]->id,
-                                          std::vector<double>(adj_matrix.get_obj_count(), 0), // the g-score
-                                          h(node_list[source],node_list[target]));
-
-
-    open.push_back(node); // add source node
-    std::push_heap(open.begin(), open.end(), order);
-
-
-    while(open.empty() == false){       // MAIN LOOP
-
-      // Retrive the node with te lowest f-sccore according to the selected objective (paramater order) (called node hence)
-      std::pop_heap(open.begin(), open.end(), order);
-      node = open.back();
-      open.pop_back();
-      
-      // Check if node has already been visited
-      if(closed.find(node->id) != closed.end()){ // This is not how its typically done!
-        continue;
-      }
-      // Else add it too closed list
-      closed.insert(node->id);
-
-      // Check if the node is our target
-      if( node->id == target){
-        return node;
-      }
-
-      // iterating over nodes neighbors
-      const std::vector<Edge> &outgoing = adj_matrix[node->id];                 // Get all nodes adjacent to node
-      for(auto p_edge = outgoing.begin(); p_edge != outgoing.end(); p_edge++){  // iterating over all neighbors
-        
-        size_t next_id = p_edge->target;
-        std::vector<double> next_g = node->g;
-        for(int i = 0; i < p_edge->cost.size(); i++){
-          next_g[i] += p_edge->cost[i];
-        }
-
-        // std::cout << "edge cost: " << p_edge->cost;
-        double next_h = h(node,node_list[next_id]);
-
-        // ignore neighboring nodes if they were visted
-        if(closed.find(next_id) != closed.end()){
-          continue;
-        }
-
-        auto next = std::make_shared<Node>(node_list[next_id]->x,
-                                           node_list[next_id]->y, 
-                                           next_id, 
-                                           next_g, 
-                                           next_h, // must pass a weight set for the weighted sum
-                                           weight_set,
-                                           focus,
-                                           node);
-
-
-        open.push_back(next);
-        std::push_heap(open.begin(), open.end(), order);
-      }
-    }      // END MAIN LOOP
-
-    //only reached if there is no path
-    return nullptr;
-  }
-
-};
+using NodePtr = std::shared_ptr<Node>;
 
 /**
  * VBEA DRIVER 
@@ -595,15 +37,15 @@ class WEIGHTED_ASTAR {
  * @param: voting_method, the voting method that is used for solution evaluation.
  */ 
 
-// FIX Record the front after intial population, gen1, and gen2 along with winner
+// FIX Record the front after initial population, gen1, and gen2 along with winner
 std::vector<std::vector<double>> VBEA(const AdjMatrix &adj_matrix, const std::vector<NodePtr> &node_list, heuristic &h, const size_t source, const size_t target, const voting_method vote_scheme){
 
   const int k = adj_matrix.get_obj_count();
-  std::cout << "start: \n";
-  std::cout << *node_list[source].get() << std::endl;
-  std::cout << "end: \n";
-  std::cout << *node_list[target].get() << std::endl;
-  std::cout << "----------------------" << std::endl;
+  // std::cout << "start: \n";
+  // std::cout << *node_list[source].get() << std::endl;
+  // std::cout << "end: \n";
+  // std::cout << *node_list[target].get() << std::endl;
+  // std::cout << "----------------------" << std::endl;
 
   // A* Object
   ASTAR A(adj_matrix, node_list);
@@ -612,7 +54,7 @@ std::vector<std::vector<double>> VBEA(const AdjMatrix &adj_matrix, const std::ve
   std::vector<std::vector<double>> results;
   int b = adj_matrix.get_obj_count();
   for(int i = 0; i < b; i++){
-    std::cout << "runing A* on objective " << i << "... \n";
+    std::cout << "running A* on objective " << i << "... \n";
     auto Y = more_than_specific(i);
     node_order order(Y);
     results.push_back(A(source, target, h, order)->g);
@@ -621,16 +63,17 @@ std::vector<std::vector<double>> VBEA(const AdjMatrix &adj_matrix, const std::ve
   // VOTING INITIAL POPULATION
   auto norm_results = normalize_matrix(results);
   auto d_scores = d_score(norm_results);
-  std::cout << "Initial population: " << std::endl;
-  for(int i = 0; i < norm_results.size(); i++){
-      std::cout << "P_" << i << " " << norm_results[i] << " | " << results[i] << " d: " << d_scores[i] << std::endl;
-  }
-  std::cout << "Initial Front Sparcity: " << sparcity_metric(results) << std::endl;
+
+  // std::cout << "Initial population: " << std::endl;
+  // for(int i = 0; i < norm_results.size(); i++){
+  //     std::cout << "P_" << i << " " << norm_results[i] << " | " << results[i] << " d: " << d_scores[i] << std::endl;
+  // }
+  // std::cout << "Initial Front Sparcity: " << sparcity_metric(results) << std::endl;
 
   // DISPLAYING VOTING RESULTS
-  std::cout << "Voting:" << std::endl;
+  // std::cout << "Voting:" << std::endl;
   auto vote_results = vote(results, vote_scheme); // solutions index is displayed in order of "fitness" according to voting method.
-  std::cout << vote_results << std::endl;
+  // std::cout << vote_results << std::endl;
 
   // CREATING WEGIHT SET OF TOP k CANDAIATES
   std::vector<std::vector<double>> weight_sets;
@@ -657,16 +100,16 @@ std::vector<std::vector<double>> VBEA(const AdjMatrix &adj_matrix, const std::ve
   d_scores = d_score(norm_results);
 
   // DISPALYING GEN1
-  for(int i = 0; i < norm_results.size(); i++){
-      std::cout << "P_" << i << " " << norm_results[i] << " | " << results[i] << " d: " << d_scores[i] << std::endl;
-  }
-  std::cout << "GEN1 Sparcity: " << sparcity_metric(results) << std::endl;
+  // for(int i = 0; i < norm_results.size(); i++){
+  //     std::cout << "P_" << i << " " << norm_results[i] << " | " << results[i] << " d: " << d_scores[i] << std::endl;
+  // }
+  // std::cout << "GEN1 Sparcity: " << sparcity_metric(results) << std::endl;
 
 
   // VOTING FOR SELECTION FOR 2nd GENERATION
-  std::cout << "Voting round 2:" << std::endl;
+  // std::cout << "Voting round 2:" << std::endl;
   vote_results = vote(norm_results, vote_scheme);
-  std::cout << vote_results << std::endl;
+  // std::cout << vote_results << std::endl;
   
   std::vector<std::vector<double>> gen2, norm_gen2;  
   std::vector<double> gen2_d_scores;
@@ -699,22 +142,44 @@ std::vector<std::vector<double>> VBEA(const AdjMatrix &adj_matrix, const std::ve
   gen2_d_scores = d_score(norm_gen2);
 
   
-  for(int i = 0; i < gen2.size(); i++){
-    std::cout << "P_" << i << " " << norm_gen2[i] << " | " << gen2[i] << " d: " << gen2_d_scores[i] << std::endl;
-  }
-  std::cout << "GEN2 Sparcity: " << sparcity_metric(gen2) << std::endl;
+  // for(int i = 0; i < gen2.size(); i++){
+  //   std::cout << "P_" << i << " " << norm_gen2[i] << " | " << gen2[i] << " d: " << gen2_d_scores[i] << std::endl;
+  // }
+  // std::cout << "GEN2 Sparcity: " << sparcity_metric(gen2) << std::endl;
 
   vote_results = vote(norm_gen2, vote_scheme);
 
-  std::cout << "GEN2 voting results: " << std::endl;
-  std::cout << vote_results << std::endl;
+  // std::cout << "GEN2 voting results: " << std::endl;
+  // std::cout << vote_results << std::endl;
 
 
   return gen2;
 
 }
 
+std::vector<record> ASCII_instance_runner(const enum::voting_method vote_method, const std::unordered_map<std::string, std::vector<std::vector<size_t>>> &instances){
 
+  std::vector<record> LOG;
+  
+  for(auto &inst : instances){ // for each map 
+    //create a the map once
+    std::vector<NodePtr> node_list;
+    AdjMatrix adj_matrix;
+
+    auto x = h_functor(0);
+    heuristic h = x;
+    getNodes_ASCII("dao-map/" + inst.first, node_list, adj_matrix);
+    for(auto param : inst.second){ // for each valid source and target position (there will be 40)
+      // get source and target
+      size_t source = param[0],
+             target = param[1];
+      auto front = VBEA(adj_matrix, node_list, h, source, target, vote_method);
+    }
+    break;
+  }
+
+  return LOG;
+}
 
 
 //
@@ -1172,89 +637,6 @@ void get_DOT_instances(const std::string FILE){
 // }
 
 //testing reading instances
-
-struct record{
-  std::string                      voting_method;      // range, borda, concorcet, etc..
-  std::string                      generations;        // 1-2
-  std::string                      file_name;
-  std::string                      child_method = "weighted_conscious";       //either weighted combined or conscious
-  std::vector<std::vector<double>> front;
-  record(const std::string file_name_, const enum::voting_method vote_method, const std::vector<std::vector<double>> &front_)
-  :file_name(file_name_), front(front_){
-    if(vote_method == voting_method::borda){
-        voting_method = "borda";
-    } else if(vote_method == voting_method::combined_approval){
-        voting_method = "combined_approval";
-    } else if(vote_method == voting_method::range){
-        voting_method = "range";
-    } else {
-      // voting_method::condornet
-        voting_method = "condornet";
-    }
-  }
-};
-
-void write_array(std::ostream &out_file, const std::vector<double> &vec){
-  
-}
-
-void write_record(std::ostream &out_file, const record &r){
-  out_file << "\t\"" << r.file_name << "\"";
-  
-            
-}
-
-
-
-// all the records will be avereged in python, this is just to write it in json format
-
-void write_all_records(const std::vector<record> &rec, std::string file_name){
-  std::ofstream out_file(file_name + ".json");
-
-  out_file << "{" << std::endl;
-
-  for(auto r : rec){
-    write_record(out_file, r);
-  }
-
-  out_file << "{";
-
-  out_file.close();
-  
-}
-
-
-
-
-
-std::vector<record> ASCII_instance_runner(const enum::voting_method vote_method, const std::unordered_map<std::string, std::vector<std::vector<size_t>>> &instances){
-
-  std::vector<record> LOG;
-  
-  for(auto &inst : instances){ // for each map 
-    //create a the map once
-    std::vector<NodePtr> node_list;
-    AdjMatrix adj_matrix;
-
-    auto x = h_functor(0);
-    heuristic h = x;
-    getNodes_ASCII("dao-map/" + inst.first, node_list, adj_matrix);
-    for(auto param : inst.second){ // for each valid source and target position (there will be 40)
-      // get source and target
-      size_t source = param[0],
-             target = param[1];
-      // run VBEA with param 
-      // Independent variable to incorperate
-      // 1. combined or conscious
-      // 2. number of generations (1, 2)
-      auto front = VBEA(adj_matrix, node_list, h, source, target, vote_method);
-      LOG.push_back({inst.first, vote_method, front});
-    }
-    break;
-  }
-
-  return LOG;
-}
 
   
 int main(){

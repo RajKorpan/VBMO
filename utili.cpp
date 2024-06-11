@@ -127,10 +127,10 @@ std::vector<double> complement_weight_set(const std::vector<double>& normalized_
     return weight_set;
 }
 
-double sparcity_metric(const std::vector<std::vector<double>> &front_approximation){
+double sparsity_metric(const std::vector<std::vector<double>> &front_approximation){
   int m = front_approximation[0].size();      // m = number of objectives in the environment
   int n = front_approximation.size();         // n = number of solutions
-  double sparcity = 0;
+  double sparsity = 0;
 
   for(int j = 0; j < m; j++){ // get the cost of a objective j for all paths
     std::vector<double> p_j;
@@ -138,16 +138,20 @@ double sparcity_metric(const std::vector<std::vector<double>> &front_approximati
       p_j.push_back(front_approximation[i][j]);
     }
 
-    std::sort(p_j.begin(), p_j.end()); //sparcity metric requires that we sort the objectve costs
+    std::sort(p_j.begin(), p_j.end()); //sparsity metric requires that we sort the objectve costs
 
     for(auto i = 0; i < n-1; i++){     // squared difference of the sorted objective cost
-      sparcity += pow(p_j[i] - p_j[i+1], 2);
+      sparsity += pow(p_j[i] - p_j[i+1], 2);
     }
   }
 
 
-  sparcity = (1.0 / (n - 1)) * sparcity;  
-  return sparcity;
+  sparsity = (1.0 / (n - 1)) * sparsity;  
+  if(isnan(sparsity)){
+    return 0;
+  } else {
+    return sparsity;
+  }
   
 }
 
@@ -239,17 +243,17 @@ std::vector<std::vector<double>> non_dominated_filter(std::vector<std::vector<do
     while(j < n) {
       if(dominate_check(front[i], front[j])){
         n--;
-        display(front[i]);
-        std::cout << " <  ";
-        display(front[j]);
-        std::cout << std::endl;
+        // display(front[i]);
+        // std::cout << " <  ";
+        // display(front[j]);
+        // std::cout << std::endl;
         
         front[j].swap(front[n]);
       } else if(dominate_check(front[j], front[i])){
-        display(front[j]);
-        std::cout << " < ";
-        display(front[i]);
-        std::cout << std::endl;
+        // display(front[j]);
+        // std::cout << " < ";
+        // display(front[i]);
+        // std::cout << std::endl;
 
         n--;        
         front[i].swap(front[n]);
@@ -268,72 +272,45 @@ std::vector<std::vector<double>> non_dominated_filter(std::vector<std::vector<do
   return non_dominated;
 }
 
-// hypervolume calculator
-// uses default refernce point of {0, 0, ..., 0}
-// pre-suppose that all solutions have been filtered for non dominance.
-double hypervolume_metric(const std::vector<double> &path_cost){
-  double HV_metric;
-  std::vector<double> temp;
+// // hypervolume calculator
+// // uses default refernce point of {0, 0, ..., 0}
+// // pre-suppose that all solutions have been filtered for non dominance.
+// double hypervolume_metric(const std::vector<double> &path_cost){
+//   double HV_metric;
+//   std::vector<double> temp;
 
-  for(int i = 0; i < path_cost.size(); i++){
-    temp.push_back(0 - path_cost[i]); // reference point is 1 since we normalized the data
-  }
+//   for(int i = 0; i < path_cost.size(); i++){
+//     temp.push_back(0 - path_cost[i]); // reference point is 1 since we normalized the data
+//   }
 
-  double sum = 0;
+//   double sum = 0;
   
-  temp.push_back(0.0);
-  std::sort(temp.begin(), temp.end());
+//   temp.push_back(0.0);
+//   std::sort(temp.begin(), temp.end());
 
 
-  for(int i = 0; i < temp.size(); i++){
-    sum += temp[i] * pow(-1.0, i+1);
-  }
+//   for(int i = 0; i < temp.size(); i++){
+//     sum += temp[i] * pow(-1.0, i+1);
+//   }
 
-  std::sort(temp.begin(), temp.end());
+//   std::sort(temp.begin(), temp.end());
 
-  HV_metric = sum / std::tgamma(temp.size() + 1);
+//   HV_metric = sum / std::tgamma(temp.size() + 1);
   
-  return HV_metric; 
+//   return HV_metric; 
+// }
+
+std::vector<std::vector<double>> remove_duplicate(const std::vector<std::vector<double>> front){
+  auto copy = front;
+
+  std::vector<std::vector<double>>::iterator iter;    
+
+  iter = std::unique(copy.begin(), copy.begin() + copy.size()); //what does this do?
+
+  copy.resize(std::distance(copy.begin(), iter));
+
+
+  return copy;
 }
 
-
-struct HypterVolumeCalculator{
-
-  bool WeakDominate(const std::vector<double> &p1, const std::vector<double> &p2){
-    for(int i = 0; i < p1.size(); i++){
-      if(p1[i] > p2[i]){
-        return false;
-      }
-    }
-    return true;
-  }
-
-  void hvRecursive(const int dimIndex, const int length){
-     
-  }
-
-  double Calculate(const std::vector<std::vector<double>> &front){
-    auto FRONT = front;
-
-    int n = front.size();       // the number of solutions
-    int b = front[0].size();    // the dimensinos
-
-    std::vector<std::vector<double>> relevantPoints;
-
-    for(int i = 0; i < FRONT.size(); i++){
-      for(int j = 0; j < FRONT[i].size(); j++){
-        FRONT[i][j] = -FRONT[i][j];
-      }
-
-    }
     
-    
-    double hvol = 0.0;
-
-    return 1.0;
-
-  }
-
-  
-    
-};

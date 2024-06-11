@@ -13,10 +13,10 @@ private:
     void compute(size_t cost_idx, const AdjacencyMatrix& adj_matrix);
 public:
     ShortestPathHeuristic(size_t source, size_t graph_size, const AdjacencyMatrix &adj_matrix);
-    std::vector<size_t> operator()(size_t node_id);
+    std::vector<double> operator()(size_t node_id);
     void set_all_to_zero(){
         for (auto n: all_nodes){
-            n->h = {0, 0};
+            n->h = {0.0, 0.0};
         }
     }
 };

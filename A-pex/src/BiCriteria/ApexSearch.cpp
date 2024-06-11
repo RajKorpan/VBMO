@@ -88,7 +88,7 @@ void ApexSearch::operator()(size_t source, size_t target, Heuristic &heuristic, 
     // Init open heap
     APQueue open(this->adj_matrix.size()+1);
 
-    NodePtr source_node = std::make_shared<Node>(source, std::vector<size_t>(num_of_objectives, 0), heuristic(source));
+    NodePtr source_node = std::make_shared<Node>(source, std::vector<double>(num_of_objectives, 0.0), heuristic(source));
     ap = std::make_shared<ApexPathPair>(source_node, source_node, heuristic);
     open.insert(ap);
 

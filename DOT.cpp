@@ -1019,6 +1019,7 @@ void VBMO_2(const node& origin, const node& target, MO_adjacency_matrix& graph, 
 
 //method for reading in DOT file and forming the graph looking at the .co, distance, and time file
 MO_adjacency_matrix CONSTRUCT_GRAPH(std::string place) {
+    MO_adjacency_matrix adjMatrix;
     std::string dir = "USA-road/USA-road-" + place;
     std::ifstream ifs;
     std::string x; 
@@ -1030,20 +1031,17 @@ MO_adjacency_matrix CONSTRUCT_GRAPH(std::string place) {
     }
 
     std::reverse(files.begin(), files.end());
-    for(auto file : files){
-        std::cout << file << std::endl;
-    }
+    // for(auto file : files){
+    //     std::cout << file << std::endl;
+    // }
+
+    auto file_iter = files.begin();
+
+    // GENERATING NODE LIST
+    ifs.open(*file_iter);
 
 
-
-
-
-    return {{}};
-
-    
-
-    ifs.open(file_iter->path(), std::ifstream::in);
-    for(int i = 0; i < 4; i++){
+    for(int i = 0 ; i < 4; i++){
         ifs.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
 
@@ -1051,127 +1049,108 @@ MO_adjacency_matrix CONSTRUCT_GRAPH(std::string place) {
     std::getline(ifs, x);
     int numNodes = stoi(x.substr(12));  //get number of nodes in the environment
 
-    // std::cout << numNodes << std::endl;
-    ifs.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    ifs.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-
+    std::cout << "expecting " << numNodes << " node" <<  std::endl;
     std::vector<node> nodeList;
 
-    int count = 0;
     double id, lat, lng; 
     while(ifs >> x){
         if(x == "v"){
             ifs >> id >> lat >> lng; 
+            lat /= 1000000;
+            lng /= 1000000;
             nodeList.push_back(node(lat, lng, id));
+        }
+    }
+   
+    std::cout << nodeList.size() << " vertices created." << std::endl;
+
+    ifs.close();
+    std::cout << "Finished reading vertex file." << std::endl;
+
+    // DISTANCE METRIC
+
+    file_iter++;
+    ifs.open(*file_iter);
+
+    for(int i = 0; i < 4; i++){
+        ifs.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+    int V, E;
+
+    ifs >> x >> x >> V >> E;
+    ifs.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    ifs.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+    std::cout << "graph contained " << V << " vertices and " << E << " edges " << std::endl;
+    double id2, obj;
+    int count = 0;
+    while(ifs >> x){
+        if(x == "a"){
+            ifs >> id >> id2 >> obj;
+            // std::cout << id << " " << id2 << " " << obj << std::endl;
+            adjMatrix[nodeList[id-1]][nodeList[id2-1]].emplace_back(obj);
+            std::cout << adjMatrix.at(nodeList[id-1]).at(nodeList[id2-1])[0] << std::endl;
             count++;
         }
     }
-    std::cout << nodeList.size() << " vertices created." << std::endl;
-
-    std::cout << "Finished reading vertex file." << std::endl;
     ifs.close();
 
-//
-// DISTANCE
-//
+    int n = 0;
+    for(auto& iter : adjMatrix){
+        n += iter.second.size();
+    }
+
+    std::cout << "counted " << n << " edges" << std::endl;
+    std::cout << "counter " << count << " edges" << std::endl;
+
+    // TIME METRIC
 
     file_iter++;
-    std::cout << file_iter->path() << std::endl;
+    ifs.open(*file_iter);
 
-    ifs.open(file_iter->path(), std::ifstream::in);
-    for(int i = 0; i < 4; i++){                                         //ignore header
-        // ifs.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        getline(ifs, x);
-        std::cout << x << std::endl;
-    }
-
-    // recieve vertex count V, and edge count E;
-    int V, E;
-    ifs >> x >> x >> V >> E;
-    std::cout << "Graph contain " << V << " vertices, and "<< E << " edges" <<  std::endl;   
-    
-    ifs.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    // ifs.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    ifs.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-
-    MO_adjacency_matrix adjMatrix;
-    int start, end;
-    double obj;
-    count = 0;
-    while(ifs >> x){
-        if(x == "a") {
-            ifs >> start >> end >> obj;
-            std::cout << start << " " << end << std::endl;
-            adjMatrix[nodeList[start-1]][nodeList[end-1]] = {obj};
-            count++;   
-        }
-    }
-
-    int doubleCheck = 0;
-    for(auto& iter: adjMatrix){
-        doubleCheck += iter.second.size();
-    }
-
-    std::cout << "Finish reading distance file." << std::endl;
-    std::cout << "expected: " << E << std::endl;
-    std::cout << "actual:   " << count << std::endl; 
-    std::cout << "in graph: " << doubleCheck << std::endl;
-    ifs.close();
-
-//
-// TIME 
-//
-
-    file_iter++;
-    std::cout << file_iter->path() << std::endl;
-
-
-    ifs.open(file_iter->path(), std::ifstream::in);
     for(int i = 0; i < 7; i++){
         ifs.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
 
+    n = 0;
     count = 0;
+
     while(ifs >> x){
         if(x == "a"){
-            ifs >> start >> end >> obj;
-            adjMatrix[nodeList[start-1]][nodeList[end-1]].push_back(obj);
-            count++;    
+            ifs >> id >> id2 >> obj;
+            // std::cout << id << " " << id2 << " " << obj << std::endl;
+            adjMatrix[nodeList[id-1]][nodeList[id2-1]].emplace_back(obj);
+            // std::cout << adjMatrix.at(nodeList[id-1]).at(nodeList[id2-1])[0] << std::endl;
+            count++;
         }
     }
-    
-    doubleCheck = 0;
-    for(auto& iter: adjMatrix){
-        doubleCheck += iter.second.size();
+    ifs.close();
+
+
+    // incorrect
+    for(auto& iter : adjMatrix){
+        n += iter.second.size();
     }
 
-    std::cout << "Finish reading time file." << std::endl;
-    std::cout << "expected: " << E << std::endl;
-    std::cout << "in graph: " << doubleCheck << std::endl;
-    ifs.close();
-    
+    std::cout << "Time:" << std::endl;
+    std::cout << "counted " << n << " edges" << std::endl;
+    std::cout << "counter " << count << " edges" << std::endl;
+
     
     //adding uniform and random cost
+    // CHECK WHAT A*pex uses for objectives
+
+    // Random number generator for random objective
     std::mt19937 RNG(std::chrono::high_resolution_clock::duration(std::chrono::high_resolution_clock::now() - begin).count()); 
 
     for(auto& iter: adjMatrix){
         for(auto& jter: iter.second){
-            jter.second.emplace_back(1000);
-            jter.second.emplace_back(RNG() % 37000);
+            jter.second.emplace_back(1000);             // uniform cost
+            jter.second.emplace_back(RNG() % 37000);    // random cost (why 37000?)
         }
     }
     // every edge should have exactly four objectives: distance, time, uniform, and random (in that order)
     
-    for(auto& iter: adjMatrix){
-        for(auto& jter: iter.second){
-            if(jter.second.size() != 4) {
-                display_vector(jter.second);
-                iter.first.display(); jter.first.display();
-                return {};
-            }
-        }
-    }
-
     return adjMatrix;
 }    
 
@@ -1181,17 +1160,19 @@ int main(){
     MO_adjacency_matrix graph = CONSTRUCT_GRAPH("BAY");
     
     
-    // int m = graph.size();
-    // int a(rand() % m), b(rand() % m);
+    int m = graph.size();
+    int a(rand() % m), b(rand() % m);
+    node origin = std::next(graph.begin(), a)->first;
+    node target = std::next(graph.begin(), b)->first;
 
-    // node origin = std::next(graph.begin(), a)->first;
-    // node target = std::next(graph.begin(), b)->first;
+    origin.display(); std::cout << " to "; target.display();
 
-    // origin.display(); std::cout << " to "; target.display();
+    HEURISTIC h;
+    int duration;
 
-    // HEURISTIC h;
-    // int duration;
+    auto test = SINGLE_OBJECTIVE_A_STAR(origin, target, graph, )
 
+    std::vector<std::vector<double>> temp = VBMO_A_STAR(origin, target, graph, h, duration);
 
     return 0;
 

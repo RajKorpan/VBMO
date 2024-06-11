@@ -1,5 +1,6 @@
 #include <iostream>
 #include <set>
+#include <ostream>
 #include <string>
 #include "Utils/Definitions.h"
 
@@ -126,6 +127,18 @@ std::ostream& operator <<(std::ostream &stream, const std::vector<size_t> &vec){
   }
   stream << "]";
   return stream;
+}
+
+std::ostream& operator <<(std::ostream &stream, const std::vector<double> &vec){
+    stream << "[";
+    for (size_t i = 0 ;  i < vec.size(); i ++){
+        stream << vec[i];
+        if (i + 1 <vec.size()){
+            stream << ", ";
+        }
+    }
+    stream << "]";
+    return stream;
 }
 
 std::ostream& operator<<(std::ostream &stream, const Node &node) {
@@ -327,4 +340,34 @@ Interval::Interval(const NodePtr top_left, const NodePtr bottom_right, std::shar
 std::ostream& operator<<(std::ostream& os, const Interval& interval){
   os << "Top left: " << *interval.top_left  << ", Bottom right: " << *interval.bottom_right << ", #nodes: " << interval.to_expand->size();
   return os;
+}
+
+
+
+double sparsity_metric(const std::vector<std::vector<double>> &front_approximation){
+  int m = front_approximation[0].size();      // m = number of objectives in the environment
+  int n = front_approximation.size();         // n = number of solutions
+  double sparsity = 0;
+
+  for(int j = 0; j < m; j++){ // get the cost of a objective j for all paths
+    std::vector<double> p_j;
+    for(int i = 0; i < n; i++){
+      p_j.push_back(front_approximation[i][j]);
+    }
+
+    std::sort(p_j.begin(), p_j.end()); //sparsity metric requires that we sort the objectve costs
+
+    for(auto i = 0; i < n-1; i++){     // squared difference of the sorted objective cost
+      sparsity += pow(p_j[i] - p_j[i+1], 2);
+    }
+  }
+
+
+  sparsity = (1.0 / (n - 1)) * sparsity;  
+  if(std::isnan(sparsity)){
+    return 0;
+  } else {
+    return sparsity;
+  }
+  
 }

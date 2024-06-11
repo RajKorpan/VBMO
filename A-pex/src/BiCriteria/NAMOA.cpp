@@ -57,7 +57,7 @@ void NAMOAdr::operator()(size_t source, size_t target, Heuristic &heuristic, Sol
     // std::vector<NodePtr> open;
     // std::make_heap(open.begin(), open.end(), more_than);
 
-    node = std::make_shared<Node>(source, std::vector<size_t>(adj_matrix.get_num_of_objectives(),0), heuristic(source));
+    node = std::make_shared<Node>(source, std::vector<double>(adj_matrix.get_num_of_objectives(),0), heuristic(source));
     open.insert(node);
 
     while (open.empty() == false) {
@@ -88,7 +88,7 @@ void NAMOAdr::operator()(size_t source, size_t target, Heuristic &heuristic, Sol
         for(auto p_edge = outgoing_edges.begin(); p_edge != outgoing_edges.end(); p_edge++) {
             size_t next_id = p_edge->target;
             // std::vector<size_t> next_g = {node->g[0]+p_edge->cost[0], node->g[1]+p_edge->cost[1]};
-            std::vector<size_t> next_g(node->g.size());
+            std::vector<double> next_g(node->g.size());
             for (size_t i = 0; i < next_g.size(); i++){
                 next_g[i] = node->g[i] + p_edge->cost[i];
             }
