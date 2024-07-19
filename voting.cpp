@@ -240,13 +240,13 @@ std::vector<double> condorcet_voting(std::vector<std::vector<double>> normalized
 
             for(int k = j; k < normalized_path_costs.size(); k++) {
                 if(k != j) { // 
-                    std::cout << normalized_path_costs[j][i] << " " << normalized_path_costs[k][i] << std::endl;      //debug
+                    // std::cout << normalized_path_costs[j][i] << " " << normalized_path_costs[k][i] << std::endl;      //debug
                     if(normalized_path_costs[j][i] < normalized_path_costs[k][i]) {
                         condorcet_scores[j]++;
                     } else if (normalized_path_costs[j][i] > normalized_path_costs[k][i]) {
                         condorcet_scores[k]++;
                     } else {/*is a draw, do nothing*/}
-                    std::cout << "-----" << std::endl;        //debug
+                    // std::cout << "-----" << std::endl;        //debug
                 }
             }
         }
@@ -354,12 +354,11 @@ std::vector<double> d_score(std::vector<std::vector<double>> normalized_path_cos
 */
 
 // updated to account for d-score tie breaking 
-std::vector<int> vote(std::vector<std::vector<double>>& path_scores, const std::string scheme){
+std::vector<int> vote(const std::vector<std::vector<double>>& path_scores, const std::vector<double> d_scores, const std::string scheme){
     std::vector<double> voting_results;    // ith paths score w.r.s.t the voting method
     std::vector<int> rank;                 // index corresponds to values ranking, v[i] = j means path j is in ith place
 
     std::vector<std::vector<double>> norm_path_scores = normalize_matrix(path_scores);
-    std::vector<double> d_scores = d_score(path_scores); // using d-score of the raw cost as it yiled more precision
     std::vector<int> order;
 
 

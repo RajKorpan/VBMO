@@ -67,5 +67,5 @@ std::vector<double> d_score(std::vector<std::vector<double>> normalized_path_cos
 */
 
 
-std::vector<int> vote(std::vector<std::vector<double>>& normalized_path_score, const std::string scheme);
+std::vector<int> vote(const std::vector<std::vector<double>>& normalized_path_score, const std::vector<double> d_scores, const std::string scheme);
 #endif

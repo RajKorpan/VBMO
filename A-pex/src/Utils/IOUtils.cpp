@@ -183,8 +183,6 @@ bool load_queries(std::string query_file, std::vector<std::pair<size_t, size_t>>
     return true;
 }
 
-
-
 bool load_ascii_file(std::string ascii_file, std::vector<Edge> &edges, size_t &graph_size){
     std::ifstream ifs(ascii_file);
 
@@ -199,13 +197,12 @@ bool load_ascii_file(std::string ascii_file, std::vector<Edge> &edges, size_t &g
     width = stoi(temp.substr(6));
     std::getline(ifs, temp);
 
-    size_t id = 1;
+    size_t id = 0;
     
-    std::cout << "h: " << height << std::endl << "w: " << width << std::endl;
 
     //allocate just enough space for the ascii map
     std::vector<std::vector<char>> map(height, std::vector<char>(width));
-    //need a way of converting xy cordinates into the id for creating the edges later on
+    // need a way of converting xy coordinates into the id for creating the edges later on
 
     struct pair_hash{
         size_t operator()(const std::pair<size_t,size_t> &p) const {
@@ -219,7 +216,7 @@ bool load_ascii_file(std::string ascii_file, std::vector<Edge> &edges, size_t &g
         }
     };
 
-    std::unordered_map<std::pair<size_t,size_t>, size_t, pair_hash> cordinateIDmap;
+    std::unordered_map<std::pair<size_t,size_t>, size_t, pair_hash> coordinateIDmap;
     edges.clear();
 
     // matching xy coordinates to id's 
@@ -229,58 +226,70 @@ bool load_ascii_file(std::string ascii_file, std::vector<Edge> &edges, size_t &g
         for(int j = 0; j < width; j++){
             map[i][j] = temp[j];
             if(map[i][j] == '.') { // "."s on the ascii map is a position 
-                cordinateIDmap[{i,j}] = id;
+                coordinateIDmap[{i,j}] = id;
                 id++;
                 // std::cout << i << " " << j << " " << id << std::endl;
             }
         }
     }
+
+    ifs.close();
     graph_size = id;
 
     // adding euclidean distance, uniform, and random objective costs
 
     std::mt19937 RNG(96534);
 
-    for(size_t i = 0; i < height; i++){
-        for(size_t j = 0; j < width; j++){
+    // !!! size_t does not go into the negatives, 0-1 does not result in a negative number, but the larget v
+    for(int i = 0; i < height; i++){
+        for(int j = 0; j < width; j++){
             if(map[i][j] == '.'){
+          
                 if(i-1 >= 0 && map[i-1][j] == '.'){                      // up 
-                
-                edges.push_back(Edge(cordinateIDmap[{i,j}], 
-                                    cordinateIDmap[{i-1,j}], {1, 1, double(RNG()%20)}));
+                // std::cout << "  " << i-1 << " " << j << std::endl;
+                edges.push_back(Edge(coordinateIDmap[{i,j}], 
+                                    coordinateIDmap[{i-1,j}], {1, 1, 1 + double(RNG()%20)}));
                 }
                 if(i-1 >= 0 && j + 1 < width && map[i-1][j+1] == '.'){   // up right
-                edges.push_back(Edge(cordinateIDmap[{i,j}], 
-                                    cordinateIDmap[{i-1,j+1}], {1, 1.5, double(RNG()%20)}));
+                // std::cout << "  " << i-1 << " " << j+1 << std::endl;
+                edges.push_back(Edge(coordinateIDmap[{i,j}], 
+                                    coordinateIDmap[{i-1,j+1}], {1, 1.414, 1 + double(RNG()%20)}));
                 }
                 if(j+1 < width && map[i][j+1] == '.'){                   // right
-                edges.push_back(Edge(cordinateIDmap[{i,j}], 
-                                    cordinateIDmap[{i,j+1}], {1, 1,double(RNG()%20)}));
+                // std::cout << "  " << i << " " << j+1 << std::endl;
+                edges.push_back(Edge(coordinateIDmap[{i,j}], 
+                                    coordinateIDmap[{i,j+1}], {1, 1, 1 + double(RNG()%20)}));
                 }
                 if(i+1 < height && j+1 < width && map[i+1][j+1] == '.'){ // down right
-                edges.push_back(Edge(cordinateIDmap[{i,j}], 
-                                    cordinateIDmap[{i+1,j+1}], {1, 1.5, double(RNG()%20)}));
+                // std::cout << "  " << i+1 << " " << j+1 << std::endl;
+                edges.push_back(Edge(coordinateIDmap[{i,j}], 
+                                    coordinateIDmap[{i+1,j+1}], {1, 1.414, 1 + double(RNG()%20)}));
                 }
                 if(i+1 < height && map[i+1][j] == '.'){                  // down
-                edges.push_back(Edge(cordinateIDmap[{i,j}], 
-                                    cordinateIDmap[{i+1,j}], {1, 1, double(RNG()%20)}));
+                // std::cout << "  " << i+1 << " " << j << std::endl;
+                edges.push_back(Edge(coordinateIDmap[{i,j}], 
+                                    coordinateIDmap[{i+1,j}], {1, 1, 1 + double(RNG()%20)}));
                 }
                 if(i+1 < height && j-1 >= 0 && map[i+1][j-1] == '.'){    // down left
-                edges.push_back(Edge(cordinateIDmap[{i,j}], 
-                                    cordinateIDmap[{i+1,j-1}], {1, 1.5, double(RNG()%20)}));
+                // std::cout << "  " << i+1 << " " << j-1 << std::endl;
+                edges.push_back(Edge(coordinateIDmap[{i,j}], 
+                                    coordinateIDmap[{i+1,j-1}], {1, 1.414, 1 + double(RNG()%20)}));
                 }
                 if(j-1 >= 0 && map[i][j-1] == '.'){                      // left
-                edges.push_back(Edge(cordinateIDmap[{i,j}], 
-                                    cordinateIDmap[{i,j-1}], {1, 1, double(RNG()%20)}));
+                // std::cout << "  " << i << " " << j-1 << std::endl;
+                edges.push_back(Edge(coordinateIDmap[{i,j}], 
+                                    coordinateIDmap[{i,j-1}], {1, 1, 1 + double(RNG()%20)}));
                 }
-                if(i-1 >= 0 && j-1 >= 0 && map[i-1][j-1] == '.'){        // up left
-                edges.push_back(Edge(cordinateIDmap[{i,j}], 
-                                    cordinateIDmap[{i-1,j-1}], {1, 1.5, double(RNG()%20)}));
+                if(i-1 >= 0 && j-1 >= 0 && map[i-1][j-1] == '.'){        // up lef
+                // std::cout << "  " << i-1 << " " << j-1 << std::endl;
+                edges.push_back(Edge(coordinateIDmap[{i,j}], 
+                                    coordinateIDmap[{i-1,j-1}], {1, 1.414, 1 + double(RNG()%20)}));
                 }
-
             }
         }
     }
+
+    // std::cout << "added first three objectives" << std::endl;
 
     //leave in for 3-objective, comment out to add last 2 objectives
     // return true;
@@ -288,11 +297,12 @@ bool load_ascii_file(std::string ascii_file, std::vector<Edge> &edges, size_t &g
     // adding random dangerous objective
     std::vector<std::vector<Edge>> tempMap(id, std::vector<Edge> {});
 
+    // create list of all edges that have the same target
     for(auto iter = edges.begin(); iter != edges.end(); iter++){
         tempMap[iter->target].push_back(*iter);
     }
 
-    //iteratoring over id's adjacency list
+    //iterating over id's adjacency list
     for(auto iter = tempMap.begin(); iter != tempMap.end(); iter++){
         double n;
         if(RNG() % 10 == 0){    //randomly make 10% of all incoming edges expensive 
@@ -331,6 +341,9 @@ bool load_ascii_file(std::string ascii_file, std::vector<Edge> &edges, size_t &g
     for(auto iter =  tempMap.begin(); iter != tempMap.end(); iter++){
         edges.insert(edges.end(), iter->begin(), iter->end());
     }
+
+    // std::cout << coordinateIDmap.size() << " " << id << " " << graph_size << std::endl;
+
 
     return true;
 }

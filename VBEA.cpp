@@ -91,6 +91,16 @@ class AdjMatrix {
   size_t size(void) const {
     return this->graph_size;
   }
+
+  size_t edge_size() const {
+    size_t n = 0;
+    for(auto &i: matrix){
+      n += i.size();
+    }    
+
+    return n;
+  }
+
   size_t get_obj_count() const{
      return obj_count;
   }
@@ -384,15 +394,20 @@ class WEIGHTED_ASTAR {
   private:
   const AdjMatrix             &adj_matrix;
   const std::vector<NodePtr>  &node_list;
-  const std::vector<double>   &weight_set;
+  std::vector<double>   &weight_set;
 
   public:
 
-  WEIGHTED_ASTAR(const AdjMatrix &adj_matrix_, const std::vector<NodePtr> &node_list_, const std::vector<double> &weight_set_)  
+  WEIGHTED_ASTAR(const AdjMatrix &adj_matrix_, const std::vector<NodePtr> &node_list_, std::vector<double> &weight_set_)  
   : adj_matrix(adj_matrix_), node_list(node_list_), weight_set(weight_set_) {}
 
+
+
+  void update_weight_set(std::vector<double> &weight_set_){
+    weight_set = weight_set_;
+  }
   // WEIGHTED COMBINED VERSION
-  NodePtr operator()(const size_t source, const size_t target, heuristic &h, node_order &order){
+  NodePtr operator()(const size_t source, const size_t target, heuristic &h, node_order &order) const {
 
     std::unordered_set<size_t> closed;    // the CLOSED set, incusuion -> visted 
 
@@ -468,7 +483,7 @@ class WEIGHTED_ASTAR {
   }
 
   // WEIGHTED CONSCIOUS VERSION
-  NodePtr operator()(const size_t source, const size_t target, heuristic &h, node_order &order, const int focus){
+  NodePtr operator()(const size_t source, const size_t target, heuristic &h, node_order &order, const int focus) const {
 
     std::unordered_set<size_t> closed;    // the CLOSED set, incusuion -> visted 
 
@@ -669,7 +684,8 @@ void getNodes_DOT(const std::string DOT_FILE, std::vector<NodePtr> &out_nodes){
 // 
 
 /**
- * 
+ * @param: out_nodes is the number of vertieces in the graph:
+ * @param: adj_matrix is the 
 */
 void getNodes_ASCII(const std::string ASCII_FILE, std::vector<NodePtr> &out_nodes, AdjMatrix &adj_matrix){
   
@@ -719,7 +735,7 @@ void getNodes_ASCII(const std::string ASCII_FILE, std::vector<NodePtr> &out_node
   /* Second pass: constructing the adjaceny matrix adding the following objective
   *  - Uniform (1)
   *  - Euclidean distance 
-  *  - Random [0,20]
+  *  - Random [1,20]
   *  - Danger (1.5, 10)
   *  - Safety (def)
   */
@@ -737,35 +753,35 @@ void getNodes_ASCII(const std::string ASCII_FILE, std::vector<NodePtr> &out_node
         if(i-1 >= 0 && map[i-1][j] == '.'){                      // up 
           
           Edges.push_back(Edge(cordinateIDmap[{i,j}], 
-                               cordinateIDmap[{i-1,j}], {1, 1, double(RNG()%20)}));
+                               cordinateIDmap[{i-1,j}], {1, 1, 1+ double(RNG()%20)}));
         }
         if(i-1 >= 0 && j + 1 < width && map[i-1][j+1] == '.'){   // up right
           Edges.push_back(Edge(cordinateIDmap[{i,j}], 
-                               cordinateIDmap[{i-1,j+1}], {1, 1.5, double(RNG()%20)}));
+                               cordinateIDmap[{i-1,j+1}], {1, 1.414, 1+ double(RNG()%20)}));
         }
         if(j+1 < width && map[i][j+1] == '.'){                   // right
           Edges.push_back(Edge(cordinateIDmap[{i,j}], 
-                               cordinateIDmap[{i,j+1}], {1, 1, double(RNG()%20)}));
+                               cordinateIDmap[{i,j+1}], {1, 1, 1+ double(RNG()%20)}));
         }
         if(i+1 < height && j+1 < width && map[i+1][j+1] == '.'){ // down right
           Edges.push_back(Edge(cordinateIDmap[{i,j}], 
-                               cordinateIDmap[{i+1,j+1}], {1, 1.5, double(RNG()%20)}));
+                               cordinateIDmap[{i+1,j+1}], {1, 1.414, 1+ double(RNG()%20)}));
         }
         if(i+1 < height && map[i+1][j] == '.'){                  // down
           Edges.push_back(Edge(cordinateIDmap[{i,j}], 
-                               cordinateIDmap[{i+1,j}], {1, 1, double(RNG()%20)}));
+                               cordinateIDmap[{i+1,j}], {1, 1, 1+ double(RNG()%20)}));
         }
         if(i+1 < height && j-1 >= 0 && map[i+1][j-1] == '.'){    // down left
           Edges.push_back(Edge(cordinateIDmap[{i,j}], 
-                               cordinateIDmap[{i+1,j-1}], {1, 1.5, double(RNG()%20)}));
+                               cordinateIDmap[{i+1,j-1}], {1, 1.414, 1+ double(RNG()%20)}));
         }
         if(j-1 >= 0 && map[i][j-1] == '.'){                      // left
           Edges.push_back(Edge(cordinateIDmap[{i,j}], 
-                               cordinateIDmap[{i,j-1}], {1, 1, double(RNG()%20)}));
+                               cordinateIDmap[{i,j-1}], {1, 1, 1+ double(RNG()%20)}));
         }
         if(i-1 >= 0 && j-1 >= 0 && map[i-1][j-1] == '.'){        // up left
           Edges.push_back(Edge(cordinateIDmap[{i,j}], 
-                               cordinateIDmap[{i-1,j-1}], {1, 1.5, double(RNG()%20)}));
+                               cordinateIDmap[{i-1,j-1}], {1, 1.414, 1+ double(RNG()%20)}));
         }
       } else {
         continue;
@@ -927,6 +943,8 @@ void DOT_RUNNER(const std::string voting_scheme){
  * FORMING INSTANCES 
 */
 
+typedef std::unordered_map<std::string, std::vector<std::vector<size_t>>> inst;
+
 std::unordered_map<std::string, std::vector<std::vector<size_t>>> get_ASCII_instances(const std::string FILE){
   std::unordered_map<std::string, std::vector<std::vector<size_t>>> instances;
 
@@ -947,7 +965,7 @@ std::unordered_map<std::string, std::vector<std::vector<size_t>>> get_ASCII_inst
 }
 
 // finds 40 source and target nodes that are reachable
-void ASCII_MAP_INSTANCE_MAKER(const std::string MAP_FILE, std::unordered_map<std::string, std::vector<std::vector<size_t>>> &map_instances){
+void ASCII_MAP_INSTANCE_MAKER(const std::string MAP_FILE, std::unordered_map<std::string, std::vector<std::vector<size_t>>> &map_instances, const int num){
   std::vector<NodePtr> node_list;
   AdjMatrix adj_matrix;
   std::mt19937 rng(std::clock());
@@ -962,7 +980,7 @@ void ASCII_MAP_INSTANCE_MAKER(const std::string MAP_FILE, std::unordered_map<std
   node_order order(Y);
   int count = 0;
 
-  while(count < 40){
+  while(count < num){
     size_t source = rng() % adj_matrix.size(), target = rng() % adj_matrix.size(); // randomly select start and end location
     if(A(source, target, h, order) == nullptr){ // if no path connecting the two exists
       continue; // redo
@@ -975,17 +993,79 @@ void ASCII_MAP_INSTANCE_MAKER(const std::string MAP_FILE, std::unordered_map<std
 }
 
 // Dir driver code for all files in a dir
-void make_ASCII_instances(const std::string dir, std::unordered_map<std::string, std::vector<std::vector<size_t>>> &map_instances){
+void make_ASCII_instances(const std::string dir, std::unordered_map<std::string, std::vector<std::vector<size_t>>> &map_instances, const int num){
 
   for(auto &file_iter: std::filesystem::directory_iterator(dir)){
     std::string MAP_FILE = file_iter.path().relative_path().string();
     std::cout << MAP_FILE << std::endl;
     map_instances[MAP_FILE];
-    ASCII_MAP_INSTANCE_MAKER(MAP_FILE, map_instances);
+    ASCII_MAP_INSTANCE_MAKER(MAP_FILE, map_instances, num);
     // break;
   }
 
 }
+
+void road_map_instance_maker(const std::string map_name, const std::string map_dir, inst &map_instances){
+  std::vector<NodePtr> node_list;
+  std::vector<Edge> edges;
+  size_t graph_size;
+  // std::mt19937 rng(std::clock());
+
+  std::uniform_int_distribution<size_t> rng;
+  std::default_random_engine generator;
+
+  std::vector<std::string> files;
+  for(auto file_iter : std::filesystem::directory_iterator(map_dir)){
+      files.push_back(file_iter.path());
+  }
+
+  //getting the file that has the nodes (the one that ends with the .co exstention)
+  std::string node_file;
+  for(auto file = files.begin(); file != files.end(); file++){
+    if(file->substr(file->size()-2) == "co"){
+      node_file = *file;
+      files.erase(file);
+      break;
+    }
+  }
+  
+  load_gr_files(files, edges, graph_size);
+  getNodes_DOT(node_file, node_list);
+  
+  // split ino s 
+  AdjMatrix adj_matrix(graph_size, edges);
+
+  // h_functor is set to 1 for Haversine distance (km), use 0 for euclidean distance
+  auto X = h_functor(1);
+  heuristic h(X);
+
+  ASTAR A(adj_matrix, node_list);
+
+  auto Y = more_than_specific(0);
+  node_order order(Y);
+  int count = 0;
+
+  while(count < 40){
+    size_t source = rng(generator) % adj_matrix.size(), target = rng(generator) % adj_matrix.size(); // randomly select start and end location
+    if(A(source, target, h, order) == nullptr){ // if no path connecting the two exists
+      continue; // redo
+    } else{
+      count++;  // increment count & record
+      map_instances[map_name].push_back({source, target});
+    }
+  }
+  
+}
+
+void make_road_instances(const std::string dir, inst &map_instances){
+  for(auto &file_iter : std::filesystem::directory_iterator(dir)){
+    std::string MAP_DIR = file_iter.path().relative_path().string();
+    std::cout << MAP_DIR << std::endl;
+    // map_instances[MAP_FILE];
+    
+  } 
+}
+
 
 
 /**
@@ -1002,27 +1082,37 @@ struct log{
                   source,
                   target;
 
+  std::vector<std::vector<std::vector<double>>> fronts, 
+                                                norm_fronts;
 
-  int             t0,                 // the timing for creating gen0
-                  t1,
-                  t2,                
-                  t;                  // total run time;
+  std::vector<std::vector<double>>              raw_d_scores,
+                                                norm_d_scores,
+                                                winner,
+                                                norm_winner; // keeps track of the winning candidate for each generation
 
+  std::vector<int>                              run_times;
+  std::vector<double>                           winner_raw_d_score,
+                                                winner_norm_d_score;
 
-  std::vector<std::vector<std::vector<double>>> fronts; 
-
+  // all other data members are written during run time
   log(const std::string file_name_, const size_t source_, const size_t target_, const std::string voting_method_)
   :file_name(file_name_), fronts({}), source(std::to_string(source_)), voting_method(voting_method_), target(std::to_string(target_)) {}
 };
 
 void write_array(std::ostream &out_file, const std::vector<double> &vec){
-   out_file << "[" << vec[0];
 
-   for(int i = 1; i < vec.size(); i++){
-     out_file << ", " << vec[i];
+   if(vec.empty()){
+     out_file << "[]";
+   } else {
+   
+     out_file << "[" << vec[0];
+
+     for(int i = 1; i < vec.size(); i++){
+       out_file << ", " << vec[i];
+     }
+
+     out_file << "]";
    }
-
-   out_file << "]";
 }
 
 
@@ -1036,158 +1126,320 @@ void write_array(std::ostream &out_file, const std::vector<double> &vec){
  * @param: voting_method, the voting method that is used for solution evaluation.
  */ 
 
-void VBEA(const AdjMatrix &adj_matrix, const std::vector<NodePtr> &node_list, heuristic &h, const size_t source, const size_t target, const std::string vote_scheme, struct::log &LOG){
+// void VBEA(const AdjMatrix &adj_matrix, const std::vector<NodePtr> &node_list, heuristic &h, const size_t source, const size_t target, const std::string vote_scheme, struct::log &LOG){
 
-  std::vector<std::vector<std::vector<double>>> FRONTS; // will hold snapshots of the fronts of gen0, 1, and 2 (after removing duplicates and filtering non-dominated solutions)
-  const int k = adj_matrix.get_obj_count();
-  // Start and end location
-  std::cout << "start: \n";
-  std::cout << *node_list[source].get() << std::endl;
-  std::cout << "end: \n";
-  std::cout << *node_list[target].get() << std::endl;
-  std::cout << "----------------------" << std::endl;
+//   std::vector<std::vector<std::vector<double>>> FRONTS; // will hold snapshots of the fronts of gen0, 1, and 2 (after removing duplicates and filtering non-dominated solutions)
+//   const int k = adj_matrix.get_obj_count();
+//   // Start and end location
+//   std::cout << "start: \n";
+//   std::cout << *node_list[source].get() << std::endl;
+//   std::cout << "end: \n";
+//   std::cout << *node_list[target].get() << std::endl;
+//   std::cout << "----------------------" << std::endl;
 
+
+//   auto start_t = std::chrono::high_resolution_clock::now();
+
+
+//   // A* Object
+//   ASTAR A(adj_matrix, node_list);
+
+//   // FORMING INITIAL POPULATION (gen0)
+//   std::vector<std::vector<double>> results;
+//   int b = adj_matrix.get_obj_count();
+//   for(int i = 0; i < b; i++){
+//     // std::cout << "runing A* on objective " << i << "... \n"; // VISUAL
+//     auto Y = more_than_specific(i);
+//     node_order order(Y);
+//     results.push_back(A(source, target, h, order)->g);
+//   }
+
+//   // NORMALIZING GEN0
+//   results = remove_duplicate(results);  // Optional, solutions 0 and 1 often are the same!
+//   auto norm_results = normalize_matrix(results);
+//   auto d_scores = d_score(norm_results);
+
+//   // VOTING RESULTS
+//   auto vote_results = vote(norm_results, d_scores,  vote_scheme); // solutions index is displayed in order of "fitness" according to voting method.
+//   // std::cout << vote_results << std::endl; // VISUAL
+
+//   int t0 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start_t).count();
+//   FRONTS.push_back(results);
+
+  
+//   // SHOW GEN0
+//   std::cout << "-----gen0-----" << std::endl;
+//   for(int i = 0; i < norm_results.size(); i++){
+//       std::cout << "P_" << i << " " << norm_results[i] << " | " << results[i] << " d: " << d_scores[i] << std::endl;
+//   }
+
+//   start_t = std::chrono::high_resolution_clock::now();
+
+//   // CREATING WEGIHT SET OF TOP k CANDAIATES
+//   std::vector<std::vector<double>> weight_sets;
+//   for(int i = 0; i < k && i < norm_results.size(); i++){
+//         weight_sets.push_back(complement_weight_set(norm_results[vote_results[i]]));
+//   }
+
+//  // FIRST CHILD POPULATION (Gen1)
+//   for(int i = 0; i < k && i < weight_sets.size(); i++){
+//     // std::cout << "running weighted A* on weight set " << i << "..." << std::endl; // VISUAL
+//     WEIGHTED_ASTAR WA(adj_matrix, node_list, weight_sets[i]);
+//     auto Y = more_than_specific(0);        // The weighted combined f-score will be the only f-score, so use the first one
+//     node_order order(Y);
+//     // results.push_back(WA(source, target, h, order)->g); // weighted combined
+//     results.push_back(WA(source, target, h, order, i)->g); // weighted conscious, the 
+//   }
+
+//   // remove duplicates and dominated solutions
+//   results = remove_duplicate(results);
+//   results = non_dominated_filter(results);  
+
+//   // NORMALIZING GEN1
+//   norm_results = normalize_matrix(results);
+//   d_scores = d_score(norm_results);
+
+//   vote_results = vote(norm_results, d_scores, vote_scheme);
+
+ 
+//   int t1 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start_t).count();
+//   FRONTS.push_back(results);
+//  // DISPALYING GEN1
+//   std::cout << "-----gen1-----" << std::endl;
+//   for(int i = 0; i < norm_results.size(); i++){
+//       std::cout << "P_" << i << " " << norm_results[i] << " | " << results[i] << " d: " << d_scores[i] << std::endl;
+//   }
+//   std::cout << vote_results << std::endl; // VISUAL
+
+//   std::vector<std::vector<double>> gen2, norm_gen2;  
+//   std::vector<double> gen2_d_scores;
+
+//   start_t = std::chrono::high_resolution_clock::now();
+
+//   // SELECTING TOP K=5 paths form prev generation with respect to voting 
+//   for(int i = 0; i < k && i < results.size(); i++){
+//     gen2.push_back(results[vote_results[i]]);
+//     norm_gen2.push_back(norm_results[vote_results[i]]);
+//   }
+
+//   // WEIGHT SET
+//   weight_sets.clear();
+//   for(int i = 0; i < gen2.size(); i++){
+//     weight_sets.push_back(complement_weight_set(norm_gen2[i]));
+//   }  
+
+//   // CREATING GEN2
+//   for(int i = 0; i < k && i < weight_sets.size(); i++){
+//     // std::cout << "running weighted A* on weight set " << i  << "..." << std::endl; // VISUAL 
+//     WEIGHTED_ASTAR WA(adj_matrix, node_list, weight_sets[i]);
+//     auto Y = more_than_specific(0);        // The weighted combined f-score will be the only f-score
+//     node_order order(Y);
+//     gen2.push_back(WA(source, target, h, order)->g);
+//   }
+
+  
+//   gen2 = remove_duplicate(gen2);
+//   gen2 = non_dominated_filter(gen2);  
+
+//   // Normalize data
+//   norm_gen2 = normalize_matrix(gen2);
+//   gen2_d_scores = d_score(norm_gen2);
+
+
+//   vote_results = vote(norm_gen2, d_scores, vote_scheme);
+//   int t2 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start_t).count();
+//   FRONTS.push_back(gen2);
+
+//   // DISPLAY GEN2  
+//   std::cout << "-----gen2-----" << std::endl;
+//   for(int i = 0; i < gen2.size(); i++){
+//     std::cout << "P_" << i << " " << norm_gen2[i] << " | " << gen2[i] << " d: " << gen2_d_scores[i] << std::endl;
+//   }
+//   std::cout << vote_results << std::endl; // VISUAL
+
+
+// }
+
+
+void write_matrix(std::ostream &out_file, const std::vector<std::vector<double>> &matrix){
+  if(matrix.empty()){
+    out_file << "[[]]";
+  } else {
+    out_file << "["; write_array(out_file, matrix[0]);
+    for(int i = 1; i < matrix.size(); i++){
+      out_file << ", "; write_array(out_file, matrix[i]);
+    }
+
+    out_file << "]";
+  }
+}
+
+
+/**
+ * VBEA DRIVER 
+ * @param: adj_matrix, the graph,
+ * @param: node_list, a method for getting information about the vertext that is needed for the heuristic,
+ * @param: h, hueristic functor,
+ * @param: k, the number of candidates for the next generation. 1 <= k <= j (number of objectives in the enviornment)
+ * @param: T, the number of generations. T >= 0
+ * @param: source, targert, the start and end vertex (node) id of the graph search,
+ * @param: voting_method, the voting method that is used for solution evaluation.
+ */ 
+
+void VBEA(const AdjMatrix &adj_matrix, const std::vector<NodePtr> &node_list, heuristic &h, const size_t source, const size_t target, const std::string vote_scheme, const int T, int K,  struct::log &LOG){
+
+  if(K > adj_matrix.get_obj_count()){
+    std::cout << "WARNING: " << K << ">" << "j" << std::endl << "setting k = j" << std::endl;
+    K = adj_matrix.get_obj_count();
+  }
+ 
+  // std::cout << "start: \n";
+  // std::cout << *node_list[source].get() << std::endl;
+  // std::cout << "end: \n";
+  // std::cout << *node_list[target].get() << std::endl;
+  // std::cout << "----------------------" << std::endl;
 
   auto start_t = std::chrono::high_resolution_clock::now();
-
+  // auto start_t = std::clock();
 
   // A* Object
   ASTAR A(adj_matrix, node_list);
 
   // FORMING INITIAL POPULATION (gen0)
-  std::vector<std::vector<double>> results;
+  std::vector<std::vector<double>> results; // will hold the combined child and parent population
   int b = adj_matrix.get_obj_count();
   for(int i = 0; i < b; i++){
-    // std::cout << "runing A* on objective " << i << "... \n"; // VISUAL
     auto Y = more_than_specific(i);
     node_order order(Y);
     results.push_back(A(source, target, h, order)->g);
   }
 
-  // NORMALIZING GEN0
-  results = remove_duplicate(results);  // Optional, solutions 0 and 1 often are the same!
+  // NORMALIZING AND CLEAN GEN0
+  results = remove_duplicate(results);  // Optional, solutions for the decomposied problems for obkectives 0 and 1 often are the same, especially for instances where distance is nearby
   auto norm_results = normalize_matrix(results);
   auto d_scores = d_score(norm_results);
 
-  // VOTING RESULTS
-  auto vote_results = vote(norm_results, vote_scheme); // solutions index is displayed in order of "fitness" according to voting method.
+  // VOTING 
+  auto vote_results = vote(norm_results, d_scores, vote_scheme); // solutions index is displayed in order of "fitness" according to voting method.
+
+  // Logging
+
+  LOG.run_times.push_back(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start_t).count());
+
+  // LOG.run_times.push_back(std::clock() - start_t);
+  // std::cout << ((double) LOG.run_times.back() / CLOCKS_PER_SEC ) * 1000 << std::endl;
+
+  LOG.fronts.push_back(results);
+  LOG.norm_fronts.push_back(norm_results);
+  
+  auto raw_d_score = d_score(results);
+  LOG.raw_d_scores.push_back(raw_d_score);
+  LOG.norm_d_scores.push_back(d_scores);
+  
+  LOG.winner.push_back(results[vote_results[0]]);
+  LOG.norm_winner.push_back(norm_results[vote_results[0]]);
+  LOG.winner_raw_d_score.push_back(raw_d_score[vote_results[0]]);
+  LOG.winner_norm_d_score.push_back(d_scores[vote_results[0]]);
+
+  // Displaying gen 0
+  // std::cout << "-----gen0-----" << std::endl;
+  // for(int i = 0; i < norm_results.size(); i++){
+  //     std::cout << "P_" << i << " " << norm_results[i] << " | " << results[i] << " d: " << d_scores[i] << std::endl;
+  // }
+  // std::cout << "voting results:" << std::endl;
   // std::cout << vote_results << std::endl; // VISUAL
 
-  int t0 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start_t).count();
-  FRONTS.push_back(results);
+  // What is not local to the loop
+  // - results
+  // - norm_results
+  // - d_scores
+  // - vote_reults
+  //
 
-  
-  // SHOW GEN0
-  std::cout << "-----gen0-----" << std::endl;
-  for(int i = 0; i < norm_results.size(); i++){
-      std::cout << "P_" << i << " " << norm_results[i] << " | " << results[i] << " d: " << d_scores[i] << std::endl;
-  }
+  // main loop
+  for(int t = 0; t < T; t++){
+    start_t = std::chrono::high_resolution_clock::now();
+    // start_t = std::clock();
 
-  start_t = std::chrono::high_resolution_clock::now();
-
-  // CREATING WEGIHT SET OF TOP k CANDAIATES
-  std::vector<std::vector<double>> weight_sets;
-  for(int i = 0; i < k && i < norm_results.size(); i++){
-        weight_sets.push_back(complement_weight_set(norm_results[vote_results[i]]));
-  }
-
- // FIRST CHILD POPULATION (Gen1)
-  for(int i = 0; i < k && i < weight_sets.size(); i++){
-    // std::cout << "running weighted A* on weight set " << i << "..." << std::endl; // VISUAL
-    WEIGHTED_ASTAR WA(adj_matrix, node_list, weight_sets[i]);
-    auto Y = more_than_specific(0);        // The weighted combined f-score will be the only f-score, so use the first one
-    node_order order(Y);
-    // results.push_back(WA(source, target, h, order)->g); // weighted combined
-    results.push_back(WA(source, target, h, order, i)->g); // weighted conscious, the 
-  }
-
-  // remove duplicates and dominated solutions
-  results = remove_duplicate(results);
-  results = non_dominated_filter(results);  
-
-  // NORMALIZING GEN1
-  norm_results = normalize_matrix(results);
-  d_scores = d_score(norm_results);
-
-  vote_results = vote(norm_results, vote_scheme);
-
- 
-  int t1 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start_t).count();
-  FRONTS.push_back(results);
- // DISPALYING GEN1
-  std::cout << "-----gen1-----" << std::endl;
-  for(int i = 0; i < norm_results.size(); i++){
-      std::cout << "P_" << i << " " << norm_results[i] << " | " << results[i] << " d: " << d_scores[i] << std::endl;
-  }
-  std::cout << vote_results << std::endl; // VISUAL
-
-  std::vector<std::vector<double>> gen2, norm_gen2;  
-  std::vector<double> gen2_d_scores;
-
-  start_t = std::chrono::high_resolution_clock::now();
-
-  // SELECTING TOP K=5 paths form prev generation with respect to voting 
-  for(int i = 0; i < k && i < results.size(); i++){
-    gen2.push_back(results[vote_results[i]]);
-    norm_gen2.push_back(norm_results[vote_results[i]]);
-  }
-
-  // WEIGHT SET
-  weight_sets.clear();
-  for(int i = 0; i < gen2.size(); i++){
-    weight_sets.push_back(complement_weight_set(norm_gen2[i]));
-  }  
-
-  // CREATING GEN2
-  for(int i = 0; i < k && i < weight_sets.size(); i++){
-    // std::cout << "running weighted A* on weight set " << i  << "..." << std::endl; // VISUAL 
-    WEIGHTED_ASTAR WA(adj_matrix, node_list, weight_sets[i]);
-    auto Y = more_than_specific(0);        // The weighted combined f-score will be the only f-score
-    node_order order(Y);
-    gen2.push_back(WA(source, target, h, order)->g);
-  }
-
-  
-  gen2 = remove_duplicate(gen2);
-  gen2 = non_dominated_filter(gen2);  
-
-  // Normalize data
-  norm_gen2 = normalize_matrix(gen2);
-  gen2_d_scores = d_score(norm_gen2);
+    // Creating the weight set form the top K solution from the previous generation 
+    std::vector<std::vector<double>> weight_sets;
+    for(int i = 0; i < K && i < norm_results.size(); i++){
+      weight_sets.push_back(complement_weight_set(norm_results[vote_results[i]]));  // pick the top K candidates normalized cost to create weight sets
+    }
+    std::vector<std::vector<double>> temp;           // Save only up too the top K result from the previous generation
+    for(int i = 0; i < K && i < results.size(); i++){
+      temp.push_back(results[vote_results[i]]);
+    }
+    std::swap(temp,results);
 
 
-  vote_results = vote(norm_gen2, vote_scheme);
-  int t2 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start_t).count();
-  FRONTS.push_back(gen2);
+    // creating the child population
+    for(int i = 0; i < K && i < weight_sets.size(); i++){
+      // the focus is which objective has the highest weighted, but what if there are multiple max's?
+      WEIGHTED_ASTAR WA(adj_matrix, node_list, weight_sets[i]);
+      auto Y = more_than_specific(0); // the new objective will be the only objective for the search.
+      node_order order(Y);
+      results.push_back(WA(source, target, h, order, i)->g);    // conscious
+      // results.push_back(WA(source, target, h, order)->g);        // combined
+    }
 
-  // DISPLAY GEN2  
-  std::cout << "-----gen2-----" << std::endl;
-  for(int i = 0; i < gen2.size(); i++){
-    std::cout << "P_" << i << " " << norm_gen2[i] << " | " << gen2[i] << " d: " << gen2_d_scores[i] << std::endl;
-  }
-  std::cout << vote_results << std::endl; // VISUAL
+    // remove duplicates and dominates dolutions from the front
+    results = remove_duplicate(results);
+    results = non_dominated_filter(results);
+
+    // voting
+    norm_results = normalize_matrix(results);
+    d_scores = d_score(norm_results);
+    vote_results = vote(norm_results, d_scores, vote_scheme);
+
+    // logging generation
+    LOG.run_times.push_back(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start_t).count());
+    // LOG.run_times.push_back(std::clock() - start_t);
+    // std::cout << ((double) LOG.run_times.back() / CLOCKS_PER_SEC ) * 1000 << std::endl;
 
 
-  LOG.fronts = FRONTS;
-  LOG.t0 = t0;
-  LOG.t1 = t1;
-  LOG.t2 = t2;
-  LOG.t = t0 + t1 + t2;
-  std::cout << t0 << " " << t1 << " " << t2 << " " << LOG.t << std::endl;
+    LOG.fronts.push_back(results);
+    LOG.norm_fronts.push_back(norm_results);
 
+    auto raw_d_score = d_score(results);
+    LOG.raw_d_scores.push_back(raw_d_score);
+    LOG.norm_d_scores.push_back(d_scores);
+
+    LOG.winner.push_back(results[vote_results[0]]);
+    LOG.norm_winner.push_back(norm_results[vote_results[0]]);
+    LOG.winner_raw_d_score.push_back(raw_d_score[vote_results[0]]);
+    LOG.winner_norm_d_score.push_back(d_scores[vote_results[0]]);
+
+    // SHOW GEN i
+    // std::cout << "-----gen" << t + 1 << "-----" << std::endl;
+    // for(int i = 0; i < norm_results.size(); i++){
+    //     std::cout << "P_" << i << " " << norm_results[i] << " | " << results[i] << " d: " << d_scores[i] << std::endl;
+    // }
+    // std::cout << "winner:" << std::endl;
+    // std::cout << results[vote_results[0]] << " d: " << d_scores[vote_results[0]] << " r_d: " << path_d_score(results[vote_results[0]]) << std::endl;
+    
+  } // end main loop;
+  return ;
 }
 
-
-void write_matrix(std::ostream &out_file, const std::vector<std::vector<double>> &matrix){
-  out_file << "["; write_array(out_file, matrix[0]);
-  for(int i = 0; i < matrix.size(); i++){
-    out_file << ", "; write_array(out_file, matrix[i]);
-  }
-
-  out_file << "]";
-}
 
 void write_record(std::ostream &out_file, const struct::log &r) {
+  // std::cout << "  "; std::cout << "{"; std::cout << std::endl;
+  
+  // std::cout << "  "; std::cout << "\"map-id\": " << "\"" << r.file_name << "\""; std::cout << std::endl;
+  // std::cout << "  "; std::cout << ", "; std::cout << std::endl;
+
+  // std::cout << "  "; std::cout << "\"source\": " << r.source; std::cout << std::endl;
+  // std::cout << "  "; std::cout << ", "; std::cout << std::endl;
+
+  // std::cout << "  "; std::cout << "\"target\": " << r.target; std::cout << std::endl;
+  // std::cout << "  "; std::cout << ", "; std::cout << std::endl;
+
+  // std::cout << "  "; std::cout << "\"voting-mechanism\": " << "\"" << r.voting_method << "\""; std::cout << std::endl;
+  // std::cout << "  "; std::cout << ", "; std::cout << std::endl;
+
+  // std::cout << "  "; std::cout << "\"child-generation-method\": " << "\"" << r.child_method << "\""; std::cout << std::endl;
+  // std::cout << "  "; std::cout << ", "; std::cout << std::endl;
   out_file << "{";
   
   out_file << "\"map-id\": " << "\"" << r.file_name << "\"";
@@ -1204,35 +1456,117 @@ void write_record(std::ostream &out_file, const struct::log &r) {
 
   out_file << "\"child-generation-method\": " << "\"" << r.child_method << "\"";
   out_file << ", ";
+
+// FRONTS
   
+  // std::cout << "  "; std::cout << "\"gen0-front\": " << r.fronts[0]; std::cout << std::endl;
+  // std::cout << "  "; std::cout << ", "; std::cout << std::endl;
+
+  // std::cout << "  "; std::cout << "\"gen0-norm-front\": " << r.norm_fronts[0]; std::cout << std::endl;
+  // std::cout << "  "; std::cout << ", "; std::cout << std::endl;
+
+  // std::cout << "  "; std::cout << "\"gen0-d-score\": " << r.all_d_scores[0]; std::cout << std::endl;
+  // std::cout << "  "; std::cout << ", "; std::cout << std::endl;
+
+  // std::cout << "  "; std::cout << "\"gen0-norm-d-score\": " << r.all_norm_d_scores[0]; std::cout << std::endl;
+  // std::cout << "  "; std::cout << ", "; std::cout << std::endl;
+
+  // std::cout << "  "; std::cout << "\"gen0-sparsity\": " << sparsity_metric(r.fronts[0]); std::cout << std::endl;
+  // std::cout << "  "; std::cout << ", "; std::cout << std::endl;
+
+  // std::cout << "  "; std::cout << "\"gen0-winner\": " << r.winners[0]; std::cout << std::endl;
+  // std::cout << "  "; std::cout << ", "; std::cout << std::endl;
+
+  // std::cout << "  "; std::cout << "\"gen0-time\": " << r.run_times[0]; std::cout << std::endl;
+
+
   out_file << "\"gen0-front\": "; write_matrix(out_file, r.fronts[0]);
+  out_file << ", ";
+
+  out_file << "\"gen0-norm-front\": "; write_matrix(out_file, r.norm_fronts[0]);
+  out_file << ", ";
+
+  out_file << "\"gen0-raw-d-score\": "; write_array(out_file, r.raw_d_scores[0]);
+  out_file << ", ";
+
+  out_file << "\"gen0-norm-d-score\": "; write_array(out_file, r.norm_d_scores[0]);
   out_file << ", ";
 
   out_file << "\"gen0-sparsity\": " << sparsity_metric(r.fronts[0]);
   out_file << ", ";
 
-  out_file << "\"gen0-time\": " << r.t0;
+  out_file << "\"gen0-raw-winner\": "; write_array(out_file, r.winner[0]);
   out_file << ", ";
 
-  out_file << "\"gen1-front\": "; write_matrix(out_file, r.fronts[0]);
+  out_file << "\"gen0-norm-winner\": "; write_array(out_file, r.norm_winner[0]);
   out_file << ", ";
 
-  out_file << "\"gen1-sparsity\": " << sparsity_metric(r.fronts[1]);
+  out_file << "\"gen0-winner-naw-d-score\": " <<  r.winner_raw_d_score[0];
+  out_file << ", ";
+  
+  out_file << "\"gen0-winner-norm-d-score\": " << r.winner_norm_d_score[0];
   out_file << ", ";
 
-  out_file << "\"gen1-time\": " << r.t1;
-  out_file << ", ";
+  out_file << "\"gen0-time\": " << r.run_times[0];
 
-  out_file << "\"gen2-front\": "; write_matrix(out_file, r.fronts[0]);
-  out_file << ", ";
 
-  out_file << "\"gen2-sparsity\": " << sparsity_metric(r.fronts[2]);
-  out_file << ", ";
+  // for(int i = 1; i < r.fronts.size(); i++){
+  // std::cout << "  "; std::cout << ", "; std::cout << std::endl;
+  
+  // std::cout << "  "; std::cout << "\"gen" << i << "-front\": " << r.fronts[i]; std::cout << std::endl;
+  // std::cout << "  "; std::cout << ", "; std::cout << std::endl;
 
-  out_file << "\"gen2-time\": " << r.t2;
-  out_file << ", ";
+  // std::cout << "  "; std::cout << "\"gen" << i << "-norm-front\": " << r.norm_fronts[i]; std::cout << std::endl;
+  // std::cout << "  "; std::cout << ", "; std::cout << std::endl;
 
-  out_file << "\"total-time\": " << r.t;
+  // std::cout << "  "; std::cout << "\"gen" << i << "-d-score\": " << r.all_d_scores[i]; std::cout << std::endl;
+  // std::cout << "  "; std::cout << ", "; std::cout << std::endl;
+
+  // std::cout << "  "; std::cout << "\"gen" << i << "-norm-d-score\": " << r.all_norm_d_scores[i]; std::cout << std::endl;
+  // std::cout << "  "; std::cout << ", "; std::cout << std::endl;
+
+  // std::cout << "  "; std::cout << "\"gen" << i << "-sparsity\": " << sparsity_metric(r.fronts[i]); std::cout << std::endl;
+  // std::cout << "  "; std::cout << ", "; std::cout << std::endl;
+
+  // std::cout << "  "; std::cout << "\"gen" << i << "-winner\": " << r.winners[i]; std::cout << std::endl;
+  // std::cout << "  "; std::cout << ", "; std::cout << std::endl;
+
+  // std::cout << "  "; std::cout << "\"gen" << i << "-time\": " << r.run_times[i]; std::cout << std::endl;
+
+  // }
+  for(int i = 1; i < r.fronts.size(); i++){
+    out_file << ", ";
+  
+    out_file << "\"gen" << i << "-front\": "; write_matrix(out_file, r.fronts[i]);
+    out_file << ", ";
+
+    out_file << "\"gen" << i << "-norm-front\": "; write_matrix(out_file, r.norm_fronts[i]);
+    out_file << ", ";
+
+    out_file << "\"gen" << i << "-raw-d-score\": "; write_array(out_file, r.raw_d_scores[0]);
+    out_file << ", ";
+
+    out_file << "\"gen" << i << "-norm-d-score\": "; write_array(out_file, r.norm_d_scores[i]);
+    out_file << ", ";
+
+    out_file << "\"gen" << i << "-sparsity\": " << sparsity_metric(r.fronts[i]);
+    out_file << ", ";
+
+    out_file << "\"gen" << i << "-raw-winner\": "; write_array(out_file, r.winner[i]);
+    out_file << ", ";
+
+    out_file << "\"gen" << i << "-norm-winner\": "; write_array(out_file, r.norm_winner[i]);
+    out_file << ", ";
+
+    out_file << "\"gen" << i << "-winner-raw-d-score\": " << r.winner_raw_d_score[i];
+    out_file << ", ";
+  
+    out_file << "\"gen" << i << "-winner-norm-d-score\": " << r.winner_norm_d_score[i];
+    out_file << ", ";
+
+    out_file << "\"gen" << i << "-time\": " << r.run_times[i];
+
+  }
 
 
   out_file << "}";
@@ -1241,20 +1575,24 @@ void write_record(std::ostream &out_file, const struct::log &r) {
 
 
 // all the records will be averaged in python, this is just to write it in json format
-void write_all_records(const std::vector<struct::log> &rec, std::string file_name){
+void write_all_records(const std::vector<struct::log> &logs, std::string file_name){
   std::ofstream out_file(file_name + ".json");
+
+  std::cout << "writting data..." << std::endl;
 
   out_file << "{\"data\": [";
 
-  write_record(out_file, rec[0]);
-  for(int i = 1; i < rec.size(); i++){
+  write_record(out_file, logs[0]);
+  for(int i = 1; i < logs.size(); i++){
     out_file << ", ";
-    write_record(out_file, rec[i]);
+    write_record(out_file, logs[i]);
   }
 
   out_file << "]}";
 
   out_file.close();
+
+  std::cout << "DONE" << std::endl;
 }
 
 /**
@@ -1262,7 +1600,7 @@ void write_all_records(const std::vector<struct::log> &rec, std::string file_nam
  */
 
 // reading the instances txt file.
-std::unordered_map<std::string, std::vector<std::vector<size_t>>> read_ASCII_instances(const std::string INSTANCE_FILE){
+std::unordered_map<std::string, std::vector<std::vector<size_t>>> read_ASCII_instances(const std::string INSTANCE_FILE, const int inst_count){
   std::unordered_map<std::string, std::vector<std::vector<size_t>>> instances;
 
   std::ifstream ifs(INSTANCE_FILE);
@@ -1274,7 +1612,7 @@ std::unordered_map<std::string, std::vector<std::vector<size_t>>> read_ASCII_ins
   while(ifs >> x){
     // std::cout << x << std::endl;
     instances[x];
-    for(int i = 0; i < 40; i++){
+    for(int i = 0; i < inst_count; i++){
       ifs >> s >> t;
       // std::cout << "  " << s << " " << t << std::endl;
       instances[x].push_back({s,t});
@@ -1294,46 +1632,57 @@ std::vector<struct::log> ASCII_instance_runner(const std::string vote_method, co
 
   std::vector<struct::log> logs;
   
+  int n = 1;   // map counter
+  int E = 0;
   for(auto &inst : instances){ // for each map 
     std::string map_name = inst.first;
-    //create a the map once
     std::vector<NodePtr> node_list;
     AdjMatrix adj_matrix;
 
-    // std::cout << map_name << std::endl;
+    std::cout << map_name << " (" << n << "/156)" << std::endl;
 
     auto x = h_functor(0);
     heuristic h = x;
     getNodes_ASCII(map_name, node_list, adj_matrix);
+    int m = 1;  // instances counter
     for(auto param : inst.second){ // for each valid source and target position (there will be 40)
       // get source and target
       size_t source = param[0],
              target = param[1];
 
-      // std::cout << "  " << source << " " << target << std::endl;
-      // run VBEA with param 
-      // Independent variable to incorperate
-      // 1. combined or conscious
-      // 2. number of generations (1, 2)
-      std::cout << "map: " << map_name << std::endl;
-      struct::log a(map_name, source, target, vote_method);
-      VBEA(adj_matrix, node_list, h, source, target, vote_method, a);
-      logs.push_back(a);
-    }
+      std::cout << "  " << source << " " << target << " (" << m << "/15)" << " E = " << E << std::endl;
 
+      struct::log a(map_name, source, target, vote_method);
+      VBEA(adj_matrix, node_list, h, source, target, vote_method, 5, adj_matrix.get_obj_count(), a);
+      logs.push_back(a);
+      m++;
+      // break;
+    }
+    n++;
+    // break;
   }
   std::cout << "Done!" << std::endl;
 
   return logs;
 }
 
+// for creating the .gr file that contains the thrid objective for all the other files
+// suppose objective cost 1 and two are already there
+void add_third_objective(std::vector<Edge> &edge_list){
+  std::default_random_engine generator(1395);
+  std::uniform_real_distribution<double> urng(0.3,0.4); // uniform random generator between 0.3 and 0.4
+
+  for(auto &e: edge_list){
+    e.cost.push_back( urng(generator)*(e.cost[0] + e.cost[1]));
+  }
+}
 
 // making instances
 // int main(){
 //   std::unordered_map<std::string, std::vector<std::vector<size_t>>> map_instances;
-//   make_ASCII_instances("dao-map", map_instances);
+//   make_ASCII_instances("dao-map", map_instances, 15);
 
-//   std::ofstream out_file("dao-instances.txt");
+//   std::ofstream out_file("dao-uniform-15.txt");
   
 //   for(auto &iter : map_instances){
 //     out_file << iter.first << '\n';
@@ -1349,85 +1698,73 @@ std::vector<struct::log> ASCII_instance_runner(const std::string vote_method, co
 
 
 
+// ASCCI INSTANCE MAIN
 // int main(){
-//   std::string map  = "dao-map/den510d.map",
-//               vote_scheme = "borda";
+//   auto instances = read_ASCII_instances("dao-uniform-15.txt", 15);
+//   // for(auto &iter : instances){
+//   //   std::cout << iter.first << std::endl;
+//   //   for(auto &jter : iter.second){
+//   //     std::cout << "  " << jter << std::endl;
+//   //   }
+//   // }
+//   std::vector<struct::log> logs = ASCII_instance_runner("condorent", instances);  
 
-//   RAND_ASCII_RUNNER(map, vote_scheme);
-
-//   return 0; 
+//   write_all_records(logs, "condorent");
+//   return 0;
 // }
 
 
-// INSTANCE RUNNER MAIN
+void map_data_write(std::ostream &out_file, const std::string map_name, const size_t node_size, const size_t edge_size){
+  out_file << " {";
+
+  out_file << "\"map-name\": " << "\"" << map_name << "\"";
+  out_file << ", ";
+
+  out_file << "\"nodes\": " << node_size;
+  out_file << ", ";
+
+  out_file << "\"edges\": " << edge_size;
+
+  out_file << "}";
+
+}
+// main for getitng the map size
 int main(){
-  auto instances = read_ASCII_instances("DAO-instances.txt");
-  // for(auto &iter : instances){
-  //   std::cout << iter.first << std::endl;
-  //   for(auto &jter : iter.second){
-  //     std::cout << "  " << jter << std::endl;
-  //   }
-  // }
-  auto logs = ASCII_instance_runner("borda", instances);
+  // 0: vertext count,
+  // 1: edge count
+  std::unordered_map<std::string, std::vector<size_t>> map_sizes;
+  std::cout << "Constructing graphs..." << std::endl;
+  for(auto &file_iter: std::filesystem::directory_iterator("dao-map")){
+    std::vector<NodePtr> node_list;
+    AdjMatrix adj_matrix;
+    std::string MAP_FILE = file_iter.path().relative_path().string();
+    std::cout << MAP_FILE<< "...";
+    getNodes_ASCII(MAP_FILE, node_list, adj_matrix);
+    map_sizes[MAP_FILE] = {adj_matrix.size(), adj_matrix.edge_size()};
+    std::cout << "Done" << std::endl;
+  }
 
-  write_all_records(logs, "v0");
+  //write to json;
 
-  return 0;
+  std::ofstream out_file("dao-map-info.json");
+
+  out_file << "{ \"data\": [";
+
+  for(auto i = map_sizes.begin(); i != map_sizes.end(); i++){
+    std::string MAP_NAME = i->first.substr(8);
+    std::cout << "map: " << MAP_NAME << "V: " << i->second[0] << ", E: " << i->second[1] << std::endl;
+    if(i == map_sizes.begin()){
+      map_data_write(out_file, i->first, i->second[0], i->second[1]);
+    } else {
+      out_file << ", ";
+      map_data_write(out_file, i->first, i->second[0], i->second[1]);
+    }
+  }
+
+
+  out_file << "]}";
 }
 
-
-
-// int main(){
-//   std::vector<struct::log> logs;
-//   std::vector<std::vector<std::vector<double>>> one, two, three;
-//   std::mt19937 rng(173);
-
-//   for(int i = 0; i < 4; i++){
-//     std::vector<std::vector<double>> matrix;
-//     for(int j = 0; j < 4; j++){
-//       std::vector<double> front;
-//       for(int k = 0; k < 4; k++){
-//         front.push_back(double(rng()% 20));
-//       }
-//       matrix.push_back(front);
-//     }
-//     one.push_back(matrix);
-//   }
-
-//   for(int i = 0; i < 4; i++){
-//     std::vector<std::vector<double>> matrix;
-//     for(int j = 0; j < 4; j++){
-//       std::vector<double> front;
-//       for(int k = 0; k < 4; k++){
-//         front.push_back(double(rng()% 20));
-//       }
-//       matrix.push_back(front);
-//     }
-//     two.push_back(matrix);
-//   }
-
-//   for(int i = 0; i < 4; i++){
-//     std::vector<std::vector<double>> matrix;
-//     for(int j = 0; j < 4; j++){
-//       std::vector<double> front;
-//       for(int k = 0; k < 4; k++){
-//         front.push_back(double(rng()% 20));
-//       }
-//       matrix.push_back(front);
-//     }
-//     three.push_back(matrix);
-//   }
-
-
-//   struct::log a("hello", 12, 123, "borda", one);
-//   struct::log b("json", 11, 11, "smt", two);
-//   struct::log c("world", 41, 31, "ayy lmao", three);
-//   logs.push_back(a);
-//   logs.push_back(b);
-//   logs.push_back(c);
-
-//   write_all_records(logs, "fake-data");
-// }
 
 
 /**

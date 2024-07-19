@@ -216,5 +216,20 @@ typedef boost::heap::priority_queue<NodePtr , boost::heap::compare<Node::compare
 
 double sparsity_metric(const std::vector<std::vector<double>> &front_approximation);
 
+std::vector<std::vector<double>> normalize_matrix(std::vector<std::vector<double>> path_costs);
+
+/** 
+ * @details find the euclidean distance in n-dimension space for a normalized path 
+ * 
+*/
+double path_d_score(const std::vector<double>& normalized_path_cost);
+
+
+/**
+ * @details When a tie is detected in a voting scheme, we pick the candidate that is closest to the Pareto space origin ({0, 0, 0, ..., 0}).
+ * @return a n sized vector where vector[i] is the euclidean distance in Pareto space between path i and the origin.
+*/
+std::vector<double> d_score(std::vector<std::vector<double>> normalized_path_costs);
+
 
 #endif //UTILS_DEFINITIONS_H

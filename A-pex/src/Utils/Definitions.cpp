@@ -342,8 +342,6 @@ std::ostream& operator<<(std::ostream& os, const Interval& interval){
   return os;
 }
 
-
-
 double sparsity_metric(const std::vector<std::vector<double>> &front_approximation){
   int m = front_approximation[0].size();      // m = number of objectives in the environment
   int n = front_approximation.size();         // n = number of solutions
@@ -370,4 +368,62 @@ double sparsity_metric(const std::vector<std::vector<double>> &front_approximati
     return sparsity;
   }
   
+}
+
+
+std::vector<std::vector<double>> normalize_matrix(std::vector<std::vector<double>> path_costs){
+    double min, max;
+    std::vector<std::vector<double>> normalized_matrix(path_costs.size(), std::vector<double>(path_costs[0].size(), 0));
+
+    for(int j = 0; j < path_costs[0].size(); j++){
+        //find min and max value of an objective cross all paths
+        min = INT_MAX;
+        max = -1;
+        //find min and max of the column (multiple max and mins are allowed)
+        for(int i = 0; i < path_costs.size(); i++){
+            if(path_costs[i][j] > max) {
+                max = path_costs[i][j];
+            } 
+            if(path_costs[i][j] < min) {
+                min = path_costs[i][j];
+            }
+        }
+
+        for(int i = 0; i < path_costs.size(); i++){
+            if(max == min){                                                       // remove NaN
+                normalized_matrix[i][j] = 0.0;
+            } else {
+                normalized_matrix[i][j] = (path_costs[i][j] - min) / (max - min); // normalize using:  val - min / max - min
+            }
+        }
+    }
+    
+    return normalized_matrix;
+}
+
+/** 
+ * @details find the euclidean distance in n-dimension space for a normalized path 
+ * 
+*/
+double path_d_score(const std::vector<double>& normalized_path_cost){
+    double d_score;
+    for(int i = 0; i < normalized_path_cost.size(); i++){
+        d_score += std::pow(normalized_path_cost[i], 2);
+    }
+    d_score = std::sqrt(d_score);
+
+    return d_score;
+}
+
+/**
+ * @details When a tie is detected in a voting scheme, we pick the candidate that is closest to the Pareto space origin ({0, 0, 0, ..., 0}).
+ * @return a n sized vector where vector[i] is the euclidean distance in Pareto space between path i and the origin.
+*/
+std::vector<double> d_score(std::vector<std::vector<double>> normalized_path_costs) {
+    std::vector<double> d_score;
+    for(int i = 0; i < normalized_path_costs.size(); i++) {
+        d_score.emplace_back(path_d_score(normalized_path_costs[i]));
+    }
+
+    return d_score;
 }

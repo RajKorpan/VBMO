@@ -1,0 +1,86 @@
+[
+{
+  "directory": "/Users/magi/Desktop/VBMO/A-pex/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_ATOMIC_NO_LIB -DBOOST_CHRONO_DYN_LINK -DBOOST_CHRONO_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_FILESYSTEM_NO_LIB -DBOOST_LOG_DYN_LINK -DBOOST_LOG_NO_LIB -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_PROGRAM_OPTIONS_NO_LIB -DBOOST_SYSTEM_DYN_LINK -DBOOST_SYSTEM_NO_LIB -DBOOST_THREAD_DYN_LINK -DBOOST_THREAD_NO_LIB -I/Users/magi/Desktop/VBMO/A-pex/inc -isystem /opt/homebrew/include  -g -Wall -g -std=gnu++14 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/multiobj.dir/src/driver.cpp.o -c /Users/magi/Desktop/VBMO/A-pex/src/driver.cpp",
+  "file": "/Users/magi/Desktop/VBMO/A-pex/src/driver.cpp",
+  "output": "CMakeFiles/multiobj.dir/src/driver.cpp.o"
+},
+{
+  "directory": "/Users/magi/Desktop/VBMO/A-pex/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_ATOMIC_NO_LIB -DBOOST_CHRONO_DYN_LINK -DBOOST_CHRONO_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_FILESYSTEM_NO_LIB -DBOOST_LOG_DYN_LINK -DBOOST_LOG_NO_LIB -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_PROGRAM_OPTIONS_NO_LIB -DBOOST_SYSTEM_DYN_LINK -DBOOST_SYSTEM_NO_LIB -DBOOST_THREAD_DYN_LINK -DBOOST_THREAD_NO_LIB -I/Users/magi/Desktop/VBMO/A-pex/inc -isystem /opt/homebrew/include  -g -Wall -g -std=gnu++14 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/multiobj.dir/src/BiCriteria/AbstractSolver.cpp.o -c /Users/magi/Desktop/VBMO/A-pex/src/BiCriteria/AbstractSolver.cpp",
+  "file": "/Users/magi/Desktop/VBMO/A-pex/src/BiCriteria/AbstractSolver.cpp",
+  "output": "CMakeFiles/multiobj.dir/src/BiCriteria/AbstractSolver.cpp.o"
+},
+{
+  "directory": "/Users/magi/Desktop/VBMO/A-pex/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_ATOMIC_NO_LIB -DBOOST_CHRONO_DYN_LINK -DBOOST_CHRONO_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_FILESYSTEM_NO_LIB -DBOOST_LOG_DYN_LINK -DBOOST_LOG_NO_LIB -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_PROGRAM_OPTIONS_NO_LIB -DBOOST_SYSTEM_DYN_LINK -DBOOST_SYSTEM_NO_LIB -DBOOST_THREAD_DYN_LINK -DBOOST_THREAD_NO_LIB -I/Users/magi/Desktop/VBMO/A-pex/inc -isystem /opt/homebrew/include  -g -Wall -g -std=gnu++14 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/multiobj.dir/src/BiCriteria/ApexSearch.cpp.o -c /Users/magi/Desktop/VBMO/A-pex/src/BiCriteria/ApexSearch.cpp",
+  "file": "/Users/magi/Desktop/VBMO/A-pex/src/BiCriteria/ApexSearch.cpp",
+  "output": "CMakeFiles/multiobj.dir/src/BiCriteria/ApexSearch.cpp.o"
+},
+{
+  "directory": "/Users/magi/Desktop/VBMO/A-pex/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_ATOMIC_NO_LIB -DBOOST_CHRONO_DYN_LINK -DBOOST_CHRONO_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_FILESYSTEM_NO_LIB -DBOOST_LOG_DYN_LINK -DBOOST_LOG_NO_LIB -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_PROGRAM_OPTIONS_NO_LIB -DBOOST_SYSTEM_DYN_LINK -DBOOST_SYSTEM_NO_LIB -DBOOST_THREAD_DYN_LINK -DBOOST_THREAD_NO_LIB -I/Users/magi/Desktop/VBMO/A-pex/inc -isystem /opt/homebrew/include  -g -Wall -g -std=gnu++14 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/multiobj.dir/src/BiCriteria/BOAStar.cpp.o -c /Users/magi/Desktop/VBMO/A-pex/src/BiCriteria/BOAStar.cpp",
+  "file": "/Users/magi/Desktop/VBMO/A-pex/src/BiCriteria/BOAStar.cpp",
+  "output": "CMakeFiles/multiobj.dir/src/BiCriteria/BOAStar.cpp.o"
+},
+{
+  "directory": "/Users/magi/Desktop/VBMO/A-pex/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_ATOMIC_NO_LIB -DBOOST_CHRONO_DYN_LINK -DBOOST_CHRONO_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_FILESYSTEM_NO_LIB -DBOOST_LOG_DYN_LINK -DBOOST_LOG_NO_LIB -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_PROGRAM_OPTIONS_NO_LIB -DBOOST_SYSTEM_DYN_LINK -DBOOST_SYSTEM_NO_LIB -DBOOST_THREAD_DYN_LINK -DBOOST_THREAD_NO_LIB -I/Users/magi/Desktop/VBMO/A-pex/inc -isystem /opt/homebrew/include  -g -Wall -g -std=gnu++14 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/multiobj.dir/src/BiCriteria/DominanceChecker.cpp.o -c /Users/magi/Desktop/VBMO/A-pex/src/BiCriteria/DominanceChecker.cpp",
+  "file": "/Users/magi/Desktop/VBMO/A-pex/src/BiCriteria/DominanceChecker.cpp",
+  "output": "CMakeFiles/multiobj.dir/src/BiCriteria/DominanceChecker.cpp.o"
+},
+{
+  "directory": "/Users/magi/Desktop/VBMO/A-pex/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_ATOMIC_NO_LIB -DBOOST_CHRONO_DYN_LINK -DBOOST_CHRONO_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_FILESYSTEM_NO_LIB -DBOOST_LOG_DYN_LINK -DBOOST_LOG_NO_LIB -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_PROGRAM_OPTIONS_NO_LIB -DBOOST_SYSTEM_DYN_LINK -DBOOST_SYSTEM_NO_LIB -DBOOST_THREAD_DYN_LINK -DBOOST_THREAD_NO_LIB -I/Users/magi/Desktop/VBMO/A-pex/inc -isystem /opt/homebrew/include  -g -Wall -g -std=gnu++14 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/multiobj.dir/src/BiCriteria/NAMOA.cpp.o -c /Users/magi/Desktop/VBMO/A-pex/src/BiCriteria/NAMOA.cpp",
+  "file": "/Users/magi/Desktop/VBMO/A-pex/src/BiCriteria/NAMOA.cpp",
+  "output": "CMakeFiles/multiobj.dir/src/BiCriteria/NAMOA.cpp.o"
+},
+{
+  "directory": "/Users/magi/Desktop/VBMO/A-pex/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_ATOMIC_NO_LIB -DBOOST_CHRONO_DYN_LINK -DBOOST_CHRONO_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_FILESYSTEM_NO_LIB -DBOOST_LOG_DYN_LINK -DBOOST_LOG_NO_LIB -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_PROGRAM_OPTIONS_NO_LIB -DBOOST_SYSTEM_DYN_LINK -DBOOST_SYSTEM_NO_LIB -DBOOST_THREAD_DYN_LINK -DBOOST_THREAD_NO_LIB -I/Users/magi/Desktop/VBMO/A-pex/inc -isystem /opt/homebrew/include  -g -Wall -g -std=gnu++14 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/multiobj.dir/src/BiCriteria/PPA.cpp.o -c /Users/magi/Desktop/VBMO/A-pex/src/BiCriteria/PPA.cpp",
+  "file": "/Users/magi/Desktop/VBMO/A-pex/src/BiCriteria/PPA.cpp",
+  "output": "CMakeFiles/multiobj.dir/src/BiCriteria/PPA.cpp.o"
+},
+{
+  "directory": "/Users/magi/Desktop/VBMO/A-pex/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_ATOMIC_NO_LIB -DBOOST_CHRONO_DYN_LINK -DBOOST_CHRONO_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_FILESYSTEM_NO_LIB -DBOOST_LOG_DYN_LINK -DBOOST_LOG_NO_LIB -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_PROGRAM_OPTIONS_NO_LIB -DBOOST_SYSTEM_DYN_LINK -DBOOST_SYSTEM_NO_LIB -DBOOST_THREAD_DYN_LINK -DBOOST_THREAD_NO_LIB -I/Users/magi/Desktop/VBMO/A-pex/inc -isystem /opt/homebrew/include  -g -Wall -g -std=gnu++14 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/multiobj.dir/src/BiCriteria/ShortestPathHeuristic.cpp.o -c /Users/magi/Desktop/VBMO/A-pex/src/BiCriteria/ShortestPathHeuristic.cpp",
+  "file": "/Users/magi/Desktop/VBMO/A-pex/src/BiCriteria/ShortestPathHeuristic.cpp",
+  "output": "CMakeFiles/multiobj.dir/src/BiCriteria/ShortestPathHeuristic.cpp.o"
+},
+{
+  "directory": "/Users/magi/Desktop/VBMO/A-pex/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_ATOMIC_NO_LIB -DBOOST_CHRONO_DYN_LINK -DBOOST_CHRONO_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_FILESYSTEM_NO_LIB -DBOOST_LOG_DYN_LINK -DBOOST_LOG_NO_LIB -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_PROGRAM_OPTIONS_NO_LIB -DBOOST_SYSTEM_DYN_LINK -DBOOST_SYSTEM_NO_LIB -DBOOST_THREAD_DYN_LINK -DBOOST_THREAD_NO_LIB -I/Users/magi/Desktop/VBMO/A-pex/inc -isystem /opt/homebrew/include  -g -Wall -g -std=gnu++14 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/multiobj.dir/src/BiCriteria/SingleCriteria.cpp.o -c /Users/magi/Desktop/VBMO/A-pex/src/BiCriteria/SingleCriteria.cpp",
+  "file": "/Users/magi/Desktop/VBMO/A-pex/src/BiCriteria/SingleCriteria.cpp",
+  "output": "CMakeFiles/multiobj.dir/src/BiCriteria/SingleCriteria.cpp.o"
+},
+{
+  "directory": "/Users/magi/Desktop/VBMO/A-pex/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_ATOMIC_NO_LIB -DBOOST_CHRONO_DYN_LINK -DBOOST_CHRONO_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_FILESYSTEM_NO_LIB -DBOOST_LOG_DYN_LINK -DBOOST_LOG_NO_LIB -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_PROGRAM_OPTIONS_NO_LIB -DBOOST_SYSTEM_DYN_LINK -DBOOST_SYSTEM_NO_LIB -DBOOST_THREAD_DYN_LINK -DBOOST_THREAD_NO_LIB -I/Users/magi/Desktop/VBMO/A-pex/inc -isystem /opt/homebrew/include  -g -Wall -g -std=gnu++14 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/multiobj.dir/src/Utils/Definitions.cpp.o -c /Users/magi/Desktop/VBMO/A-pex/src/Utils/Definitions.cpp",
+  "file": "/Users/magi/Desktop/VBMO/A-pex/src/Utils/Definitions.cpp",
+  "output": "CMakeFiles/multiobj.dir/src/Utils/Definitions.cpp.o"
+},
+{
+  "directory": "/Users/magi/Desktop/VBMO/A-pex/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_ATOMIC_NO_LIB -DBOOST_CHRONO_DYN_LINK -DBOOST_CHRONO_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_FILESYSTEM_NO_LIB -DBOOST_LOG_DYN_LINK -DBOOST_LOG_NO_LIB -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_PROGRAM_OPTIONS_NO_LIB -DBOOST_SYSTEM_DYN_LINK -DBOOST_SYSTEM_NO_LIB -DBOOST_THREAD_DYN_LINK -DBOOST_THREAD_NO_LIB -I/Users/magi/Desktop/VBMO/A-pex/inc -isystem /opt/homebrew/include  -g -Wall -g -std=gnu++14 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/multiobj.dir/src/Utils/IOUtils.cpp.o -c /Users/magi/Desktop/VBMO/A-pex/src/Utils/IOUtils.cpp",
+  "file": "/Users/magi/Desktop/VBMO/A-pex/src/Utils/IOUtils.cpp",
+  "output": "CMakeFiles/multiobj.dir/src/Utils/IOUtils.cpp.o"
+},
+{
+  "directory": "/Users/magi/Desktop/VBMO/A-pex/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_ATOMIC_NO_LIB -DBOOST_CHRONO_DYN_LINK -DBOOST_CHRONO_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_FILESYSTEM_NO_LIB -DBOOST_LOG_DYN_LINK -DBOOST_LOG_NO_LIB -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_PROGRAM_OPTIONS_NO_LIB -DBOOST_SYSTEM_DYN_LINK -DBOOST_SYSTEM_NO_LIB -DBOOST_THREAD_DYN_LINK -DBOOST_THREAD_NO_LIB -I/Users/magi/Desktop/VBMO/A-pex/inc -isystem /opt/homebrew/include  -g -Wall -g -std=gnu++14 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/multiobj.dir/src/Utils/Logger.cpp.o -c /Users/magi/Desktop/VBMO/A-pex/src/Utils/Logger.cpp",
+  "file": "/Users/magi/Desktop/VBMO/A-pex/src/Utils/Logger.cpp",
+  "output": "CMakeFiles/multiobj.dir/src/Utils/Logger.cpp.o"
+},
+{
+  "directory": "/Users/magi/Desktop/VBMO/A-pex/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_ATOMIC_NO_LIB -DBOOST_CHRONO_DYN_LINK -DBOOST_CHRONO_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_FILESYSTEM_NO_LIB -DBOOST_LOG_DYN_LINK -DBOOST_LOG_NO_LIB -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_PROGRAM_OPTIONS_NO_LIB -DBOOST_SYSTEM_DYN_LINK -DBOOST_SYSTEM_NO_LIB -DBOOST_THREAD_DYN_LINK -DBOOST_THREAD_NO_LIB -I/Users/magi/Desktop/VBMO/A-pex/inc -isystem /opt/homebrew/include  -g -Wall -g -std=gnu++14 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/multiobj.dir/src/Utils/MapQueue.cpp.o -c /Users/magi/Desktop/VBMO/A-pex/src/Utils/MapQueue.cpp",
+  "file": "/Users/magi/Desktop/VBMO/A-pex/src/Utils/MapQueue.cpp",
+  "output": "CMakeFiles/multiobj.dir/src/Utils/MapQueue.cpp.o"
+},
+{
+  "directory": "/Users/magi/Desktop/VBMO/A-pex/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_ATOMIC_NO_LIB -DBOOST_CHRONO_DYN_LINK -DBOOST_CHRONO_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_FILESYSTEM_NO_LIB -DBOOST_LOG_DYN_LINK -DBOOST_LOG_NO_LIB -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_PROGRAM_OPTIONS_NO_LIB -DBOOST_SYSTEM_DYN_LINK -DBOOST_SYSTEM_NO_LIB -DBOOST_THREAD_DYN_LINK -DBOOST_THREAD_NO_LIB -I/Users/magi/Desktop/VBMO/A-pex/inc -isystem /opt/homebrew/include  -g -Wall -g -std=gnu++14 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/multiobj.dir/src/Utils/apex.cpp.o -c /Users/magi/Desktop/VBMO/A-pex/src/Utils/apex.cpp",
+  "file": "/Users/magi/Desktop/VBMO/A-pex/src/Utils/apex.cpp",
+  "output": "CMakeFiles/multiobj.dir/src/Utils/apex.cpp.o"
+}
+]

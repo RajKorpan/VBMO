@@ -312,5 +312,4 @@ std::vector<std::vector<double>> remove_duplicate(const std::vector<std::vector<
 
   return copy;
 }
-
     
