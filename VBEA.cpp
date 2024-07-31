@@ -648,7 +648,7 @@ void getNodes_DOT(const std::string DOT_FILE, std::vector<NodePtr> &out_nodes){
   std::fstream ifs(DOT_FILE);
   out_nodes.clear();
   out_nodes.push_back(nullptr);     // id starts at 1;
-  std::cout << "Node File: "<< DOT_FILE << std::endl;
+  // std::cout << "Node File: "<< DOT_FILE << std::endl;
   
   std::string x;
   double a, b;
@@ -1005,34 +1005,36 @@ void make_ASCII_instances(const std::string dir, std::unordered_map<std::string,
 
 }
 
-void road_map_instance_maker(const std::string map_name, const std::string map_dir, inst &map_instances){
+/**
+ * @param mao
+*/
+void road_map_instance_maker(const std::string MAP_DIR, const int inst_count, const std::string FILE_NAME){
   std::vector<NodePtr> node_list;
   std::vector<Edge> edges;
   size_t graph_size;
-  // std::mt19937 rng(std::clock());
 
   std::uniform_int_distribution<size_t> rng;
   std::default_random_engine generator;
 
   std::vector<std::string> files;
-  for(auto file_iter : std::filesystem::directory_iterator(map_dir)){
+  for(auto file_iter : std::filesystem::directory_iterator(MAP_DIR)){
       files.push_back(file_iter.path());
   }
 
-  //getting the file that has the nodes (the one that ends with the .co exstention)
+  //finding the file that has the nodes (the one that ends with the .co exstention) from the other files (.gr)
   std::string node_file;
   for(auto file = files.begin(); file != files.end(); file++){
     if(file->substr(file->size()-2) == "co"){
       node_file = *file;
-      files.erase(file);
+      files.erase(file); //remove from other files
       break;
     }
   }
   
+  std::cout << "Constructing Graph..." << std::endl;
   load_gr_files(files, edges, graph_size);
   getNodes_DOT(node_file, node_list);
   
-  // split ino s 
   AdjMatrix adj_matrix(graph_size, edges);
 
   // h_functor is set to 1 for Haversine distance (km), use 0 for euclidean distance
@@ -1043,28 +1045,36 @@ void road_map_instance_maker(const std::string map_name, const std::string map_d
 
   auto Y = more_than_specific(0);
   node_order order(Y);
-  int count = 0;
 
-  while(count < 40){
-    size_t source = rng(generator) % adj_matrix.size(), target = rng(generator) % adj_matrix.size(); // randomly select start and end location
-    if(A(source, target, h, order) == nullptr){ // if no path connecting the two exists
-      continue; // redo
-    } else{
-      count++;  // increment count & record
-      map_instances[map_name].push_back({source, target});
+  std::vector<std::vector<size_t>> instances;
+
+  for(int i = 0; i < inst_count; i++){
+    size_t s = rng(generator) % adj_matrix.size(), t = rng(generator) % adj_matrix.size();
+
+    if(A(s, t, h, order) == nullptr){
+      i--;
+      continue;
+    } else {
+      std::cout << "s: " << s << ", " << "t: " << t << " (" << i << "/" << inst_count << ")" << std::endl;
+      std::vector<size_t> temp = {s, t};
+      instances.push_back(temp);
     }
   }
+
+  // Savin
+  std::cout << "writting " << instances.size() << " instnaces" << std::endl;
+  std::ofstream out_file(FILE_NAME + ".txt");
+
+  out_file << "source target" << std::endl;
+  for(auto &inst : instances){
+    out_file << "v " << inst[0]<< " " << inst[1] << std::endl;
+  }
   
+  std::cout << "DONE" << std::endl;
+
+  out_file.close();
 }
 
-void make_road_instances(const std::string dir, inst &map_instances){
-  for(auto &file_iter : std::filesystem::directory_iterator(dir)){
-    std::string MAP_DIR = file_iter.path().relative_path().string();
-    std::cout << MAP_DIR << std::endl;
-    // map_instances[MAP_FILE];
-    
-  } 
-}
 
 
 
@@ -1274,6 +1284,16 @@ void write_matrix(std::ostream &out_file, const std::vector<std::vector<double>>
   }
 }
 
+int max_i(const std::vector<double> &vec){
+  int j;
+  for(int i = 0; i < vec.size(); i++){
+    if(vec[i] > vec[j]){
+      j = i;
+    }
+  }
+
+  return j;
+}
 
 /**
  * VBEA DRIVER 
@@ -1379,8 +1399,11 @@ void VBEA(const AdjMatrix &adj_matrix, const std::vector<NodePtr> &node_list, he
       WEIGHTED_ASTAR WA(adj_matrix, node_list, weight_sets[i]);
       auto Y = more_than_specific(0); // the new objective will be the only objective for the search.
       node_order order(Y);
-      results.push_back(WA(source, target, h, order, i)->g);    // conscious
-      // results.push_back(WA(source, target, h, order)->g);        // combined
+
+      // select the focus to be the lowest number:
+      int j = max_i(weight_sets[i]);
+      results.push_back(WA(source, target, h, order, j)->g);    // conscious
+      // results.push_back(WA(source, target, h, order)->g);    // combined
     }
 
     // remove duplicates and dominates dolutions from the front
@@ -1668,14 +1691,117 @@ std::vector<struct::log> ASCII_instance_runner(const std::string vote_method, co
 
 // for creating the .gr file that contains the thrid objective for all the other files
 // suppose objective cost 1 and two are already there
-void add_third_objective(std::vector<Edge> &edge_list){
+void add_third_objective(const std::string MAP, std::vector<Edge> &edge_list, const std::vector<std::vector<size_t>> &instances){
   std::default_random_engine generator(1395);
   std::uniform_real_distribution<double> urng(0.3,0.4); // uniform random generator between 0.3 and 0.4
 
   for(auto &e: edge_list){
     e.cost.push_back( urng(generator)*(e.cost[0] + e.cost[1]));
   }
+
+  // save to a text file
+  // std::cout << "enter map name (BAY, FLA, NY, etc): ";
+  // std::string MAP;
+  // std::cin >> MAP;
+  std::ofstream out_file("USA-road-3." + MAP + ".gr");
+
+  out_file << "source target" << std::endl;
+  for(auto &inst : instances){
+    out_file << "v " << inst[0] << " " << inst[1] << std::endl;
+  }
 }
+
+
+/**
+ * add the function for up too five objectives for Apex and VBEA forthe Road maps intnace
+*/
+
+std::vector<std::vector<size_t>> load_road_instances(const std::string MAP){
+  std::vector<std::vector<size_t>> instances;
+  // std::ifstream ifs(MAP + "-20.txt");
+  std::ifstream ifs(MAP + "-25.txt");
+  std::string x;
+  size_t s, t;
+
+  getline(ifs, x);
+
+  while(ifs >> x){
+    if(x == "v"){
+      ifs >> s >> t;
+      std::cout << s << " " << t << std::endl;
+      instances.push_back({s, t});
+    } else{
+      break;
+    }
+  }
+
+  ifs.close();
+  return instances;
+}
+
+std::vector<struct::log> road_instances_runner(const std::string MAP, const std::string voting_method){
+  std::vector<struct::log> LOGS;
+
+  // fetching instances
+  std::cout << "Reading Instances... " << std::endl;
+  std::vector<std::vector<size_t>> instances = load_road_instances(MAP);
+  std::cout << "Read " << instances.size() << " instances." << std::endl;
+
+  // return {{}};
+
+  //contruct graph
+  std::vector<NodePtr> node_list;
+  std::vector<Edge> edges;
+  size_t graph_size;
+  std::string MAP_DIR = "USA-road/USA-road-" + MAP;
+
+
+  std::vector<std::string> files;
+  for(auto file_iter : std::filesystem::directory_iterator(MAP_DIR)){
+      files.push_back(file_iter.path());
+  }
+  std::string node_file;
+  for(auto file = files.begin(); file != files.end(); file++){
+    if(file->substr(file->size()-2) == "co"){
+      node_file = *file;
+      files.erase(file); //remove from other files
+      break;
+    }
+  }
+  
+  std::cout << "Constructing Graph...";
+  load_gr_files(files, edges, graph_size);
+  getNodes_DOT(node_file, node_list);
+  //check if third objective file exist:
+  bool has_third = false;
+  for(auto &f : files){
+    if(f == "USA-road-3." + MAP + ".gr"){
+      has_third = true;
+      break;
+    }
+  }
+  if(!has_third){ // add if it doesnt
+    add_third_objective(MAP, edges, instances);
+  }
+
+  AdjMatrix adj_matrix(graph_size, edges);
+  std::cout << " Finished" << std::endl << "Graph Size: " << adj_matrix.size() << ", objective count: " << adj_matrix.get_obj_count() << std::endl;
+  
+  heuristic h = h_functor(1);
+  int n = 1;
+  for(auto &inst: instances){
+    std::cout << "  " << inst[0] << " " << inst[1] << " (" << n << "/" << instances.size() << ")" << std::endl;
+    struct::log a(MAP, inst[0], inst[1], voting_method);
+    VBEA(adj_matrix, node_list, h, inst[0], inst[1], voting_method, 5, adj_matrix.get_obj_count(), a);
+    LOGS.push_back(a);
+    // break;
+    n++;
+  }
+
+
+  return LOGS;
+}
+
 
 // making instances
 // int main(){
@@ -1697,6 +1823,24 @@ void add_third_objective(std::vector<Edge> &edge_list){
 // }
 
 
+// ROAD MAP main
+// int main(){
+//   std::string MAP = "BAY";
+//   road_map_instance_maker("USA-road/USA-road-" + MAP, 25, MAP + "-25");
+
+//   return 0;
+// }
+
+int main(){
+  std::string MAP = "BAY";
+  std::string VOTING = "range";
+  auto LOGS = road_instances_runner(MAP, VOTING);
+  write_all_records(LOGS, "testing_" + MAP + "_25_" + VOTING);
+
+  return 0;
+}
+
+
 
 // ASCCI INSTANCE MAIN
 // int main(){
@@ -1707,9 +1851,9 @@ void add_third_objective(std::vector<Edge> &edge_list){
 //   //     std::cout << "  " << jter << std::endl;
 //   //   }
 //   // }
-//   std::vector<struct::log> logs = ASCII_instance_runner("condorent", instances);  
+//   std::vector<struct::log> logs = ASCII_instance_runner("combined_approval", instances);  
 
-//   write_all_records(logs, "condorent");
+//   write_all_records(logs, "combined-conscious-2");
 //   return 0;
 // }
 
@@ -1729,41 +1873,41 @@ void map_data_write(std::ostream &out_file, const std::string map_name, const si
 
 }
 // main for getitng the map size
-int main(){
-  // 0: vertext count,
-  // 1: edge count
-  std::unordered_map<std::string, std::vector<size_t>> map_sizes;
-  std::cout << "Constructing graphs..." << std::endl;
-  for(auto &file_iter: std::filesystem::directory_iterator("dao-map")){
-    std::vector<NodePtr> node_list;
-    AdjMatrix adj_matrix;
-    std::string MAP_FILE = file_iter.path().relative_path().string();
-    std::cout << MAP_FILE<< "...";
-    getNodes_ASCII(MAP_FILE, node_list, adj_matrix);
-    map_sizes[MAP_FILE] = {adj_matrix.size(), adj_matrix.edge_size()};
-    std::cout << "Done" << std::endl;
-  }
+// int main(){
+//   // 0: vertext count,
+//   // 1: edge count
+//   std::unordered_map<std::string, std::vector<size_t>> map_sizes;
+//   std::cout << "Constructing graphs..." << std::endl;
+//   for(auto &file_iter: std::filesystem::directory_iterator("dao-map")){
+//     std::vector<NodePtr> node_list;
+//     AdjMatrix adj_matrix;
+//     std::string MAP_FILE = file_iter.path().relative_path().string();
+//     std::cout << MAP_FILE<< "...";
+//     getNodes_ASCII(MAP_FILE, node_list, adj_matrix);
+//     map_sizes[MAP_FILE] = {adj_matrix.size(), adj_matrix.edge_size()};
+//     std::cout << "Done" << std::endl;
+//   }
 
-  //write to json;
+//   //write to json;
 
-  std::ofstream out_file("dao-map-info.json");
+//   std::ofstream out_file("dao-map-info.json");
 
-  out_file << "{ \"data\": [";
+//   out_file << "{ \"data\": [";
 
-  for(auto i = map_sizes.begin(); i != map_sizes.end(); i++){
-    std::string MAP_NAME = i->first.substr(8);
-    std::cout << "map: " << MAP_NAME << "V: " << i->second[0] << ", E: " << i->second[1] << std::endl;
-    if(i == map_sizes.begin()){
-      map_data_write(out_file, i->first, i->second[0], i->second[1]);
-    } else {
-      out_file << ", ";
-      map_data_write(out_file, i->first, i->second[0], i->second[1]);
-    }
-  }
+//   for(auto i = map_sizes.begin(); i != map_sizes.end(); i++){
+//     std::string MAP_NAME = i->first.substr(8);
+//     std::cout << "map: " << MAP_NAME << "V: " << i->second[0] << ", E: " << i->second[1] << std::endl;
+//     if(i == map_sizes.begin()){
+//       map_data_write(out_file, i->first, i->second[0], i->second[1]);
+//     } else {
+//       out_file << ", ";
+//       map_data_write(out_file, i->first, i->second[0], i->second[1]);
+//     }
+//   }
 
 
-  out_file << "]}";
-}
+//   out_file << "]}";
+// }
 
 
 
