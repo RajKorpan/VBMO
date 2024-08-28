@@ -1,0 +1,1 @@
+/usr/bin/g++  -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/evol.dir/VBEA.cpp.o -o evol  inc/libgraph.a inc/libIOutili.a inc/libutili.a inc/libv.a

@@ -272,33 +272,6 @@ std::vector<std::vector<double>> non_dominated_filter(std::vector<std::vector<do
   return non_dominated;
 }
 
-// // hypervolume calculator
-// // uses default refernce point of {0, 0, ..., 0}
-// // pre-suppose that all solutions have been filtered for non dominance.
-// double hypervolume_metric(const std::vector<double> &path_cost){
-//   double HV_metric;
-//   std::vector<double> temp;
-
-//   for(int i = 0; i < path_cost.size(); i++){
-//     temp.push_back(0 - path_cost[i]); // reference point is 1 since we normalized the data
-//   }
-
-//   double sum = 0;
-  
-//   temp.push_back(0.0);
-//   std::sort(temp.begin(), temp.end());
-
-
-//   for(int i = 0; i < temp.size(); i++){
-//     sum += temp[i] * pow(-1.0, i+1);
-//   }
-
-//   std::sort(temp.begin(), temp.end());
-
-//   HV_metric = sum / std::tgamma(temp.size() + 1);
-  
-//   return HV_metric; 
-// }
 
 std::vector<std::vector<double>> remove_duplicate(const std::vector<std::vector<double>> front){
   auto copy = front;

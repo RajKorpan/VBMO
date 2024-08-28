@@ -6,8 +6,6 @@
 #include <cmath>            // sqrt(), abs(), and other basic math functions
 #include <queue>            // using priority_queue as the openSet for A*
 
-
-
 /**
  * ===========================================
  * HELPERS FUNCTIONS
@@ -19,8 +17,6 @@
  * @param path_costs is a n x n matrix.
  * @return a n x n matrix that is normalized.
  */
-
- // FIX: what if max == min, then lots of NaN
 std::vector<std::vector<double>> normalize_matrix(std::vector<std::vector<double>> path_costs){
     double min, max;
     std::vector<std::vector<double>> normalized_matrix(path_costs.size(), std::vector<double>(path_costs[0].size(), 0));
@@ -294,10 +290,6 @@ std::vector<double> borda_voting(std::vector<std::vector<double>> normalized_pat
     return borda_results;
 }
 
-/**
- * @details combined approval invloves comparing every candidate with each other, giving the "greater" (the one with the lower objective cost) a point, the losser receiving nothing. Repeart for each objective.
- * @return a 1 x n vector where vector[i] is the total number of points path i won via the n trials.
-*/
 std::vector<double> combined_aproval_voting(std::vector<std::vector<double>> normalized_path_costs) {
     // result vector will have the total sum 
     std::vector<double> combined_approval_sum = {};

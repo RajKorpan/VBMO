@@ -1,0 +1,2 @@
+/Library/Developer/CommandLineTools/usr/bin/ar qc libutili.a CMakeFiles/utili.dir/utili.cpp.o
+/Library/Developer/CommandLineTools/usr/bin/ranlib libutili.a

@@ -1,0 +1,2 @@
+/Library/Developer/CommandLineTools/usr/bin/ar qc libv.a CMakeFiles/v.dir/v.cpp.o
+/Library/Developer/CommandLineTools/usr/bin/ranlib libv.a

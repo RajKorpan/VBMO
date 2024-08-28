@@ -1,0 +1,9 @@
+/Users/magi/Desktop/VBMO/VBEA/inc/CMakeFiles/evol.dir
+/Users/magi/Desktop/VBMO/VBEA/inc/CMakeFiles/edit_cache.dir
+/Users/magi/Desktop/VBMO/VBEA/inc/CMakeFiles/rebuild_cache.dir
+/Users/magi/Desktop/VBMO/VBEA/inc/inc/CMakeFiles/graph.dir
+/Users/magi/Desktop/VBMO/VBEA/inc/inc/CMakeFiles/IOutili.dir
+/Users/magi/Desktop/VBMO/VBEA/inc/inc/CMakeFiles/utili.dir
+/Users/magi/Desktop/VBMO/VBEA/inc/inc/CMakeFiles/v.dir
+/Users/magi/Desktop/VBMO/VBEA/inc/inc/CMakeFiles/edit_cache.dir
+/Users/magi/Desktop/VBMO/VBEA/inc/inc/CMakeFiles/rebuild_cache.dir

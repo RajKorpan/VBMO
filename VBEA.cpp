@@ -31,6 +31,7 @@ struct Edge {
   size_t                source;
   size_t                target;
   std::vector<double>   cost;
+  double                velocity;
 
   Edge(size_t source_, size_t target_, std::vector<double> cost_): source(source_), target(target_), cost(cost_) {}
 
@@ -124,6 +125,14 @@ class AdjMatrix {
       }
       stream << "}";
       return stream;
+  }
+
+  void add_velocity(){
+    for(int x = 0; x < matrix.size(); x++){
+      for(int y = 0; y < matrix[x].size(); y++){
+        matrix[x][y].velocity = std::max(sin(x-1), cos(y-1));
+      }
+    }
   }
 };
 
@@ -846,6 +855,8 @@ void getNodes_ASCII(const std::string ASCII_FILE, std::vector<NodePtr> &out_node
 
 }
 
+
+
 void RAND_ASCII_RUNNER(const std::string MAP_FILE, const std::string vote_scheme){
   std::vector<NodePtr> node_list;
   AdjMatrix adj_matrix;
@@ -1088,7 +1099,7 @@ void road_map_instance_maker(const std::string MAP_DIR, const int inst_count, co
 struct log{
   std::string     voting_method,      // range, borda, concorcet, etc..
                   file_name,
-                  child_method = "weighted_conscious",       //either weighted combined or conscious
+                  child_method = "weighted_combined",       //either weighted combined or conscious
                   source,
                   target;
 
@@ -1308,10 +1319,12 @@ int max_i(const std::vector<double> &vec){
 
 void VBEA(const AdjMatrix &adj_matrix, const std::vector<NodePtr> &node_list, heuristic &h, const size_t source, const size_t target, const std::string vote_scheme, const int T, int K,  struct::log &LOG){
 
-  if(K > adj_matrix.get_obj_count()){
-    std::cout << "WARNING: " << K << ">" << "j" << std::endl << "setting k = j" << std::endl;
-    K = adj_matrix.get_obj_count();
-  }
+  // if(K > adj_matrix.get_obj_count()){
+  //   std::cout << "WARNING: " << K << ">" << "j" << std::endl << "setting k = j" << std::endl;
+  //   K = adj_matrix.get_obj_count();
+  // }
+
+  K = 100; // will stop before if there are not enougt weight sets
  
   // std::cout << "start: \n";
   // std::cout << *node_list[source].get() << std::endl;
@@ -1362,12 +1375,12 @@ void VBEA(const AdjMatrix &adj_matrix, const std::vector<NodePtr> &node_list, he
   LOG.winner_norm_d_score.push_back(d_scores[vote_results[0]]);
 
   // Displaying gen 0
-  // std::cout << "-----gen0-----" << std::endl;
-  // for(int i = 0; i < norm_results.size(); i++){
-  //     std::cout << "P_" << i << " " << norm_results[i] << " | " << results[i] << " d: " << d_scores[i] << std::endl;
-  // }
-  // std::cout << "voting results:" << std::endl;
-  // std::cout << vote_results << std::endl; // VISUAL
+  std::cout << "-----gen0-----" << std::endl;
+  for(int i = 0; i < norm_results.size(); i++){
+      std::cout << "P_" << i << " " << norm_results[i] << " | " << results[i] << " d: " << d_scores[i] << std::endl;
+  }
+  std::cout << "voting results:" << std::endl;
+  std::cout << vote_results << std::endl; // VISUAL
 
   // What is not local to the loop
   // - results
@@ -1402,8 +1415,8 @@ void VBEA(const AdjMatrix &adj_matrix, const std::vector<NodePtr> &node_list, he
 
       // select the focus to be the lowest number:
       int j = max_i(weight_sets[i]);
-      results.push_back(WA(source, target, h, order, j)->g);    // conscious
-      // results.push_back(WA(source, target, h, order)->g);    // combined
+      // results.push_back(WA(source, target, h, order, j)->g);    // conscious
+      results.push_back(WA(source, target, h, order)->g);    // combined
     }
 
     // remove duplicates and dominates dolutions from the front
@@ -1434,12 +1447,12 @@ void VBEA(const AdjMatrix &adj_matrix, const std::vector<NodePtr> &node_list, he
     LOG.winner_norm_d_score.push_back(d_scores[vote_results[0]]);
 
     // SHOW GEN i
-    // std::cout << "-----gen" << t + 1 << "-----" << std::endl;
-    // for(int i = 0; i < norm_results.size(); i++){
-    //     std::cout << "P_" << i << " " << norm_results[i] << " | " << results[i] << " d: " << d_scores[i] << std::endl;
-    // }
-    // std::cout << "winner:" << std::endl;
-    // std::cout << results[vote_results[0]] << " d: " << d_scores[vote_results[0]] << " r_d: " << path_d_score(results[vote_results[0]]) << std::endl;
+    std::cout << "-----gen" << t + 1 << "-----" << std::endl;
+    for(int i = 0; i < norm_results.size(); i++){
+        std::cout << "P_" << i << " " << norm_results[i] << " | " << results[i] << " d: " << d_scores[i] << std::endl;
+    }
+    std::cout << "winner:" << std::endl;
+    std::cout << results[vote_results[0]] << " d: " << d_scores[vote_results[0]] << " r_d: " << path_d_score(results[vote_results[0]]) << std::endl;
     
   } // end main loop;
   return ;
@@ -1674,7 +1687,7 @@ std::vector<struct::log> ASCII_instance_runner(const std::string vote_method, co
              target = param[1];
 
       std::cout << "  " << source << " " << target << " (" << m << "/15)" << " E = " << E << std::endl;
-
+      
       struct::log a(map_name, source, target, vote_method);
       VBEA(adj_matrix, node_list, h, source, target, vote_method, 5, adj_matrix.get_obj_count(), a);
       logs.push_back(a);
@@ -1824,18 +1837,11 @@ std::vector<struct::log> road_instances_runner(const std::string MAP, const std:
 
 
 // ROAD MAP main
-// int main(){
-//   std::string MAP = "BAY";
-//   road_map_instance_maker("USA-road/USA-road-" + MAP, 25, MAP + "-25");
-
-//   return 0;
-// }
-
 int main(){
-  std::string MAP = "BAY";
-  std::string VOTING = "range";
+  std::string MAP = "NY";
+  std::string VOTING = "combined_approval";
   auto LOGS = road_instances_runner(MAP, VOTING);
-  write_all_records(LOGS, "testing_" + MAP + "_25_" + VOTING);
+  write_all_records(LOGS,  "uncapped_" + MAP + "_25_" + VOTING + "combined");
 
   return 0;
 }
@@ -1843,20 +1849,6 @@ int main(){
 
 
 // ASCCI INSTANCE MAIN
-// int main(){
-//   auto instances = read_ASCII_instances("dao-uniform-15.txt", 15);
-//   // for(auto &iter : instances){
-//   //   std::cout << iter.first << std::endl;
-//   //   for(auto &jter : iter.second){
-//   //     std::cout << "  " << jter << std::endl;
-//   //   }
-//   // }
-//   std::vector<struct::log> logs = ASCII_instance_runner("combined_approval", instances);  
-
-//   write_all_records(logs, "combined-conscious-2");
-//   return 0;
-// }
-
 
 void map_data_write(std::ostream &out_file, const std::string map_name, const size_t node_size, const size_t edge_size){
   out_file << " {";
@@ -1918,9 +1910,12 @@ void map_data_write(std::ostream &out_file, const std::string map_name, const si
 // main for dao maps, change dir to the name of 
 // int main(){
 //   std::string dir = "dao-map";
-//   ASCII_DIR_RUNNER(dir, voting_method::borda, 4);
+//   std::string voting_method = "borda";
 
-//   // DOT_RUNNER(voting_method::borda,3);
+//   auto instances = get_ASCII_instances("dao-uniform-15.txt");
+//   auto LOGS = ASCII_instance_runner(voting_method, instances);
+//   write_all_records(LOGS, "uncap_borda_total_combined");
+//   return 0;
 // }
 
 //testing reading instances
@@ -1931,5 +1926,4 @@ void map_data_write(std::ostream &out_file, const std::string map_name, const si
 //   ASCII_instance_runner(voting_method::borda, instances);
 
 // }
-
 
