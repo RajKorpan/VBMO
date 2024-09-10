@@ -193,7 +193,8 @@ using node_order = std::function<bool(const NodePtr&, const NodePtr&)>;
 struct more_than_specific{
   const size_t cost_idx;
 
-  more_than_specific(const size_t cost_idx_): cost_idx(cost_idx_){}
+  more_than_specific(const size_t cost_idx_): 
+  cost_idx(cost_idx_){}
 
   bool operator()(const NodePtr &a, const NodePtr &b) const {
     return a->f[cost_idx] > b->f[cost_idx];

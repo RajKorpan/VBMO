@@ -3,7 +3,6 @@ project(VBEA)
 
 set(CMAKE_CXX_STANDARD 14)
 SET(CMAKE_CXX_COMPILER "/usr/bin/g++")
-SET(CMAKE_CXX_FLAGS_DEBUG "-g")
 
 add_executable(evol VBEA.cpp)
 

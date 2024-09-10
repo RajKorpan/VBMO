@@ -3,6 +3,7 @@
 #include <ctime>
 #include <ios>
 #include <string>
+#include <unordered_map>
 #include <vector>
 #include <random>
 #include <fstream>
@@ -125,6 +126,47 @@ void get_nodes_ROAD(const std::string ASCII_FILE, std::vector<NodePtr> &out_node
   ifs.close();
 }
 
+
+void load_nodes_ASCII(const std::string ASCII_FILE, std::vector<NodePtr> &out_nodes, AdjMatrix &adj_matrix){
+  
+  std::fstream ifs(ASCII_FILE);
+  
+  std::string temp;
+  size_t height;
+  size_t width;
+
+  //get height and width of the graph
+  std::getline(ifs, temp);
+  // std::cout << temp << std::endl;
+  std::getline(ifs, temp);
+  height = stoi(temp.substr(7));
+  std::getline(ifs, temp);
+  width = stoi(temp.substr(6));
+  std::getline(ifs, temp);
+
+  size_t id = 0; // ids will actually start at 1.
+  double x,y;
+
+  std::vector<std::vector<char>> ascii_map(height, std::vector<char>(width));
+
+  std::unordered_map<size_t, NodePtr> idMAP;
+  std::unordered_map<std::pair<double, double>, NodePtr, pair_hash> cordMAP;
+
+  for(size_t i = 0; i < height; i++){
+    std::getline(ifs, temp);
+    for(size_t j = 0; i < width; j++){
+      ascii_map[i][j] = temp[j];
+      if(ascii_map[i][j] == '.'){
+        id++;
+        out_nodes.push_back(std::make_shared<Node>(i, j, id));
+      }
+    }
+    
+  }
+
+  ifs.close();
+}
+
 void get_nodes_ASCII(const std::string ASCII_FILE, std::vector<NodePtr> &out_nodes, AdjMatrix &adj_matrix){
   
   std::fstream ifs(ASCII_FILE);
@@ -144,7 +186,7 @@ void get_nodes_ASCII(const std::string ASCII_FILE, std::vector<NodePtr> &out_nod
 
   // std::cout << "h: " << height << ", w: " << width << std::endl;
 
-  size_t id = 1;
+  size_t id = 0; // id will be incremented before assigment (i.e. their enumeraton will start at one)
   double x, y;
 
   std::vector<std::vector<char>> map(height, std::vector<char>(width));
@@ -159,15 +201,13 @@ void get_nodes_ASCII(const std::string ASCII_FILE, std::vector<NodePtr> &out_nod
     for(int j = 0; j < width; j++){
       map[i][j] = temp[j];
       if(map[i][j] == '.'){
+        id++;
         out_nodes.push_back(std::make_shared<Node>(i, j, id));     // create the nodes with the x,y cordinate of the grid, and with a unique id provided by the counter
         cordinateIDmap[std::make_pair(i,j)] = id;
         idNodeMap[id] = out_nodes.back();
-        id++;
       }
     }
   }
-    
-
 
   // Contructing adjacencny matrix with the following objectives
   // - Uniform (1)
@@ -230,13 +270,11 @@ void get_nodes_ASCII(const std::string ASCII_FILE, std::vector<NodePtr> &out_nod
   std::vector<std::vector<Edge>> tempMap(id, std::vector<Edge> {});  
 
 
-  // Adding danger objective
-  
-  // group nodes by which have a shared incoming edge
+  // DANGER OBJECTIVE
+  // group nodes by which have a shared incoming edge (y in x->y)
   for(auto iter = Edges.begin(); iter != Edges.end(); iter++){
     tempMap[iter->target].push_back(*iter);
   }
-
   // randomly select 10% of edges and make all incoming edges expensive
   for(auto iter = tempMap.begin(); iter != tempMap.end(); iter++){
     double n;
@@ -249,27 +287,31 @@ void get_nodes_ASCII(const std::string ASCII_FILE, std::vector<NodePtr> &out_nod
       jter->cost.push_back(n);
     }
   }
-
-  
-  // Adding Safety objective
+  // Restore 
   Edges.clear();
-  
   for(auto iter = tempMap.begin(); iter != tempMap.end(); iter++){
     Edges.insert(Edges.end(), iter->begin(), iter->end());
   }
+
+  // SAFTELY OBJECTIVE
+  // group by outgoing edges (x in x->y)
   tempMap.clear();
   tempMap = std::vector<std::vector<Edge>>(id, std::vector<Edge> {});  
   for(auto iter = Edges.begin(); iter != Edges.end(); iter++){
     tempMap[iter->source].push_back(*iter);
+  } 
+  for(int i = 0; i < tempMap.size(); i++){
+    for(int j = 0; j < tempMap[i].size(); j++){     
+      tempMap[i][j].cost.push_back( (10 - tempMap[i].size() + 10 - tempMap[j].size()) / 2.0);
+    }
   }
-
-  // Restore Edges list
+  // Restore 
   Edges.clear();
   for(auto iter = tempMap.begin(); iter != tempMap.end(); iter++){
     Edges.insert(Edges.end(), iter->begin(), iter->end());
   }
 
-  //adding Delay objective
+  // DELAY 
   for(auto iter = Edges.begin(); iter != Edges.end(); iter++){
     size_t s_v = idNodeMap[iter->source]->v, t_v = idNodeMap[iter->target]->v;
     double D;
@@ -290,9 +332,12 @@ void get_nodes_ASCII(const std::string ASCII_FILE, std::vector<NodePtr> &out_nod
 
   // displaying all edges and nodes
   // std::cout << adj_matrix << std::endl;
-  for(auto &iter : out_nodes){
-    std::cout << *iter << std::endl;
-  }
+  // for(auto &iter : out_nodes){
+  //   std::cout << *iter << std::endl;
+  // }
+
+  // std::cout << id << std::endl;
+  // std::cout << out_nodes.size() << std::endl;
 }
 
 
@@ -424,12 +469,6 @@ void write_record(std::ostream &out_file, const struct::log &r) {
   out_file << "\"target\": " << r.target;
   out_file << ", ";
 
-  out_file << "\"voting-mechanism\": " << "\"" << r.voting_method << "\"";
-  out_file << ", ";
-
-  out_file << "\"child-generation-method\": " << "\"" << r.child_method << "\"";
-  out_file << ", ";
-
 // FRONTS
 
   out_file << "\"gen0-front\": "; write_matrix(out_file, r.fronts[0]);
@@ -522,6 +561,27 @@ void write_all_records(const std::vector<struct::log> &logs, std::string file_na
   std::cout << "DONE" << std::endl;
 }
 
+void write_all_records_alt(const std::vector<struct::log> &logs, std::string file_name, const size_t T, const size_t K, const std::string voting_method){
+    std::ofstream out_file(file_name + ".json");
+
+  std::cout << "writting data...";
+
+  out_file << "{\"data\": [";
+
+  write_record(out_file, logs[0]);
+  for(int i = 1; i < logs.size(); i++){
+    out_file << ", ";
+    write_record(out_file, logs[i]);
+  }
+
+
+  out_file  << "], " 
+            << "\"T\": " << T << ", "
+            << "\"K\": " << K << ", "
+            << "\"voting_method\": " << voting_method << "}";
+
+}
+
 
 // RND
 
@@ -535,24 +595,24 @@ void add_third_objective(const std::string MAP, std::vector<Edge> &edge_list,  s
     e.cost.push_back( urng(generator)*(e.cost[0] + e.cost[1]));
   }
 
-  // std::ofstream out_file("USA-road-3." + MAP + ".gr");
+  std::ofstream out_file("USA-road-3." + MAP + ".gr");
 
-  // out_file << "c 9th DIMACS Implementation Challenge: Shortest Paths" << std::endl
-  //          << "c https://ojs.aaai.org/index.php/ICAPS/article/view/19825" << std::endl
-  //          << "c TIGER/Line graph USA-road-3." + MAP << std::endl 
-  //          << "p sp"  << node_list.size() - 1  << " " << edge_list.size() << std::endl
-  //          << "c graph contains" << node_list.size() - 1 << "nodes and " << edge_list.size() <<"arcs" << std::endl
-  //          << "c" << std::endl;
-  // for(auto &e: edge_list){
-  //   out_file << "c " << e.source << " " << e.target << e.cost.back() << std::endl;
-  // }
+  out_file << "c 9th DIMACS Implementation Challenge: Shortest Paths" << std::endl
+           << "c https://ojs.aaai.org/index.php/ICAPS/article/view/19825" << std::endl
+           << "c TIGER/Line graph USA-road-3." + MAP << std::endl 
+           << "p sp"  << node_list.size() - 1  << " " << edge_list.size() << std::endl
+           << "c graph contains" << node_list.size() - 1 << "nodes and " << edge_list.size() <<"arcs" << std::endl
+           << "c" << std::endl;
+  for(auto &e: edge_list){
+    out_file << "c " << e.source << " " << e.target << e.cost.back() << std::endl;
+  }
 
-  // out_file.close();
+  out_file.close();
 }
 
 // creating a .gr file for the delay objective
 void add_delay_objective(const std::string MAP, std::vector<Edge> &edge_list, std::vector<NodePtr> &node_list){     
-  // node with id j can be count at node_list[j-1];
+  // node with id j is found at at node_list[j-1];
   for(auto &e : edge_list){
     size_t s_v = node_list[e.source - 1]->v, t_v = node_list[e.target-1]->v;
     double D;
@@ -570,19 +630,19 @@ void add_delay_objective(const std::string MAP, std::vector<Edge> &edge_list, st
 
   }
 
-  // std::ofstream out_file("USA-road-DELAY." + MAP + ".gr");
+  std::ofstream out_file("USA-road-DELAY." + MAP + ".gr");
 
-  // out_file << "c 9th DIMACS Implementation Challenge: Shortest Paths" << std::endl
-  //          << "c https://ci.ovgu.de/Publications/Scalable+Many_Objective+Pathfinding+Benchmark+Suite-p-910.html" << std::endl
-  //          << "c TIGER/Line graph USA-road-DELAY." + MAP << std::endl 
-  //          << "p sp"  << node_list.size() - 1  << " " << edge_list.size() << std::endl
-  //          << "c graph contains" << node_list.size() - 1 << "nodes and " << edge_list.size() <<"arcs" << std::endl
-  //          << "c" << std::endl;
-  // for(auto &e: edge_list){
-  //   out_file << "c " << e.source << " " << e.target << e.cost.back() << std::endl;
-  // }
+  out_file << "c 9th DIMACS Implementation Challenge: Shortest Paths" << std::endl
+           << "c https://ci.ovgu.de/Publications/Scalable+Many_Objective+Pathfinding+Benchmark+Suite-p-910.html" << std::endl
+           << "c TIGER/Line graph USA-road-DELAY." + MAP << std::endl 
+           << "p sp"  << node_list.size() - 1  << " " << edge_list.size() << std::endl
+           << "c graph contains" << node_list.size() - 1 << "nodes and " << edge_list.size() <<"arcs" << std::endl
+           << "c" << std::endl;
+  for(auto &e: edge_list){
+    out_file << "c " << e.source << " " << e.target << e.cost.back() << std::endl;
+  }
 
-  // out_file.close();
+  out_file.close();
 }
 
 

@@ -20,6 +20,7 @@
 
 // WEIGHTED COMBINED VERSION
 void VBEA_COMBINED(struct::log &LOG, const AdjMatrix &adj_matrix, std::vector<NodePtr> node_list, heuristic &h,  const size_t source, const size_t target, const std::string voting_method, const size_t K, const size_t T = 0, const bool visualize = false){
+  std::cout << source << " " << target << std::endl;
   auto start_t = std::chrono::high_resolution_clock::now();
   int b = adj_matrix.get_obj_count();
   
@@ -287,7 +288,7 @@ int main(int argc, char **arg){
 
   // PARAMETERS
   std::string VOTING_METHOD = "borda";
-  std::string MAP = "../dao-map/den001d.map";
+  std::string MAP = "dao-map/den001d.map";
   std::string HEURISTIC = "euclidean";
   // std::string HEURISTIC = "haversine";
   // std::string MAP = "../USA-ROAD/USA=ROAD-BAY";
@@ -306,7 +307,6 @@ int main(int argc, char **arg){
 
   if(MAP.substr(MAP.length()-3, 3) == "map"){                 // ASCII MAP CONSTRUCTOR
     get_nodes_ASCII(MAP, node_list, adj_matrix);
-    return 0;
 
   } else{                                      // ROAD MAP CONSTRUCTOR
     std::vector<std::string> obj_files;
@@ -314,13 +314,13 @@ int main(int argc, char **arg){
     size_t graph_size;
     std::string map_name = MAP.substr(-3);
     if(map_name[0] == '-'){ map_name = map_name.substr(-2);}
-    // get all files from the folder
+    // load all the files form the DAO folder to seperate the objective folders from node folder.
     for(auto file_iter : std::__fs::filesystem::directory_iterator(MAP)){obj_files.push_back(file_iter.path());}
     std::string NODE_FILE; // isolating the node file
     for(auto file = obj_files.begin(); file != obj_files.end(); file++){
       if(file->substr(file->size()-2) == "co"){
         NODE_FILE = *file;
-        obj_files.erase(file); //remove from other files
+        obj_files.erase(file); //removing node file from the objective files
         break;
       }
     }
@@ -342,15 +342,15 @@ int main(int argc, char **arg){
   }
 
   std::cout << " Finished" << std::endl 
-            << " Graph Size: " << adj_matrix.size() << ", objective count: " << adj_matrix.get_obj_count() << std::endl;
+            << "Graph Size: " << adj_matrix.size() << ", objective count: " << adj_matrix.get_obj_count() << std::endl;
 
 
   struct::log LOG(MAP, source, target, VOTING_METHOD, CHILD_METHOD);
   std::mt19937 rng(std::clock());
   // source = rng() % adj_matrix.size();
   // target = rng() % adj_matrix.size();
-  source = rng() % adj_matrix.size();
-  target = rng() % adj_matrix.size();
+  source = rng() % adj_matrix.size() - 1;
+  target = rng() % adj_matrix.size() - 1;
 
   size_t s_x = node_list[source]->x,
          s_y = node_list[source]->y,
@@ -362,6 +362,8 @@ int main(int argc, char **arg){
   } else if (HEURISTIC == "haversine"){
     h = h_functor(1);
   }
+
+// MAP DISPLAY (REMOVE FOR FINAL)
 
   std::fstream ifs(MAP);
   std::string temp;
@@ -377,9 +379,6 @@ int main(int argc, char **arg){
   width = stoi(temp.substr(6));
   std::getline(ifs, temp);
 
-
-  // std::cout << "h: " << height << ", w: " << width << std::endl;
-
   size_t id = 1;
   double x, y;
 
@@ -391,10 +390,10 @@ int main(int argc, char **arg){
     for(int j = 0; j < width; j++){
       map[i][j] = temp[j];
       if(map[i][j] == '.'){
-        if(i == s_x && j == s_y){
+        if(i == s_x && j == s_y){ // source
           map[i][j] = '!';
         }
-        if(i == t_x && j == t_y){
+        if(i == t_x && j == t_y){ // target
           map[i][j] = '?';
         }
       }
@@ -402,6 +401,10 @@ int main(int argc, char **arg){
     }
     std::cout << std::endl;
   }
+  ifs.close();
+// END OF MAP DISPLAY
+
+return 0;
 
   if(CHILD_METHOD == "conscious"){
     VBEA_CONSCIOUS(LOG, adj_matrix, node_list, h, source, target, VOTING_METHOD, K, T, visualize);

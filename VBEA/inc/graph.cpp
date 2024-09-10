@@ -43,35 +43,20 @@ NodePtr ASTAR::operator()(const size_t source, const size_t target, heuristic &h
   std::push_heap(open.begin(), open.end(), order);
 
   // BEGIN main loop
-  //temp
-  std::unordered_map<size_t, size_t> visit_count;
   while(!open.empty()){
     // retrieve the node with the lowest f-score for a specific objective function (as determined by the parameter order)
     std::pop_heap(open.begin(), open.end(), order);
     node = open.back();
     open.pop_back();
 
-    // visit_count[node->id]++;
-
     // discard visted nodes?
     if(closed.find(node->id) != closed.end()){
        continue;
-    } 
-    closed.insert(node->id);
-
-    // std::cout << node->id << " " << visit_count[node->id] << std::endl;
-
+    } else {
+      closed.insert(node->id);
+    }
 
     if(node->id == target){ //motify to retrace path
-      // trace back code
-      // std::cout << node->id << std::endl;
-      // node_list[target]->parent = node;
-
-      // auto searchPtr = node_list[target];
-      // while(searchPtr != node_list[source]){
-      //   trace_back.push_back(searchPtr->id);
-      //   searchPtr = searchPtr->parent;
-      // }
       return node;
     }
 
@@ -410,7 +395,7 @@ NodePtr WEIGHTED_ASTAR::operator()(const size_t source, const size_t target, heu
 
 
 AdjMatrix::AdjMatrix(size_t graph_size_, std::vector<Edge> &edges, bool inverse)
-  : matrix((graph_size_ + 1), std::vector<Edge>()), graph_size(graph_size_) { // + 1 because edges start at 1
+  : matrix((graph_size_ + 1), std::vector<Edge>()), graph_size(graph_size_) { // + 1 because node count start at 1
     obj_count = edges[0].cost.size();
     for(auto iter = edges.begin(); iter != edges.end(); ++iter){ // Represented as an adjaceny list
       if(inverse) {
