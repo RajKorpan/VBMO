@@ -5,6 +5,7 @@
 #include <cstdio>
 #include <ctime>
 #include <ios>
+#include <unordered_map>
 #include <string>
 #include <vector>
 #include <random>
@@ -42,6 +43,9 @@ std::ostream& operator<<(std::ostream &stream, const std::vector<int> &vec);
 
 std::ostream& operator<<(std::ostream &stream, const std::vector<std::string> &vec);
 
+std::ostream& operator<<(std::ostream &stream, const Edge &edge);
+
+
 //
 // IO functions for USA-road
 //
@@ -63,7 +67,6 @@ void get_nodes_ASCII(const std::string ASCII_FILE, std::vector<NodePtr> &out_nod
 //
 struct log{
   std::string     voting_method,      // range, borda, concorcet, etc..
-                  file_name,          // the map file name
                   child_method,       // either weighted combined or conscious
                   source,
                   target;
@@ -73,17 +76,18 @@ struct log{
 
   std::vector<std::vector<double>>              raw_d_scores,
                                                 norm_d_scores,
+
                                                 winner,
                                                 norm_winner; // keeps track generation
-
-  std::vector<int>                              run_times;
   std::vector<double>                           winner_raw_d_score,
                                                 winner_norm_d_score;
-  std::vector<std::vector<size_t>>              trace; // series of nodes that was used in tracing the path
+
+  std::vector<int>                              run_times;
+  // std::vector<std::vector<size_t>>              trace; // series of nodes that was used in tracing the path
 
   // all other data members are written during run time
-  log(const std::string file_name_, const size_t source_, const size_t target_, const std::string voting_method_, const std::string child_method_)
-  :file_name(file_name_), fronts({}), source(std::to_string(source_)), voting_method(voting_method_), target(std::to_string(target_)), child_method(child_method_) {}
+  log(const size_t source_, const size_t target_)
+  :fronts({}), source(std::to_string(source_)), target(std::to_string(target_)) {}
 };
 
 void write_array(std::ostream &out_file, const std::vector<double> &vec);
@@ -94,17 +98,19 @@ void write_record(std::ostream &out_file, const struct::log &log);
 
 void write_all_records(const std::vector<struct::log> &logs, std::string file_name);
 
-void load_road_instances();
+void write_all_records_alt(const std::vector<struct::log> &logs, std::string file_name, const size_t T, const size_t K, const std::string voting_method, const std::string child_method);
 
-void load_ascii_instances();
+void load_road_instances(const std::string query_file, std::vector<std::vector<size_t>> &queries_out);
 
-void road_instnaces_runner();
+bool load_ascii_file(std::string ascii_file, std::vector<Edge> &out_edges, std::vector<NodePtr> &out_nodes, size_t &graph_size);
 
-void ascii_instances_runner();
+std::unordered_map<std::string, std::vector<std::vector<size_t>>>  load_asci_queries(const std::string asci_query_file);
 
-void add_third_objective(const std::string MAP, std::vector<Edge> &edge_list,  std::vector<NodePtr> &node_list);
+void add_third_objective(const std::string MAP, std::vector<Edge> &edge_list,  std::vector<NodePtr> &node_list, bool save = false);
 
-void add_delay_objective(const std::string MAP, std::vector<Edge> &edge_list, std::vector<NodePtr> &node_list);
+void add_delay_objective(const std::string MAP, std::vector<Edge> &edge_list,  std::vector<NodePtr> &node_list, bool save = false);
+
+void write_ascii_inst(std::ostream &out_file, const std::vector<struct::log> &LOG, const std::string &MAP_NAME);
 #endif
 
 

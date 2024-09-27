@@ -1,0 +1,1 @@
+{"map": "BAY", "merge strategy": "RANDOM", "eps": 1, "data": [{"source": 200128, "target": 37658, "front":[[868224, 1.48612e+06, 1575, 829899]], "d-score": [1.91079e+06], "norm front": [[0, 0, 0, 0]], "norm d-score": [1.73624e-157], "sparsity": 0, "time": 54}]}

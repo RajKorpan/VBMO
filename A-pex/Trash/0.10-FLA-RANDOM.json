@@ -1,0 +1,1 @@
+{"map": "FLA", "merge strategy": "RANDOM", "eps": 0.1, "data": [{"source": 232180, "target": 910685, "front":[[5.5459e+06, 5.51881e+06, 3.84656e+06, 1547]], "d-score": [8.71839e+06], "norm front": [[0, 0, 0, 0]], "norm d-score": [1.74393e-157], "sparsity": 0, "time": 148}]}

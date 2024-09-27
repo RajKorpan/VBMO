@@ -1,0 +1,1 @@
+{"map": "BAY", "merge strategy": "MORE_SLACK", "eps": 0.5, "data": [{"source": 200128, "target": 37658, "front":[[934134, 1.4054e+06, 1086, 831312]], "d-score": [1.88118e+06], "norm front": [[0, 0, 0, 0]], "norm d-score": [1.73548e-157], "sparsity": 0, "time": 506}]}

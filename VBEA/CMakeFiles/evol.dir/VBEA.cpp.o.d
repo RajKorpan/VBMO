@@ -956,9 +956,11 @@ CMakeFiles/evol.dir/VBEA.cpp.o: /Users/magi/Desktop/VBMO/VBEA/VBEA.cpp \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__filesystem/recursive_directory_iterator.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__filesystem/u8path.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/iostream \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/stack \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/deque \
+  /Users/magi/Desktop/VBMO/VBEA/inc/IOutili.hpp \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/fstream \
   /Users/magi/Desktop/VBMO/VBEA/inc/graph.hpp \
-  /Users/magi/Desktop/VBMO/VBEA/inc/IOutili.hpp \
   /Users/magi/Desktop/VBMO/VBEA/inc/utili.hpp \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/codecvt \
   /Users/magi/Desktop/VBMO/VBEA/inc/v.hpp

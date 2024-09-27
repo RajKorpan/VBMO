@@ -25,7 +25,11 @@ void split_string(std::string string, std::string delimiter, std::vector<std::st
 
 bool load_gr_files(std::vector<std::string> gr_files, std::vector<Edge> &edges_out, size_t &graph_size){
   size_t          max_node_num = 0;
+  // size_t          i = 0;
+  // std::cout << gr_files.size() << std::endl;
   for (auto gr_file: gr_files){
+      // i++;
+      // std::cout << i << std::endl;
     std::ifstream file(gr_file.c_str());
     
     if (file.is_open() == false){
@@ -59,7 +63,8 @@ bool load_gr_files(std::vector<std::string> gr_files, std::vector<Edge> &edges_o
               std::cerr << "file inconsistency" << std::endl;
               return false;
             }
-            edges_out[idx_edge].cost.push_back(std::stoul(decomposed_line[3]));
+            edges_out[idx_edge].cost.push_back(std::stod(decomposed_line[3]));
+            // std::cout << edges_out[idx_edge].cost.back() << std::endl;
           }else{
             Edge e(std::stod(decomposed_line[1]),
                    std::stod(decomposed_line[2]),

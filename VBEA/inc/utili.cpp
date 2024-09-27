@@ -6,10 +6,12 @@
 #include <utility>
 #include <random>
 #include <vector>
+#include <algorithm>
 #include <cmath>
 #include <iostream>
 
 #include "utili.hpp"
+#include "IOutili.hpp"
 
 std::vector<std::vector<double> > normalize_matrix(std::vector<std::vector<double> > path_costs){
     double min, max;
@@ -147,15 +149,23 @@ std::vector<double> complement_weight_set(const std::vector<double> &normalized_
 
 
 // cuases issuesQ
-void remove_duplicates(std::vector<std::vector<double> > &matrix){
-  for(auto iter = matrix.begin(); iter != matrix.end(); iter++){
-    for(auto jter = iter; jter != matrix.end(); jter++){
-      if(*iter == *jter){
-        jter = matrix.erase(jter);
-      }
-    }
-  }
+void remove_duplicates(std::vector<std::vector<double>> &matrix){
+  int n = matrix.size();
+  // std::cout << matrix << std::endl;
+  auto diter = std::unique(matrix.begin(), matrix.begin() + n);
+  matrix.resize(std::distance(matrix.begin(), diter));
+  // std::cout << matrix << std::endl;
 }
+
+// void remove_duplicates(std::vector<std::vector<double> > &matrix){
+//   for(auto iter = matrix.begin(); iter != matrix.end(); iter++){
+//     for(auto jter = iter; jter != matrix.end(); jter++){
+//       if(*iter == *jter){
+//         jter = matrix.erase(jter);
+//       }
+//     }
+//   }
+// }
 
 
 // return true if A dominates B, lower is better

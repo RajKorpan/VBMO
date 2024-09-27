@@ -1,4 +1,4 @@
-dao-map/lak300d.map
+resources/dao-map/lak300d.map
 3312 2500
 10628 11747
 9396 2970
@@ -14,7 +14,7 @@ dao-map/lak300d.map
 10887 1425
 2163 9519
 3823 11482
-dao-map/lak510d.map
+resources/dao-map/lak510d.map
 4413 7087
 2378 5257
 6513 682
@@ -30,7 +30,7 @@ dao-map/lak510d.map
 6160 5718
 453 5039
 1263 7334
-dao-map/den206d.map
+resources/dao-map/den206d.map
 1767 2144
 1938 1211
 3007 2478
@@ -46,7 +46,7 @@ dao-map/den206d.map
 2016 3203
 1959 3036
 2104 2280
-dao-map/lak506d.map
+resources/dao-map/lak506d.map
 13053 5886
 8643 8003
 4198 12952
@@ -62,7 +62,7 @@ dao-map/lak506d.map
 12424 2321
 9514 9962
 5968 9892
-dao-map/orz500d.map
+resources/dao-map/orz500d.map
 15285 16593
 2926 17266
 3755 3734
@@ -78,7 +78,7 @@ dao-map/orz500d.map
 18180 16154
 7452 7130
 10069 3047
-dao-map/den504d.map
+resources/dao-map/den504d.map
 1212 773
 9010 11978
 5570 9582
@@ -94,7 +94,7 @@ dao-map/den504d.map
 4740 6853
 10689 1979
 11893 11551
-dao-map/lak526d.map
+resources/dao-map/lak526d.map
 96 574
 766 62
 796 531
@@ -110,7 +110,7 @@ dao-map/lak526d.map
 497 513
 950 118
 76 898
-dao-map/den011d.map
+resources/dao-map/den011d.map
 8078 13402
 3156 3285
 338 8574
@@ -126,7 +126,7 @@ dao-map/den011d.map
 12887 12696
 1140 11146
 7503 6259
-dao-map/lak100c.map
+resources/dao-map/lak100c.map
 11005 5432
 34006 13548
 12754 21860
@@ -142,7 +142,7 @@ dao-map/lak100c.map
 25030 9107
 8179 15067
 22162 5673
-dao-map/orz700d.map
+resources/dao-map/orz700d.map
 6634 61263
 16678 25486
 62674 61601
@@ -158,7 +158,7 @@ dao-map/orz700d.map
 89832 58135
 60625 8038
 12164 11916
-dao-map/lgt603d.map
+resources/dao-map/lgt603d.map
 22647 19164
 22577 24755
 5533 1431
@@ -174,7 +174,7 @@ dao-map/lgt603d.map
 26401 3087
 13605 15217
 13468 12607
-dao-map/den401d.map
+resources/dao-map/den401d.map
 2607 1254
 3642 3637
 3532 9034
@@ -190,7 +190,7 @@ dao-map/den401d.map
 7571 7036
 5810 4731
 7310 11023
-dao-map/orz901d.map
+resources/dao-map/orz901d.map
 36889 19321
 15542 30432
 2316 34869
@@ -206,7 +206,7 @@ dao-map/orz901d.map
 37317 9885
 33225 10855
 12122 36822
-dao-map/brc200d.map
+resources/dao-map/brc200d.map
 13631 4448
 1990 11022
 11363 1720
@@ -222,7 +222,7 @@ dao-map/brc200d.map
 15396 3780
 9719 14814
 14674 13132
-dao-map/den207d.map
+resources/dao-map/den207d.map
 538 676
 487 630
 246 677
@@ -238,7 +238,7 @@ dao-map/den207d.map
 790 586
 811 366
 772 12
-dao-map/lak100d.map
+resources/dao-map/lak100d.map
 23193 36580
 36575 5539
 33964 2165
@@ -254,7 +254,7 @@ dao-map/lak100d.map
 37423 6793
 23394 651
 12691 25792
-dao-map/orz999d.map
+resources/dao-map/orz999d.map
 3633 12894
 13941 6750
 40077 35931
@@ -270,7 +270,7 @@ dao-map/orz999d.map
 2819 43576
 10250 5093
 6231 12637
-dao-map/lgt101d.map
+resources/dao-map/lgt101d.map
 210 183
 109 50
 188 467
@@ -286,7 +286,7 @@ dao-map/lgt101d.map
 460 71
 180 225
 396 416
-dao-map/ost102d.map
+resources/dao-map/ost102d.map
 13 239
 70 122
 73 76
@@ -302,7 +302,7 @@ dao-map/ost102d.map
 178 106
 221 144
 16 106
-dao-map/orz101d.map
+resources/dao-map/orz101d.map
 1704 490
 1540 152
 1401 738
@@ -318,7 +318,7 @@ dao-map/orz101d.map
 1322 1731
 1355 1107
 294 895
-dao-map/den312d.map
+resources/dao-map/den312d.map
 457 1315
 1915 78
 792 1998
@@ -334,7 +334,7 @@ dao-map/den312d.map
 242 2332
 1089 1631
 1173 844
-dao-map/ost000t.map
+resources/dao-map/ost000t.map
 31900 60173
 39128 37583
 45514 99458
@@ -350,7 +350,7 @@ dao-map/ost000t.map
 5834 16858
 18232 105664
 60302 32666
-dao-map/orz300d.map
+resources/dao-map/orz300d.map
 71367 45918
 17320 41325
 514 79455
@@ -366,7 +366,7 @@ dao-map/orz300d.map
 31326 16857
 78179 80779
 57855 81386
-dao-map/combat.map
+resources/dao-map/combat.map
 30349 28910
 3360 31859
 5536 9618
@@ -382,7 +382,7 @@ dao-map/combat.map
 27456 24387
 14885 19135
 31082 26275
-dao-map/lak101d.map
+resources/dao-map/lak101d.map
 19 46
 122 294
 176 194
@@ -398,7 +398,7 @@ dao-map/lak101d.map
 25 118
 9 268
 266 14
-dao-map/lgt604d.map
+resources/dao-map/lgt604d.map
 3229 7289
 4306 1679
 1397 1250
@@ -414,7 +414,7 @@ dao-map/lgt604d.map
 6868 838
 2950 2920
 9177 5330
-dao-map/den502d.map
+resources/dao-map/den502d.map
 7851 11123
 26458 5322
 22054 932
@@ -430,7 +430,7 @@ dao-map/den502d.map
 11270 14621
 6057 16137
 2299 20078
-dao-map/lak202d.map
+resources/dao-map/lak202d.map
 3555 1235
 5627 4069
 1818 5288
@@ -446,7 +446,7 @@ dao-map/lak202d.map
 3573 5402
 5861 407
 6084 5781
-dao-map/den308d.map
+resources/dao-map/den308d.map
 1785 5
 1052 1582
 1419 228
@@ -462,7 +462,7 @@ dao-map/den308d.map
 1923 2160
 1030 1859
 2494 408
-dao-map/lak107d.map
+resources/dao-map/lak107d.map
 308 10
 30 163
 36 182
@@ -478,7 +478,7 @@ dao-map/lak107d.map
 125 294
 222 156
 203 25
-dao-map/lak110d.map
+resources/dao-map/lak110d.map
 81 130
 69 105
 151 136
@@ -494,7 +494,7 @@ dao-map/lak110d.map
 17 151
 98 97
 71 129
-dao-map/orz302d.map
+resources/dao-map/orz302d.map
 1693 4297
 2550 2549
 1577 3844
@@ -510,7 +510,7 @@ dao-map/orz302d.map
 3946 4010
 930 1494
 1462 3885
-dao-map/lak405d.map
+resources/dao-map/lak405d.map
 3879 45763
 19712 9702
 1313 26877
@@ -526,7 +526,7 @@ dao-map/lak405d.map
 26612 27127
 38023 20599
 17043 22661
-dao-map/brc201d.map
+resources/dao-map/brc201d.map
 23489 6419
 1557 24058
 12500 12580
@@ -542,7 +542,7 @@ dao-map/brc201d.map
 18077 18185
 11180 1614
 4708 4294
-dao-map/lgt300d.map
+resources/dao-map/lgt300d.map
 21713 19811
 3916 9485
 12498 9658
@@ -558,7 +558,7 @@ dao-map/lgt300d.map
 30406 36400
 19080 4004
 15151 6109
-dao-map/lak307d.map
+resources/dao-map/lak307d.map
 2896 3521
 105 3364
 3400 931
@@ -574,7 +574,7 @@ dao-map/lak307d.map
 1624 769
 3651 946
 2446 2575
-dao-map/brc503d.map
+resources/dao-map/brc503d.map
 34927 48691
 62990 24953
 23872 27208
@@ -590,7 +590,7 @@ dao-map/brc503d.map
 56764 53496
 5665 6363
 17552 57086
-dao-map/brc501d.map
+resources/dao-map/brc501d.map
 31252 47618
 19109 54302
 32442 26495
@@ -606,7 +606,7 @@ dao-map/brc501d.map
 795 18578
 50326 4293
 43033 45393
-dao-map/arena2.map
+resources/dao-map/arena2.map
 13928 18200
 1670 13145
 1077 1866
@@ -622,7 +622,7 @@ dao-map/arena2.map
 21449 1584
 1547 7199
 18743 13298
-dao-map/den900d.map
+resources/dao-map/den900d.map
 4711 671
 688 995
 1511 3371
@@ -638,7 +638,7 @@ dao-map/den900d.map
 2002 4876
 598 898
 3745 3199
-dao-map/lgt605d.map
+resources/dao-map/lgt605d.map
 372 349
 1640 1988
 1615 2938
@@ -654,7 +654,7 @@ dao-map/lgt605d.map
 1590 1668
 2108 1276
 1515 2896
-dao-map/den407d.map
+resources/dao-map/den407d.map
 351 290
 664 632
 429 119
@@ -670,7 +670,7 @@ dao-map/den407d.map
 391 361
 354 614
 808 194
-dao-map/orz301d.map
+resources/dao-map/orz301d.map
 1700 62
 2423 89
 4394 2044
@@ -686,7 +686,7 @@ dao-map/orz301d.map
 3911 4227
 1503 3628
 187 2699
-dao-map/den000d.map
+resources/dao-map/den000d.map
 14950 33368
 14867 15695
 50982 55904
@@ -702,7 +702,7 @@ dao-map/den000d.map
 26914 12696
 17231 54732
 17867 57085
-dao-map/hrt201d.map
+resources/dao-map/hrt201d.map
 6434 19005
 17294 10748
 21690 6607
@@ -718,7 +718,7 @@ dao-map/hrt201d.map
 3204 21280
 3667 9754
 1545 21690
-dao-map/orz702d.map
+resources/dao-map/orz702d.map
 39518 18217
 3964 68197
 43525 8054
@@ -734,7 +734,7 @@ dao-map/orz702d.map
 42216 22245
 10467 70756
 33329 7625
-dao-map/orz000d.map
+resources/dao-map/orz000d.map
 3639 408
 812 2021
 1120 3613
@@ -750,7 +750,7 @@ dao-map/orz000d.map
 3097 611
 444 3246
 2112 1970
-dao-map/lak109d.map
+resources/dao-map/lak109d.map
 202 122
 116 196
 223 53
@@ -766,7 +766,7 @@ dao-map/lak109d.map
 19 6
 109 30
 201 133
-dao-map/brc101d.map
+resources/dao-map/brc101d.map
 25514 15462
 254 14594
 5023 21646
@@ -782,7 +782,7 @@ dao-map/brc101d.map
 29470 12636
 16841 18593
 6339 12615
-dao-map/brc100d.map
+resources/dao-map/brc100d.map
 23311 25685
 19450 4909
 18886 25301
@@ -798,7 +798,7 @@ dao-map/brc100d.map
 1338 21675
 2195 28165
 5392 15899
-dao-map/hrt001d.map
+resources/dao-map/hrt001d.map
 2354 2117
 235 846
 472 868
@@ -814,7 +814,7 @@ dao-map/hrt001d.map
 2088 2033
 2043 609
 931 1677
-dao-map/brc504d.map
+resources/dao-map/brc504d.map
 17161 16908
 45334 32854
 22832 26201
@@ -830,7 +830,7 @@ dao-map/brc504d.map
 44592 28663
 13920 17330
 2681 20985
-dao-map/den510d.map
+resources/dao-map/den510d.map
 51414 4119
 45833 4145
 20592 43394
@@ -846,7 +846,7 @@ dao-map/den510d.map
 2484 36650
 15591 31970
 14248 55163
-dao-map/lak308d.map
+resources/dao-map/lak308d.map
 8698 131
 433 339
 5540 1646
@@ -862,7 +862,7 @@ dao-map/lak308d.map
 4928 6799
 11645 9410
 7266 3345
-dao-map/orz800d.map
+resources/dao-map/orz800d.map
 20641 28884
 23434 14493
 16519 37032
@@ -878,7 +878,7 @@ dao-map/orz800d.map
 49842 50387
 12342 222
 4336 14952
-dao-map/den408d.map
+resources/dao-map/den408d.map
 307 463
 290 223
 224 303
@@ -894,7 +894,7 @@ dao-map/den408d.map
 19 496
 132 339
 382 502
-dao-map/hrt000d.map
+resources/dao-map/hrt000d.map
 37106 78420
 32244 95282
 24693 52994
@@ -910,7 +910,7 @@ dao-map/hrt000d.map
 9411 79402
 56540 63036
 552 5996
-dao-map/orz103d.map
+resources/dao-map/orz103d.map
 32611 37636
 12588 29807
 16339 24027
@@ -926,7 +926,7 @@ dao-map/orz103d.map
 1575 22523
 11357 3106
 36146 37886
-dao-map/lgt602d.map
+resources/dao-map/lgt602d.map
 4157 12495
 12549 4464
 31070 21998
@@ -942,7 +942,7 @@ dao-map/lgt602d.map
 19687 6276
 6818 2708
 26954 1164
-dao-map/rmtst.map
+resources/dao-map/rmtst.map
 4835 5114
 3473 1087
 548 3440
@@ -958,7 +958,7 @@ dao-map/rmtst.map
 1087 4901
 4230 4199
 2198 2325
-dao-map/orz701d.map
+resources/dao-map/orz701d.map
 30733 28434
 31181 1020
 2750 39664
@@ -974,7 +974,7 @@ dao-map/orz701d.map
 32477 23773
 35885 27865
 10894 38238
-dao-map/den404d.map
+resources/dao-map/den404d.map
 206 318
 208 77
 258 39
@@ -990,7 +990,7 @@ dao-map/den404d.map
 210 259
 42 55
 236 227
-dao-map/den601d.map
+resources/dao-map/den601d.map
 7176 9216
 3560 4489
 7153 34
@@ -1006,7 +1006,7 @@ dao-map/den601d.map
 6001 16733
 11965 13874
 9560 7199
-dao-map/lak403d.map
+resources/dao-map/lak403d.map
 847 2955
 6569 12452
 23084 13301
@@ -1022,7 +1022,7 @@ dao-map/lak403d.map
 6010 2206
 23994 18506
 2685 13843
-dao-map/lak504d.map
+resources/dao-map/lak504d.map
 81 3639
 4771 7636
 7608 11437
@@ -1038,7 +1038,7 @@ dao-map/lak504d.map
 9360 3388
 9263 8098
 14372 16824
-dao-map/den520d.map
+resources/dao-map/den520d.map
 20030 9979
 25869 9331
 5104 25954
@@ -1054,7 +1054,7 @@ dao-map/den520d.map
 4008 15733
 10761 25146
 19611 22354
-dao-map/ost003d.map
+resources/dao-map/ost003d.map
 7090 8927
 2753 871
 12383 1094
@@ -1070,7 +1070,7 @@ dao-map/ost003d.map
 8464 10443
 7135 12861
 12223 6388
-dao-map/lak200d.map
+resources/dao-map/lak200d.map
 6546 3011
 4646 3405
 5245 2737
@@ -1086,7 +1086,7 @@ dao-map/lak200d.map
 3023 424
 5397 491
 5970 1762
-dao-map/lak201d.map
+resources/dao-map/lak201d.map
 1540 6835
 2682 3175
 3150 9652
@@ -1102,7 +1102,7 @@ dao-map/lak201d.map
 10345 3648
 6331 7889
 8499 6067
-dao-map/den202d.map
+resources/dao-map/den202d.map
 396 347
 71 68
 476 519
@@ -1118,7 +1118,7 @@ dao-map/den202d.map
 398 16
 575 179
 554 373
-dao-map/brc505d.map
+resources/dao-map/brc505d.map
 15198 15241
 25032 18334
 4371 27640
@@ -1134,7 +1134,7 @@ dao-map/brc505d.map
 21361 21141
 27613 10600
 31071 5550
-dao-map/ost002d.map
+resources/dao-map/ost002d.map
 1258 3809
 6915 5888
 5964 5769
@@ -1150,7 +1150,7 @@ dao-map/ost002d.map
 2717 10528
 7827 1604
 2248 2000
-dao-map/lak515d.map
+resources/dao-map/lak515d.map
 1012 867
 915 276
 1646 777
@@ -1166,7 +1166,7 @@ dao-map/lak515d.map
 145 349
 448 703
 1588 1016
-dao-map/brc300d.map
+resources/dao-map/brc300d.map
 3876 3044
 557 4695
 3768 3068
@@ -1182,7 +1182,7 @@ dao-map/brc300d.map
 1179 4461
 548 4244
 2456 3461
-dao-map/lak302d.map
+resources/dao-map/lak302d.map
 13078 4733
 3341 11928
 6836 3629
@@ -1198,7 +1198,7 @@ dao-map/lak302d.map
 12252 13657
 10394 5567
 4889 13130
-dao-map/den200n.map
+resources/dao-map/den200n.map
 6570 7071
 531 5929
 3382 3255
@@ -1214,7 +1214,7 @@ dao-map/den200n.map
 2076 1172
 4498 12708
 15509 734
-dao-map/orz102d.map
+resources/dao-map/orz102d.map
 11 477
 158 454
 275 500
@@ -1230,7 +1230,7 @@ dao-map/orz102d.map
 651 126
 330 37
 10 111
-dao-map/den203d.map
+resources/dao-map/den203d.map
 2576 381
 960 1621
 1401 837
@@ -1246,7 +1246,7 @@ dao-map/den203d.map
 36 25
 1870 1544
 55 469
-dao-map/lak514d.map
+resources/dao-map/lak514d.map
 17693 21058
 3196 4146
 2841 993
@@ -1262,7 +1262,7 @@ dao-map/lak514d.map
 237 1126
 9828 9402
 3736 3687
-dao-map/den005d.map
+resources/dao-map/den005d.map
 172 3814
 37 1911
 14567 12909
@@ -1278,7 +1278,7 @@ dao-map/den005d.map
 11654 15046
 12164 121
 4044 1118
-dao-map/ost000a.map
+resources/dao-map/ost000a.map
 19486 39913
 70989 383
 121248 98004
@@ -1294,7 +1294,7 @@ dao-map/ost000a.map
 129723 94390
 18788 26459
 117173 108790
-dao-map/orz107d.map
+resources/dao-map/orz107d.map
 581 564
 303 143
 610 538
@@ -1310,7 +1310,7 @@ dao-map/orz107d.map
 415 302
 171 22
 634 4
-dao-map/orz303d.map
+resources/dao-map/orz303d.map
 540 4739
 16775 5066
 9284 18679
@@ -1326,7 +1326,7 @@ dao-map/orz303d.map
 14894 13588
 4491 11851
 17676 16650
-dao-map/lak304d.map
+resources/dao-map/lak304d.map
 13515 13382
 8860 8717
 2998 15467
@@ -1342,7 +1342,7 @@ dao-map/lak304d.map
 12200 17471
 6772 8228
 9809 9855
-dao-map/brc502d.map
+resources/dao-map/brc502d.map
 4309 901
 2598 1905
 2376 2282
@@ -1358,7 +1358,7 @@ dao-map/brc502d.map
 5320 5078
 132 1387
 934 505
-dao-map/lak404d.map
+resources/dao-map/lak404d.map
 354 9427
 11109 9696
 12000 13753
@@ -1374,7 +1374,7 @@ dao-map/lak404d.map
 2168 4090
 1993 362
 11567 5003
-dao-map/orz200d.map
+resources/dao-map/orz200d.map
 3319 3180
 2482 3656
 645 4707
@@ -1390,7 +1390,7 @@ dao-map/orz200d.map
 1512 983
 4583 3636
 2037 3049
-dao-map/hrt201n.map
+resources/dao-map/hrt201n.map
 10040 12346
 2548 18558
 15033 20370
@@ -1406,7 +1406,7 @@ dao-map/hrt201n.map
 16473 14449
 7612 12020
 19516 497
-dao-map/lak519d.map
+resources/dao-map/lak519d.map
 4679 601
 14620 1216
 13252 5471
@@ -1422,7 +1422,7 @@ dao-map/lak519d.map
 9708 3713
 363 8814
 15333 1759
-dao-map/oth999d.map
+resources/dao-map/oth999d.map
 1125 13
 652 1093
 1461 618
@@ -1438,7 +1438,7 @@ dao-map/oth999d.map
 306 1308
 1424 498
 153 80
-dao-map/den201d.map
+resources/dao-map/den201d.map
 291 113
 513 435
 436 89
@@ -1454,7 +1454,7 @@ dao-map/den201d.map
 309 452
 18 206
 458 526
-dao-map/lak512d.map
+resources/dao-map/lak512d.map
 23701 27516
 22789 29362
 20674 6049
@@ -1470,7 +1470,7 @@ dao-map/lak512d.map
 17753 8867
 25653 26505
 15897 6488
-dao-map/hrt002d.map
+resources/dao-map/hrt002d.map
 141 468
 57 596
 234 558
@@ -1486,7 +1486,7 @@ dao-map/hrt002d.map
 137 39
 117 613
 370 12
-dao-map/lak103d.map
+resources/dao-map/lak103d.map
 766 570
 542 768
 309 34
@@ -1502,7 +1502,7 @@ dao-map/lak103d.map
 392 21
 558 328
 427 246
-dao-map/den009d.map
+resources/dao-map/den009d.map
 318 586
 747 241
 898 746
@@ -1518,7 +1518,7 @@ dao-map/den009d.map
 490 690
 805 339
 255 689
-dao-map/den405d.map
+resources/dao-map/den405d.map
 838 272
 708 213
 921 464
@@ -1534,7 +1534,7 @@ dao-map/den405d.map
 43 80
 290 309
 723 608
-dao-map/brc999d.map
+resources/dao-map/brc999d.map
 11845 10904
 9130 8082
 8641 6610
@@ -1550,7 +1550,7 @@ dao-map/brc999d.map
 6334 381
 9198 8004
 5454 27
-dao-map/oth001d.map
+resources/dao-map/oth001d.map
 4385 7235
 5485 7032
 3531 7057
@@ -1566,7 +1566,7 @@ dao-map/oth001d.map
 6751 6583
 13509 13577
 11558 11477
-dao-map/lak507d.map
+resources/dao-map/lak507d.map
 1693 1475
 476 692
 264 3929
@@ -1582,7 +1582,7 @@ dao-map/lak507d.map
 4266 3967
 620 687
 1275 4246
-dao-map/lak203d.map
+resources/dao-map/lak203d.map
 1427 2158
 2773 3293
 2815 2526
@@ -1598,7 +1598,7 @@ dao-map/lak203d.map
 976 965
 2134 2671
 2027 1931
-dao-map/brc000d.map
+resources/dao-map/brc000d.map
 10752 25312
 20148 15730
 3297 4099
@@ -1614,7 +1614,7 @@ dao-map/brc000d.map
 26417 4250
 23107 402
 13654 12576
-dao-map/oth000d.map
+resources/dao-map/oth000d.map
 9023 3696
 1233 6907
 11223 16837
@@ -1630,7 +1630,7 @@ dao-map/oth000d.map
 16041 543
 7151 2533
 13810 15713
-dao-map/lgt601d.map
+resources/dao-map/lgt601d.map
 14827 18327
 11176 4971
 5635 19140
@@ -1646,7 +1646,7 @@ dao-map/lgt601d.map
 19578 23526
 4305 5796
 19131 16326
-dao-map/orz304d.map
+resources/dao-map/orz304d.map
 3641 5147
 1968 3142
 1446 4189
@@ -1662,7 +1662,7 @@ dao-map/orz304d.map
 4757 782
 4181 1171
 5037 2594
-dao-map/den101d.map
+resources/dao-map/den101d.map
 955 1320
 1347 309
 2 854
@@ -1678,7 +1678,7 @@ dao-map/den101d.map
 1005 164
 432 29
 1048 911
-dao-map/lak100n.map
+resources/dao-map/lak100n.map
 4821 12723
 21118 30122
 25362 28134
@@ -1694,7 +1694,7 @@ dao-map/lak100n.map
 19934 9175
 32998 2836
 23222 6605
-dao-map/arena.map
+resources/dao-map/arena.map
 318 1922
 160 1534
 286 734
@@ -1710,7 +1710,7 @@ dao-map/arena.map
 1012 1590
 1375 389
 1402 275
-dao-map/lgt600d.map
+resources/dao-map/lgt600d.map
 9126 15407
 15809 8890
 17723 6665
@@ -1726,7 +1726,7 @@ dao-map/lgt600d.map
 9208 3737
 9169 1612
 15807 4771
-dao-map/orz601d.map
+resources/dao-map/orz601d.map
 1445 1566
 153 534
 1690 1775
@@ -1742,7 +1742,7 @@ dao-map/orz601d.map
 1514 422
 1657 1307
 1225 1710
-dao-map/orz703d.map
+resources/dao-map/orz703d.map
 46339 37100
 47638 21507
 17569 68903
@@ -1758,7 +1758,7 @@ dao-map/orz703d.map
 8961 34128
 34402 46622
 73289 55872
-dao-map/den901d.map
+resources/dao-map/den901d.map
 2677 4798
 5081 7016
 781 4411
@@ -1774,7 +1774,7 @@ dao-map/den901d.map
 3739 4070
 2512 812
 713 7181
-dao-map/lak511d.map
+resources/dao-map/lak511d.map
 18763 28511
 7841 8360
 12940 14875
@@ -1790,7 +1790,7 @@ dao-map/lak511d.map
 16664 20807
 8510 10186
 5763 1798
-dao-map/den001d.map
+resources/dao-map/den001d.map
 4154 8140
 6840 640
 176 6585
@@ -1806,7 +1806,7 @@ dao-map/den001d.map
 3521 7060
 271 1492
 436 584
-dao-map/lak513d.map
+resources/dao-map/lak513d.map
 9222 15660
 36222 33441
 410 910
@@ -1822,7 +1822,7 @@ dao-map/lak513d.map
 9506 21306
 22393 16819
 14867 18764
-dao-map/isound1.map
+resources/dao-map/isound1.map
 2290 2960
 1409 15
 2456 884
@@ -1838,7 +1838,7 @@ dao-map/isound1.map
 304 2523
 2058 1397
 2009 185
-dao-map/den500d.map
+resources/dao-map/den500d.map
 27699 29362
 4489 21118
 27172 7850
@@ -1854,7 +1854,7 @@ dao-map/den500d.map
 4009 1150
 26778 10636
 18352 14365
-dao-map/lak505d.map
+resources/dao-map/lak505d.map
 188 9769
 2746 9387
 16294 19935
@@ -1870,7 +1870,7 @@ dao-map/lak505d.map
 16678 10408
 2926 11144
 16418 6093
-dao-map/lak250d.map
+resources/dao-map/lak250d.map
 2684 2274
 356 306
 4605 4205
@@ -1886,7 +1886,7 @@ dao-map/lak250d.map
 6606 6813
 4115 4517
 1274 1619
-dao-map/combat2.map
+resources/dao-map/combat2.map
 26236 4948
 31806 13798
 4517 14954
@@ -1902,7 +1902,7 @@ dao-map/combat2.map
 13764 23736
 9902 11662
 14933 1918
-dao-map/den200d.map
+resources/dao-map/den200d.map
 4081 5771
 15650 891
 4418 14200
@@ -1918,7 +1918,7 @@ dao-map/den200d.map
 4617 5069
 13990 14143
 1942 9534
-dao-map/den998d.map
+resources/dao-map/den998d.map
 185 764
 289 608
 1110 1154
@@ -1934,7 +1934,7 @@ dao-map/den998d.map
 1230 1505
 1301 733
 885 99
-dao-map/lak102d.map
+resources/dao-map/lak102d.map
 202 298
 355 349
 242 135
@@ -1950,7 +1950,7 @@ dao-map/lak102d.map
 507 80
 135 516
 149 256
-dao-map/den602d.map
+resources/dao-map/den602d.map
 14254 26873
 22794 23709
 12965 9906
@@ -1966,7 +1966,7 @@ dao-map/den602d.map
 4889 8450
 8535 31823
 25352 19764
-dao-map/orz900d.map
+resources/dao-map/orz900d.map
 7103 49841
 51698 80878
 34275 79223
@@ -1982,7 +1982,7 @@ dao-map/orz900d.map
 56907 53317
 61882 63289
 22473 51492
-dao-map/lak503d.map
+resources/dao-map/lak503d.map
 7476 3085
 14633 2274
 6338 14823
@@ -1998,7 +1998,7 @@ dao-map/lak503d.map
 10227 1553
 1923 15667
 6834 974
-dao-map/ost101d.map
+resources/dao-map/ost101d.map
 1585 2106
 84 232
 1624 2020
@@ -2014,7 +2014,7 @@ dao-map/ost101d.map
 2279 97
 23 2070
 1451 3306
-dao-map/den012d.map
+resources/dao-map/den012d.map
 2234 8965
 1417 11274
 22469 18641
@@ -2030,7 +2030,7 @@ dao-map/den012d.map
 7586 22193
 12100 15481
 13981 13573
-dao-map/brc203d.map
+resources/dao-map/brc203d.map
 1105 1587
 20038 9353
 10256 10614
@@ -2046,7 +2046,7 @@ dao-map/brc203d.map
 3820 1900
 3384 10465
 15430 11110
-dao-map/ost100d.map
+resources/dao-map/ost100d.map
 97205 112834
 44356 76086
 105581 35762
@@ -2062,7 +2062,7 @@ dao-map/ost100d.map
 86526 63294
 75612 13040
 2333 87896
-dao-map/lak104d.map
+resources/dao-map/lak104d.map
 143 254
 622 626
 672 793
@@ -2078,7 +2078,7 @@ dao-map/lak104d.map
 517 576
 92 44
 365 111
-dao-map/orz106d.map
+resources/dao-map/orz106d.map
 298 299
 130 332
 97 0
@@ -2094,7 +2094,7 @@ dao-map/orz106d.map
 49 312
 63 190
 277 155
-dao-map/brc202d.map
+resources/dao-map/brc202d.map
 35527 29802
 8257 10486
 28164 9589
@@ -2110,7 +2110,7 @@ dao-map/brc202d.map
 13537 14546
 29921 22665
 4349 32251
-dao-map/lak400d.map
+resources/dao-map/lak400d.map
 7434 37176
 1704 8914
 32004 11067
@@ -2126,7 +2126,7 @@ dao-map/lak400d.map
 30587 32802
 40217 22752
 27326 7389
-dao-map/rmtst03.map
+resources/dao-map/rmtst03.map
 610 2180
 2845 2915
 1706 2017
@@ -2142,7 +2142,7 @@ dao-map/rmtst03.map
 3451 2469
 4824 4456
 3060 1081
-dao-map/ost001d.map
+resources/dao-map/ost001d.map
 8867 2924
 8029 10204
 4048 8305
@@ -2158,7 +2158,7 @@ dao-map/ost001d.map
 8290 10063
 10552 8287
 6916 418
-dao-map/rmtst01.map
+resources/dao-map/rmtst01.map
 5117 1422
 2496 1142
 2269 3659
@@ -2174,7 +2174,7 @@ dao-map/rmtst01.map
 5597 923
 566 4918
 878 4495
-dao-map/brc997d.map
+resources/dao-map/brc997d.map
 4473 588
 2156 19815
 12310 3215
@@ -2190,7 +2190,7 @@ dao-map/brc997d.map
 10365 20290
 20623 13866
 15326 15215
-dao-map/orz201d.map
+resources/dao-map/orz201d.map
 110 410
 279 645
 316 107
@@ -2206,7 +2206,7 @@ dao-map/orz201d.map
 654 349
 361 44
 212 262
-dao-map/lak106d.map
+resources/dao-map/lak106d.map
 383 434
 1050 889
 850 1579
@@ -2222,7 +2222,7 @@ dao-map/lak106d.map
 1288 1157
 53 1233
 438 1144
-dao-map/den403d.map
+resources/dao-map/den403d.map
 1987 908
 813 792
 1704 642
@@ -2238,7 +2238,7 @@ dao-map/den403d.map
 1745 1800
 42 1219
 1940 298
-dao-map/den501d.map
+resources/dao-map/den501d.map
 24949 23257
 21366 18143
 26047 9136
@@ -2254,7 +2254,7 @@ dao-map/den501d.map
 605 26085
 9726 5778
 24428 875
-dao-map/orz100d.map
+resources/dao-map/orz100d.map
 14952 96549
 32009 41072
 58138 64779
@@ -2270,7 +2270,7 @@ dao-map/orz100d.map
 54494 31490
 28392 95074
 83728 58397
-dao-map/orz105d.map
+resources/dao-map/orz105d.map
 316 269
 142 526
 350 30
@@ -2286,7 +2286,7 @@ dao-map/orz105d.map
 531 157
 426 4
 404 53
-dao-map/den020d.map
+resources/dao-map/den020d.map
 2057 1070
 1747 1406
 2585 1444
@@ -2302,7 +2302,7 @@ dao-map/den020d.map
 1510 327
 1427 2301
 1967 2441
-dao-map/den505d.map
+resources/dao-map/den505d.map
 7014 15491
 3575 12459
 3588 4584
@@ -2318,7 +2318,7 @@ dao-map/den505d.map
 20914 10458
 15747 1022
 1179 7251
-dao-map/lak108d.map
+resources/dao-map/lak108d.map
 161 161
 218 123
 134 69
@@ -2334,7 +2334,7 @@ dao-map/lak108d.map
 235 115
 78 130
 204 284
-dao-map/lak105d.map
+resources/dao-map/lak105d.map
 173 107
 50 20
 31 203
@@ -2350,7 +2350,7 @@ dao-map/lak105d.map
 364 231
 267 250
 330 166
-dao-map/den204d.map
+resources/dao-map/den204d.map
 2238 695
 641 286
 2703 581
@@ -2366,7 +2366,7 @@ dao-map/den204d.map
 1523 764
 2404 162
 1007 1206
-dao-map/den600d.map
+resources/dao-map/den600d.map
 782 13077
 10103 1681
 7902 4764
@@ -2382,7 +2382,7 @@ dao-map/den600d.map
 2118 6598
 10956 9020
 2367 2377
-dao-map/orz704d.map
+resources/dao-map/orz704d.map
 307 2060
 720 248
 418 1052
@@ -2398,7 +2398,7 @@ dao-map/orz704d.map
 1286 487
 1663 390
 1726 845
-dao-map/brc204d.map
+resources/dao-map/brc204d.map
 12636 3327
 17224 21465
 20300 13192
@@ -2414,7 +2414,7 @@ dao-map/brc204d.map
 22173 2185
 17006 10502
 2380 17551
-dao-map/orz203d.map
+resources/dao-map/orz203d.map
 195 129
 57 175
 150 133
@@ -2430,7 +2430,7 @@ dao-map/orz203d.map
 188 23
 54 119
 47 161
-dao-map/lak303d.map
+resources/dao-map/lak303d.map
 1091 7304
 4242 13137
 5729 2935
@@ -2446,7 +2446,7 @@ dao-map/lak303d.map
 11106 7331
 2270 11288
 11957 9913
-dao-map/lak401d.map
+resources/dao-map/lak401d.map
 41379 14941
 35617 16146
 22682 32730
@@ -2462,7 +2462,7 @@ dao-map/lak401d.map
 3192 19872
 2643 15807
 42184 26367
-dao-map/den400d.map
+resources/dao-map/den400d.map
 11209 21613
 27580 14862
 12914 7592
@@ -2478,7 +2478,7 @@ dao-map/den400d.map
 6581 1234
 81 930
 5331 6190
-dao-map/ost004d.map
+resources/dao-map/ost004d.map
 4274 937
 3111 3309
 3366 4402

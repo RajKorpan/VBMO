@@ -1,0 +1,1 @@
+{"map": "FLA", "merge strategy": "MORE_SLACK", "eps": 0.5, "data": [{"source": 232180, "target": 910685, "front":[[5.53381e+06, 5.51881e+06, 3.84379e+06, 1547]], "d-score": [8.70948e+06], "norm front": [[0, 0, 0, 0]], "norm d-score": [1.74455e-157], "sparsity": 0, "time": 101}]}
