@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <chrono>
 #include <climits>
 #include <cstddef>
@@ -14,6 +15,16 @@
 #include "inc/v.hpp"
 
 
+std::vector<double> random_weight(const size_t &b){
+  std::vector<double> new_weight;
+  std::uniform_real_distribution<double> rng(0.0, 1.0);
+  std::mt19937 generator(std::clock());
+  for(int i = 0; i < b; i++){
+    new_weight.push_back(rng(generator));
+  }
+
+  return new_weight;
+}
 void UNCAPPED_VBEA_COMBINED(struct::log &LOG, const AdjMatrix &adj_matrix, std::vector<NodePtr> node_list, heuristic &h,  const size_t source, const size_t target, const std::string voting_method, const size_t cutoff_time, const size_t K, const size_t T = 0, const bool visualize = false){
   auto start_t = std::chrono::high_resolution_clock::now();
   int end_t;
@@ -40,10 +51,8 @@ void UNCAPPED_VBEA_COMBINED(struct::log &LOG, const AdjMatrix &adj_matrix, std::
   d_score = calculate_d_score(normalized_front);
   vote_results = vote(voting_method, normalized_front, d_score);
 
-
   end_t = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start_t).count();
   total_t += end_t;
-
   
   if(visualize){
     std::cout << "-----gen0-----" << std::endl;
@@ -230,7 +239,6 @@ void UNCAPPED_VBEA_CONSCIOUS(struct::log &LOG, const AdjMatrix &adj_matrix, std:
     node_order order = more_than_specific(i);
     front.push_back(A(source, target, h, order)->g);
     std::cout << "===========" << std::endl;
-
   }
   remove_duplicates(front);
   normalized_front = normalize_matrix(front);
@@ -365,7 +373,177 @@ void UNCAPPED_VBEA_CONSCIOUS(struct::log &LOG, const AdjMatrix &adj_matrix, std:
 // K: size of the child population, 
 // T: number of generations, limit 
 
+// void VBEA_COMBINED(struct::log &LOG, const AdjMatrix &adj_matrix, std::vector<NodePtr> node_list, heuristic &h,  const size_t source, const size_t target, const std::string voting_method, const size_t cutoff_time, const size_t K, const size_t T = 0, const bool visualize = false){
+//   auto start_t = std::chrono::high_resolution_clock::now();
+//   int end_t;
+//   int total_t = 0;
+//   int b = adj_matrix.get_obj_count();
+
+//   // BEGIN GEN 0
+//   ASTAR A(adj_matrix, node_list);
+//   std::vector<std::vector<double>> front;
+//   std::vector<std::vector<double>> normalized_front;
+//   std::vector<double> d_score,
+//                       norm_d_score;
+//   std::vector<int> vote_results;
+
+//   for(int i = 0; i < b; i++){
+//     std::cout << i << std::endl;
+//     std::cout << "===========" << std::endl;
+//     node_order order = more_than_specific(i);
+//     front.push_back(A(source, target, h, order)->g);
+//   }
+//   if(K > b){
+//     std::uniform_real_distribution<double> rng(0.0, 1.0);
+//     std::mt19937 generator(std::clock());
+//     WEIGHTED_ASTAR WA(adj_matrix, node_list);
+//     node_order order = more_than_specific(0);
+//     for(size_t i = b; i < K; i++){
+//       std::vector<double> rand_weight(b, rng(generator));
+//       WA.update_weight(rand_weight);
+//       std::cout << i << std::endl;
+//       std::cout << "===========" << std::endl;
+//       front.push_back(WA(source, target, h, order)->g);
+//     }
+//   }
+
+//   remove_duplicates(front);
+//   normalized_front = normalize_matrix(front);
+//   d_score = calculate_d_score(normalized_front);
+//   vote_results = vote(voting_method, normalized_front, d_score);
+
+//   end_t = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start_t).count();
+//   total_t += end_t;
+  
+//   if(visualize){
+//     std::cout << "-----gen0-----" << std::endl;
+//     for(int i = 0; i < front.size(); i++){
+//         std::cout << "P_" << i << " " << front[i] << " | " << normalized_front[i] << " d: " << d_score[i] << std::endl;
+//     }
+//     std::cout << "voting results:" << std::endl;
+//     std::cout << vote_results << std::endl;
+//     std::cout << "time: " << end_t <<  " ms " << std::endl;
+//     std::cout << "current run time: " << total_t << " ms" << std::endl;
+//   }
+//   // END GEN 0
+  
+//   // WRITE GEN 0
+//   if(total_t >= cutoff_time){
+//     std::cout << "TIME LIMIT REACHED" << std::endl;
+//     for(int i = LOG.fronts.size() ; i <= T; i++){
+//       LOG.fronts.push_back({});
+//       LOG.norm_fronts.push_back({});
+
+//       LOG.norm_d_scores.push_back({-1});
+//       LOG.raw_d_scores.push_back({-1});
+
+//       LOG.winner.push_back({-1});
+//       LOG.norm_winner.push_back({-1});
+//       LOG.winner_norm_d_score.push_back(-1);
+//       LOG.winner_raw_d_score.push_back(i);
+
+//       LOG.run_times.push_back(-1);
+
+//     }
+//     return ;
+
+//   } else {  
+//     LOG.fronts.push_back(front);
+//     LOG.norm_fronts.push_back(normalized_front);
+
+//     LOG.norm_d_scores.push_back(d_score);
+//     LOG.raw_d_scores.push_back(calculate_d_score(front));
+
+//     LOG.winner.push_back(front[vote_results[0]]);
+//     LOG.norm_winner.push_back(normalized_front[vote_results[0]]);
+//     LOG.winner_norm_d_score.push_back(d_score[vote_results[0]]);
+//     LOG.winner_raw_d_score.push_back(LOG.raw_d_scores.back()[vote_results[0]]);
+
+//     LOG.run_times.push_back(end_t);
+//   }
+
+//   // BEGIN GEN i
+//   for(int t = 1; t <= T; t++){
+//     // std::cout << "-----" << t << "------" << std::endl;
+//     start_t = std::chrono::high_resolution_clock::now();
+//     std::vector<std::vector<double>> temp; // order the solutions on their voting rank
+//     std::vector<std::vector<double>> weight_sets;
+//     for(int i = 0; i < K && i < front.size(); i++){ // save only the top K solutions from the previous generation
+//       temp.push_back(front[vote_results[i]]); 
+//       weight_sets.push_back(complement_weight_set(normalized_front[vote_results[i]]));
+//     }
+//     while(weight_sets.size() < K){    // fill the weight_sets with random weight sets if there are not enough
+//       std::uniform_real_distribution<double> rng(0.0, 1.0);
+//       std::mt19937 generator(std::clock());
+
+//       weight_sets.push_back(std::vector<double>(b, rng(generator)));
+//     }
+
+//     std::swap(temp,front); // why?
+//     //front now is now ordered according to its rank 
+
+//     // std::cout << "f: " << front.size() << std::endl
+//     //           << "w: " << weight_sets.size() << std::endl;
+//     //creating child population
+//     WEIGHTED_ASTAR WA(adj_matrix, node_list);
+//     auto order = node_order(more_than_specific(0));
+//     for(int i = 0; i < K && i < weight_sets.size(); i++){
+//       std::cout << i << std::endl;
+//       WA.update_weight(weight_sets[i]);
+//       front.push_back(WA(source, target, h, order)->g);
+//       std::cout << "===========" << std::endl;
+//     }
+
+//     remove_duplicates(front);
+//     front = non_dominated_filter(front);
+//     normalized_front = normalize_matrix(front);
+//     d_score = calculate_d_score(normalized_front);
+//     vote_results = vote(voting_method, normalized_front, d_score);
+
+//     end_t = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start_t).count();
+//     total_t += end_t;
+
+//     if(visualize){
+//       std::cout << "-----gen" << t << "-----" << std::endl;
+//       for(int i = 0; i < front.size(); i++){
+//           std::cout << "P_" << i << " " << front[i] << " | " << normalized_front[i] << " d: " << d_score[i] << std::endl;
+//       }
+//       std::cout << "voting results:" << std::endl;
+//       std::cout << vote_results << std::endl;
+//       std::cout << "time: " << end_t << " ms" << std::endl;
+//       std::cout << "current run time: " << total_t << " ms" << std::endl;
+
+//     }
+//     if(total_t >= cutoff_time){
+//       std::cout << "TIME LIMIT REACHED" << std::endl;
+//       // FILL LOG with sentinal values
+//       for(int i = LOG.fronts.size() ; i < T; i++){
+//         LOG.run_times.push_back(-1);
+//         LOG.fronts.push_back({});
+//         LOG.norm_fronts.push_back({});
+//         LOG.norm_d_scores.push_back({-1});
+//         LOG.raw_d_scores.push_back({-1});
+//         LOG.winner.push_back({});
+//         LOG.winner_norm_d_score.push_back({});
+//         LOG.winner_raw_d_score.push_back({});
+//       }
+
+//       return ;
+//     } else {  
+//       LOG.run_times.push_back(end_t);
+//       LOG.fronts.push_back(front);
+//       LOG.norm_fronts.push_back(normalized_front);
+//       LOG.norm_d_scores.push_back(d_score);
+//       LOG.winner.push_back(front[vote_results[0]]);
+//       LOG.norm_winner.push_back(normalized_front[vote_results[0]]);
+//       LOG.winner_norm_d_score.push_back(d_score[vote_results[0]]);
+//     }
+//   }
+// }
+
+// WEIGHTED COMBINED VERSION
 void VBEA_COMBINED(struct::log &LOG, const AdjMatrix &adj_matrix, std::vector<NodePtr> node_list, heuristic &h,  const size_t source, const size_t target, const std::string voting_method, const size_t cutoff_time, const size_t K, const size_t T = 0, const bool visualize = false){
+
   auto start_t = std::chrono::high_resolution_clock::now();
   int end_t;
   int total_t = 0;
@@ -373,6 +551,7 @@ void VBEA_COMBINED(struct::log &LOG, const AdjMatrix &adj_matrix, std::vector<No
 
   // BEGIN GEN 0
   ASTAR A(adj_matrix, node_list);
+  WEIGHTED_ASTAR WA(adj_matrix, node_list);
   std::vector<std::vector<double>> front;
   std::vector<std::vector<double>> normalized_front;
   std::vector<double> d_score,
@@ -381,24 +560,21 @@ void VBEA_COMBINED(struct::log &LOG, const AdjMatrix &adj_matrix, std::vector<No
 
   for(int i = 0; i < b; i++){
     std::cout << i << std::endl;
-    std::cout << "===========" << std::endl;
-    node_order order = more_than_specific(i);
+    node_order order = node_order(more_than_specific(i));
     front.push_back(A(source, target, h, order)->g);
-  }
-  if(K > b){
-    std::uniform_real_distribution<double> rng(0.0, 1.0);
-    std::mt19937 generator(std::clock());
-    WEIGHTED_ASTAR WA(adj_matrix, node_list);
-    node_order order = more_than_specific(0);
-    for(size_t i = b; i < K; i++){
-      std::vector<double> rand_weight(b, rng(generator));
-      WA.update_weight(rand_weight);
-      std::cout << i << std::endl;
-      std::cout << "===========" << std::endl;
-      front.push_back(WA(source, target, h, order)->g);
-    }
+    std::cout << "===========" << std::endl;
   }
 
+  auto order = node_order(more_than_specific(0));
+  std::vector<double> rand_weight(b);
+  while(front.size() < K){
+    std::cout << front.size() << std::endl;
+    rand_weight = random_weight(b);
+    WA.update_weight(rand_weight);
+    front.push_back(WA(source, target, h, order)->g);
+    std::cout << "===========" << std::endl;
+  }
+  
   remove_duplicates(front);
   normalized_front = normalize_matrix(front);
   d_score = calculate_d_score(normalized_front);
@@ -464,26 +640,30 @@ void VBEA_COMBINED(struct::log &LOG, const AdjMatrix &adj_matrix, std::vector<No
       temp.push_back(front[vote_results[i]]); 
       weight_sets.push_back(complement_weight_set(normalized_front[vote_results[i]]));
     }
-    while(weight_sets.size() < K){    // fill the weight_sets with random weight sets if there are not enough
-      std::uniform_real_distribution<double> rng(0.0, 1.0);
-      std::mt19937 generator(std::clock());
-
-      weight_sets.push_back(std::vector<double>(b, rng(generator)));
-    }
-
-    std::swap(temp,front); // why?
-    //front now is now ordered according to its rank 
-
+    
+    std::swap(temp,front); // front now only contains at most the top K candidates
     // std::cout << "f: " << front.size() << std::endl
     //           << "w: " << weight_sets.size() << std::endl;
     //creating child population
+
     WEIGHTED_ASTAR WA(adj_matrix, node_list);
     auto order = node_order(more_than_specific(0));
-    for(int i = 0; i < K && i < weight_sets.size(); i++){
+    int i = 0;
+    for(i = 0; i < K && i < weight_sets.size(); i++){
       std::cout << i << std::endl;
       WA.update_weight(weight_sets[i]);
+      int f = select_focus(weight_sets[i]);
       front.push_back(WA(source, target, h, order)->g);
       std::cout << "===========" << std::endl;
+    }
+    std::vector<double> rand_weight;
+    while(i < K){
+      std::cout << i << std::endl;
+      rand_weight = random_weight(b);
+      WA.update_weight(rand_weight);
+      front.push_back(WA(source, target, h, order)->g);
+      std::cout << "===========" << std::endl;
+      i++;
     }
 
     remove_duplicates(front);
@@ -518,6 +698,9 @@ void VBEA_COMBINED(struct::log &LOG, const AdjMatrix &adj_matrix, std::vector<No
         LOG.winner.push_back({});
         LOG.winner_norm_d_score.push_back({});
         LOG.winner_raw_d_score.push_back({});
+
+        LOG.run_times.push_back(-1);
+
       }
 
       return ;
@@ -529,54 +712,58 @@ void VBEA_COMBINED(struct::log &LOG, const AdjMatrix &adj_matrix, std::vector<No
       LOG.winner.push_back(front[vote_results[0]]);
       LOG.norm_winner.push_back(normalized_front[vote_results[0]]);
       LOG.winner_norm_d_score.push_back(d_score[vote_results[0]]);
+
+
+      LOG.run_times.push_back(end_t);
     }
   }
+  
 }
 
-// WEIGHTED COMBINED VERSION
-void VBEA_COMBINED(struct::log &LOG, const AdjMatrix &adj_matrix, std::vector<NodePtr> node_list, heuristic &h,  const size_t source, const size_t target, const std::string voting_method, const size_t K, const size_t T = 0, const bool visualize = false){
-  std::cout << source << " " << target << std::endl;
+
+
+void VBEA_CONSCIOUS(struct::log &LOG, const AdjMatrix &adj_matrix, std::vector<NodePtr> node_list, heuristic &h,  const size_t source, const size_t target, const std::string voting_method, const size_t cutoff_time,  const size_t K, const size_t T = 0, const bool visualize = false){
   auto start_t = std::chrono::high_resolution_clock::now();
+  int end_t;
+  int total_t = 0;
   int b = adj_matrix.get_obj_count();
-  
-// BEGIN GEN 0
+
+  // BEGIN GEN 0
   ASTAR A(adj_matrix, node_list);
+  WEIGHTED_ASTAR WA(adj_matrix, node_list);
   std::vector<std::vector<double>> front;
   std::vector<std::vector<double>> normalized_front;
-  std::vector<double> d_score;
+  std::vector<double> d_score,
+                      norm_d_score;
   std::vector<int> vote_results;
+
 
   for(int i = 0; i < b; i++){
     std::cout << i << std::endl;
-    std::cout << "===========" << std::endl;
-    node_order order = more_than_specific(i);
+    node_order order = node_order(more_than_specific(i));
     front.push_back(A(source, target, h, order)->g);
-  }
-  // if K > adj_matrix.size(), then create random weight sets to fill up the population
-  if(K > b){
-    std::uniform_real_distribution<double> rng(0.0, 1.0);
-    std::mt19937 generator(std::clock());
-    WEIGHTED_ASTAR WA(adj_matrix, node_list);
-    node_order order = more_than_specific(0);
-    for(size_t i = b; i < K; i++){
-      std::vector<double> rand_weight(b, rng(generator));
-      WA.update_weight(rand_weight);
-      std::cout << i << std::endl;
-      std::cout << "===========" << std::endl;
-      front.push_back(WA(source, target, h, order)->g);
-    }
+    std::cout << "===========" << std::endl;
   }
 
-  // remove_duplicates(front);
-  // std::cout << "rd" << std::endl;
+  auto order = node_order(more_than_specific(0));
+  std::vector<double> rand_weight(b);
+  while(front.size() < K){
+    std::cout << front.size() << std::endl;
+    rand_weight = random_weight(b);
+    int f = select_focus(rand_weight);
+    WA.update_weight(rand_weight);
+    front.push_back(WA(source, target, h, order, f)->g);
+    std::cout << "===========" << std::endl;
+  }
+  
+  remove_duplicates(front);
   normalized_front = normalize_matrix(front);
-  std::cout << "nm" << std::endl;
   d_score = calculate_d_score(normalized_front);
-  std::cout << "ds" << std::endl;
   vote_results = vote(voting_method, normalized_front, d_score);
-  std::cout << "v" << std::endl;
 
-
+  end_t = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start_t).count();
+  total_t += end_t;
+  
   if(visualize){
     std::cout << "-----gen0-----" << std::endl;
     for(int i = 0; i < front.size(); i++){
@@ -584,190 +771,286 @@ void VBEA_COMBINED(struct::log &LOG, const AdjMatrix &adj_matrix, std::vector<No
     }
     std::cout << "voting results:" << std::endl;
     std::cout << vote_results << std::endl;
+    std::cout << "time: " << end_t <<  " ms " << std::endl;
+    std::cout << "current run time: " << total_t << " ms" << std::endl;
   }
-// END GEN 0 
- 
-
+  // END GEN 0
   
-// SAVING
-  auto raw_d_score = calculate_d_score(front);
-  LOG.run_times.push_back(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start_t).count());
-  LOG.fronts.push_back(front);
-  LOG.norm_fronts.push_back(normalized_front);
-  LOG.raw_d_scores.push_back(raw_d_score);
-  LOG.norm_d_scores.push_back(d_score);
-  LOG.winner.push_back(front[vote_results[0]]);
-  LOG.norm_winner.push_back(normalized_front[vote_results[0]]);
-  LOG.winner_norm_d_score.push_back(d_score[vote_results[0]]);
-  LOG.winner_raw_d_score.push_back(raw_d_score[vote_results[0]]);
-  std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start_t).count();
+  // WRITE GEN 0
+  if(total_t >= cutoff_time){
+    std::cout << "TIME LIMIT REACHED" << std::endl;
+    for(int i = LOG.fronts.size() ; i <= T; i++){
+      LOG.fronts.push_back({});
+      LOG.norm_fronts.push_back({});
 
-  
-  for(int t = 0; t < T; t++){
-    // create weight sets and culling previous population
-    std::vector<std::vector<double>> temp;
+      LOG.norm_d_scores.push_back({-1});
+      LOG.raw_d_scores.push_back({-1});
+
+      LOG.winner.push_back({-1});
+      LOG.norm_winner.push_back({-1});
+      LOG.winner_norm_d_score.push_back(-1);
+      LOG.winner_raw_d_score.push_back(i);
+
+      LOG.run_times.push_back(-1);
+
+    }
+    return ;
+
+  } else {  
+    LOG.fronts.push_back(front);
+    LOG.norm_fronts.push_back(normalized_front);
+
+    LOG.norm_d_scores.push_back(d_score);
+    LOG.raw_d_scores.push_back(calculate_d_score(front));
+
+    LOG.winner.push_back(front[vote_results[0]]);
+    LOG.norm_winner.push_back(normalized_front[vote_results[0]]);
+    LOG.winner_norm_d_score.push_back(d_score[vote_results[0]]);
+    LOG.winner_raw_d_score.push_back(LOG.raw_d_scores.back()[vote_results[0]]);
+
+    LOG.run_times.push_back(end_t);
+  }
+
+  // BEGIN GEN i
+  for(int t = 1; t <= T; t++){
+    // std::cout << "-----" << t << "------" << std::endl;
+    start_t = std::chrono::high_resolution_clock::now();
+    std::vector<std::vector<double>> temp; // order the solutions on their voting rank
     std::vector<std::vector<double>> weight_sets;
     for(int i = 0; i < K && i < front.size(); i++){ // save only the top K solutions from the previous generation
-      temp.push_back(front[vote_results[i]]);
+      temp.push_back(front[vote_results[i]]); 
       weight_sets.push_back(complement_weight_set(normalized_front[vote_results[i]]));
     }
-    std::swap(temp,front);
-
-    while(weight_sets.size() < K){    // fill the weight_sets with random weight sets if there are not enough
-      std::uniform_real_distribution<double> rng(0.0, 1.0);
-      std::mt19937 generator(std::clock());
-
-      weight_sets.push_back(std::vector<double>(b, rng(generator)));
-    }
-
+    
+    std::swap(temp,front); // front now only contains at most the top K candidates
+    // std::cout << "f: " << front.size() << std::endl
+    //           << "w: " << weight_sets.size() << std::endl;
     //creating child population
+
     WEIGHTED_ASTAR WA(adj_matrix, node_list);
     auto order = node_order(more_than_specific(0));
-    for(int i = 0; i < K; i++){
+    int i = 0;
+    for(i = 0; i < K && i < weight_sets.size(); i++){
+      std::cout << i << std::endl;
       WA.update_weight(weight_sets[i]);
+      int f = select_focus(weight_sets[i]);
       front.push_back(WA(source, target, h, order)->g);
+      std::cout << "===========" << std::endl;
+    }
+    std::vector<double> rand_weight;
+    while(i < K){
+      std::cout << i << std::endl;
+      rand_weight = random_weight(b);
+      WA.update_weight(rand_weight);
+      int f = select_focus(rand_weight);
+      front.push_back(WA(source, target, h, order, f)->g);
+      std::cout << "===========" << std::endl;
+      i++;
     }
 
-    //cleaning
     remove_duplicates(front);
     front = non_dominated_filter(front);
     normalized_front = normalize_matrix(front);
     d_score = calculate_d_score(normalized_front);
     vote_results = vote(voting_method, normalized_front, d_score);
 
-    //SAVING
+    end_t = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start_t).count();
+    total_t += end_t;
 
     if(visualize){
-      std::cout << "-----gen" << t + 1 << "-----" << std::endl;
+      std::cout << "-----gen" << t << "-----" << std::endl;
       for(int i = 0; i < front.size(); i++){
           std::cout << "P_" << i << " " << front[i] << " | " << normalized_front[i] << " d: " << d_score[i] << std::endl;
       }
       std::cout << "voting results:" << std::endl;
       std::cout << vote_results << std::endl;
+      std::cout << "time: " << end_t << " ms" << std::endl;
+      std::cout << "current run time: " << total_t << " ms" << std::endl;
+
     }
+    if(total_t >= cutoff_time){
+      std::cout << "TIME LIMIT REACHED" << std::endl;
+      // FILL LOG with sentinal values
+      for(int i = LOG.fronts.size() ; i < T; i++){
+        LOG.run_times.push_back(-1);
+        LOG.fronts.push_back({});
+        LOG.norm_fronts.push_back({});
+        LOG.norm_d_scores.push_back({-1});
+        LOG.raw_d_scores.push_back({-1});
+        LOG.winner.push_back({});
+        LOG.winner_norm_d_score.push_back({});
+        LOG.winner_raw_d_score.push_back({});
 
+        LOG.run_times.push_back(-1);
+      }
+
+      return ;
+    } else {  
+      LOG.run_times.push_back(end_t);
+      LOG.fronts.push_back(front);
+      LOG.norm_fronts.push_back(normalized_front);
+      LOG.norm_d_scores.push_back(d_score);
+      LOG.winner.push_back(front[vote_results[0]]);
+      LOG.norm_winner.push_back(normalized_front[vote_results[0]]);
+      LOG.winner_norm_d_score.push_back(d_score[vote_results[0]]);
+
+      LOG.run_times.push_back(end_t);
+
+    }
   }
-
+  
 }
 
-void VBEA_CONSCIOUS(struct::log &LOG, const AdjMatrix &adj_matrix, std::vector<NodePtr> node_list, heuristic &h,  const size_t source, const size_t target, const std::string voting_method, const size_t K, const size_t T = 0, const bool visualize = false){
-  auto start_t = std::chrono::high_resolution_clock::now();
-  std::uniform_real_distribution<double> rng(0.0, 1.0);
-  std::mt19937 generator(std::clock());
-  WEIGHTED_ASTAR WA(adj_matrix, node_list);
+// void VBEA_CONSCIOUS(struct::log &LOG, const AdjMatrix &adj_matrix, std::vector<NodePtr> node_list, heuristic &h,  const size_t source, const size_t target, const std::string voting_method, const size_t K, const size_t T = 0, const bool visualize = false){
+//   auto start_t = std::chrono::high_resolution_clock::now();
+//   int end_t;
+//   int total_t = 0;
 
+//   std::uniform_real_distribution<double> rng(0.0, 1.0);
+//   std::mt19937 generator(std::clock());
 
-
-  int b = adj_matrix.get_obj_count();
+//   int b = adj_matrix.get_obj_count();
   
-// BEGIN GEN 0
-  ASTAR A(adj_matrix, node_list);
-  std::vector<std::vector<double>> front;
-  std::vector<std::vector<double>> normalized_front;
-  std::vector<double> d_score;
-  std::vector<int> vote_results;
+// // BEGIN GEN 0
+//   ASTAR A(adj_matrix, node_list);
+//   std::vector<std::vector<double>> front;
+//   std::vector<std::vector<double>> normalized_front;
+//   std::vector<double> d_score;
+//   std::vector<int> vote_results;
 
-  // the initial decomompositon
-  for(int i = 0; i < b; i++){
-    std::cout << i << std::endl;
-    node_order order = more_than_specific(i);
-    front.push_back(A(source, target, h, order)->g);
-    std::cout << "=====" << std::endl;
-  }
-  // if K > adj_matrix.size(), then create random weight sets to fill up the population
-  if(K > b){
-    node_order order = more_than_specific(0);
-    for(size_t i = b; i < K; i++){
-      std::cout << i << std::endl;
-      std::vector<double> rand_weight(b, rng(generator));
-      WA.update_weight(rand_weight);
-      int f = select_focus(rand_weight);
-      front.push_back(WA(source, target, h, order, f)->g);
-      std::cout << "=====" << std::endl;
-    } 
-  }
+//   // the initial decomompositon
+//   for(int i = 0; i < b; i++){
+//     std::cout << i << std::endl;
+//     node_order order = more_than_specific(i);
+//     front.push_back(A(source, target, h, order)->g);
+//     std::cout << "=====" << std::endl;
+//   }
+//   // if K > adj_matrix.size(), then create random weight sets to fill up the population
+//   if(K > b){
+//     WEIGHTED_ASTAR WA(adj_matrix, node_list);
+//     node_order order = more_than_specific(0);
+//     for(size_t i = b; i < K; i++){
+//       std::cout << i << std::endl;
+//       std::vector<double> rand_weight(b, rng(generator));
+//       WA.update_weight(rand_weight);
+//       std::cout << "===========" << std::endl;
+//       front.push_back(WA(source, target, h, order)->g);
+//     }
+//   }
+  
     
-  remove_duplicates(front);
-  normalized_front = normalize_matrix(front);
-  d_score = calculate_d_score(normalized_front);
-  vote_results = vote(voting_method, normalized_front, d_score);
+//   remove_duplicates(front);
+//   std::cout << "!" << std::endl;
+//   normalized_front = normalize_matrix(front);
+//   std::cout << "!" << std::endl;
+//   d_score = calculate_d_score(normalized_front);
+//   std::cout << "!" << std::endl;
+//   vote_results = vote(voting_method, normalized_front, d_score);
+//   std::cout << "!" << std::endl;
 
-  if(visualize){
-    std::cout << "-----gen0-----" << std::endl;
-    for(int i = 0; i < front.size(); i++){
-        std::cout << "P_" << i << " " << front[i] << " | " << normalized_front[i] << " d: " << d_score[i] << std::endl;
-    }
-    std::cout << "voting results:" << std::endl;
-    std::cout << vote_results << std::endl;
-  }
-// END GEN 0 
+
+//   end_t = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start_t).count();
+
+//   if(visualize){
+//     std::cout << "-----gen0-----" << std::endl;
+//     for(int i = 0; i < front.size(); i++){
+//         std::cout << "P_" << i << " " << front[i] << " | " << normalized_front[i] << " d: " << d_score[i] << std::endl;
+//     }
+//     std::cout << "voting results:" << std::endl;
+//     std::cout << vote_results << std::endl;
+//   }
+
+//   LOG.fronts.push_back(front);
+//   LOG.norm_fronts.push_back(normalized_front);
+
+//   LOG.norm_d_scores.push_back(d_score);
+//   LOG.raw_d_scores.push_back(calculate_d_score(front));
+
+//   LOG.winner.push_back(front[vote_results[0]]);
+//   LOG.norm_winner.push_back(normalized_front[vote_results[0]]);
+//   LOG.winner_norm_d_score.push_back(d_score[vote_results[0]]);
+//   LOG.winner_raw_d_score.push_back(LOG.raw_d_scores.back()[vote_results[0]]);
+
+//   LOG.run_times.push_back(end_t);
+
+// // END GEN 0 
  
-// SAVING
+// // SAVING
   
-  for(int t = 0; t < T; t++){
-    start_t = std::chrono::high_resolution_clock::now();
-    // create weight sets;
-    std::vector<std::vector<double>> weight_sets;
-    for(int i = 0; i < K && i < vote_results.size(); i++){ 
-        weight_sets.push_back(complement_weight_set(normalized_front[vote_results[i]]));
-    }
-    if(weight_sets.size() < K){    // fill the weight_sets with random weight sets if there are not enough
-      node_order order = more_than_specific(0);
-      for(int i = weight_sets.size(); i < K; i++){
-        std::cout << i << std::endl;
-        std::vector<double> rand_weight(b, rng(generator));
-        WA.update_weight(rand_weight);
-        int f = select_focus(rand_weight);
-        front.push_back(WA(source, target, h, order, f)->g);
-        std::cout << "=====" << std::endl;
-      }
-    }
+//   for(int t = 0; t < T; t++){
+//     // create weight sets and culling previous population
+//     std::vector<std::vector<double>> temp;
+//     std::vector<std::vector<double>> weight_sets;
+//     for(int i = 0; i < K && i < front.size(); i++){ // save only the top K solutions from the previous generation
+//       temp.push_back(front[vote_results[i]]);
+//       weight_sets.push_back(complement_weight_set(normalized_front[vote_results[i]]));
+//     }
+//     std::swap(temp,front);
 
-    //creating child population
-    WEIGHTED_ASTAR WA(adj_matrix, node_list);
-    auto order = node_order(more_than_specific(0));
-    int f; // focus
-    for(int i = 0; i < K; i++){
-      std::cout << i << std::endl;
-      WA.update_weight(weight_sets[i]);
-      int f = select_focus(weight_sets[i]);
-      front.push_back(WA(source, target, h, order)->g);
-      std::cout << "===========" << std::endl;
-
-    }
-
-    //cleanring
-    remove_duplicates(front);
-    front = non_dominated_filter(front);
-    normalized_front = normalize_matrix(front);
-    d_score = calculate_d_score(normalized_front);
-
-    //culling?
-
-    //SAVING
-    std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start_t).count();
+//     while(weight_sets.size() < K){    // fill the weight_sets with random weight sets if there are not enough
+//       std::uniform_real_distribution<double> rng(0.0, 1.0);
+//       std::mt19937 generator(std::clock());
+//       weight_sets.push_back(std::vector<double>(b, rng(generator)));
+//     }
 
 
-    if(visualize){
-      std::cout << "-----gen" << t + 1 << "-----" << std::endl;
-      for(int i = 0; i < front.size(); i++){
-          std::cout << "P_" << i << " " << front[i] << " | " << normalized_front[i] << " d: " << d_score[i] << std::endl;
-      }
-      std::cout << "voting results:" << std::endl;
-      std::cout << vote_results << std::endl;
-    }
+//     //creating child population
+//     WEIGHTED_ASTAR WA(adj_matrix, node_list);
+//     auto order = node_order(more_than_specific(0));
+//     int f; // focus
+//     for(int i = 0; i < K; i++){
+//       std::cout << i << std::endl;
+//       WA.update_weight(weight_sets[i]);
+//       std::cout << "-" << std::endl;
+//       int f = select_focus(weight_sets[i]);
+//       std::cout << weight_sets[i] << std::endl;
+//       std::cout << f << std::endl;
+//       front.push_back(WA(source, target, h, order, f)->g);
+//       std::cout << "===========" << std::endl;
+//     }
 
-  }
+//     remove_duplicates(front);
+//     front = non_dominated_filter(front);
+//     normalized_front = normalize_matrix(front);
+//     d_score = calculate_d_score(normalized_front);
+//     vote_results = vote(voting_method, normalized_front, d_score);
 
-  return ;
+//     end_t = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start_t).count();
 
-};
+//     if(visualize){
+//       std::cout << "-----gen" << t + 1 << "-----" << std::endl;
+//       for(int i = 0; i < front.size(); i++){
+//           std::cout << "P_" << i << " " << front[i] << " | " << normalized_front[i] << " d: " << d_score[i] << std::endl;
+//       }
+//       std::cout << "voting results:" << std::endl;
+//       std::cout << vote_results << std::endl;
+//     }
+
+//     // write data:
+//     LOG.fronts.push_back(front);
+//     LOG.norm_fronts.push_back(normalized_front);
+
+//     LOG.norm_d_scores.push_back(d_score);
+//     LOG.raw_d_scores.push_back(calculate_d_score(front));
+
+//     LOG.winner.push_back(front[vote_results[0]]);
+//     LOG.norm_winner.push_back(normalized_front[vote_results[0]]);
+//     LOG.winner_norm_d_score.push_back(d_score[vote_results[0]]);
+//     LOG.winner_raw_d_score.push_back(LOG.raw_d_scores.back()[vote_results[0]]);
+
+//     LOG.run_times.push_back(end_t);
+
+//   }
 
 
-void road_instnaces_runner(const std::string query_file, size_t graph_size, std::vector<Edge> &edge_list, std::vector<NodePtr> &node_list, const size_t K, const size_t T, const std::string voting_method, const size_t cutoff_time, std::vector<struct::log> &LOGS){
+// };
+
+
+void road_instnaces_runner(const std::string query_file, size_t graph_size, std::vector<Edge> &edge_list, std::vector<NodePtr> &node_list, const size_t K, const size_t T, const std::string voting_method, const std::string child_method, const size_t cutoff_time, std::vector<struct::log> &LOGS){
 
   std::vector<std::vector<size_t>> queries;
   load_road_instances(query_file, queries);
+  std::cout << "loaded instances" << std::endl;
 
   AdjMatrix adj_matrix(graph_size, edge_list);
   heuristic h = h_functor(1);
@@ -781,7 +1064,15 @@ void road_instnaces_runner(const std::string query_file, size_t graph_size, std:
     std::cout << "=====" << std::endl;
     i++;
     struct::log a(source, target); 
-    UNCAPPED_VBEA_CONSCIOUS(a, adj_matrix, node_list, h, source, target, voting_method, cutoff_time, K, T, true);
+
+    if(child_method == "combined"){
+      VBEA_COMBINED(a, adj_matrix, node_list, h, source, target, voting_method, cutoff_time, K, T, true);
+    } else {
+      VBEA_CONSCIOUS(a, adj_matrix, node_list, h, source, target, voting_method, cutoff_time, K, T, true);
+    }
+
+    // VBEA_CONSCIOUS(a, adj_matrix, node_list, h, source, target, voting_method, cutoff_time, K, T, true);
+
     LOGS.push_back(a);
   }  
 }
@@ -953,9 +1244,11 @@ void inst_maker(){
 void wrapper(){
   std::string VOTING_METHOD;
   std::string HEURISTIC = "haversine";
-  std::string CHILD_METHOD = "combined";
-  std::vector<std::string> ALL_VOTING_METHODS = {"condorent", "combined_approval"};
-  size_t  K = INT_MAX,
+  std::string CHILD_METHOD = "conscious";
+  // std::vector<std::string> ALL_VOTING_METHODS = {"borda"};
+  std::vector<std::string> ALL_VOTING_METHODS = {"borda", "range", "condorcet", "combined_approval"};
+
+  size_t  K = 20,
           T = 5,
           source,
           target;
@@ -963,9 +1256,12 @@ void wrapper(){
   // END PARAMETERS
   // OPTIONAL
   size_t cutoff_time = 300000; // in milliseconds
+  // size_t cutoff_time = INT_MAX;
   // END OPTIONAL
 
-  std::vector<std::string> suffixs = {"BAY", "FLA", "COL", "NY"};
+  std::vector<std::string> suffixs = {"BAY", "COL", "NY"};
+  // std::vector<std::string> suffixs = {"FLA"};
+
   std::string prefix = "USA-ROAD/USA-ROAD-";
 
 
@@ -979,6 +1275,7 @@ void wrapper(){
       std::vector<NodePtr> node_list;
       size_t graph_size;
       std::string DIR = prefix + s;
+      std::cout << DIR << std::endl;
 
       for(auto file_iter : std::__fs::filesystem::directory_iterator(DIR)){obj_files.push_back(file_iter.path());}
       std::string NODE_FILE; // isolating the node file
@@ -998,25 +1295,26 @@ void wrapper(){
 
       std::cout << "child method: " << CHILD_METHOD << std::endl;
 
-    
+      std::cout << "building graph...";
       load_gr_files(obj_files, edge_list, graph_size);
       get_nodes_ROAD(NODE_FILE, node_list);
+      std::cout << " Done." << std::endl;
 
       //add thrid and delay objective if they don't exist
-       bool has_third = false, has_delay = false;
-       for(auto &f: obj_files){
-         if(f == "USA-ROAD/USA-ROAD-" + s + "/USA-road-3." + s + ".gr"){ has_third = true;}
-         if(f == "USA-ROAD/USA-ROAD-" + s + "/USA-road-DELAY."+ s + ".gr"){ has_delay = true;}
-       }
-       if(!has_third){add_third_objective(s, edge_list, node_list);}
-       if(!has_delay){add_delay_objective(s, edge_list, node_list);} 
+       // bool has_third = false, has_delay = false;
+       // for(auto &f: obj_files){
+       //   if(f == "USA-ROAD/USA-ROAD-" + s + "/USA-road-3." + s + ".gr"){ has_third = true;}
+       //   if(f == "USA-ROAD/USA-ROAD-" + s + "/USA-road-DELAY."+ s + ".gr"){ has_delay = true;}
+       // }
+       // if(!has_third){add_third_objective(s, edge_list, node_list);}
+       // if(!has_delay){add_delay_objective(s, edge_list, node_list);} 
      
 
         std::string query_file = "USA-ROAD/instances/" + s + "_instances.txt";
 
         std::vector<struct::log> LOGS;
 
-        road_instnaces_runner(query_file, graph_size, edge_list, node_list, K, T, VOTING_METHOD, cutoff_time, LOGS);
+        road_instnaces_runner(query_file, graph_size, edge_list, node_list, K, T, VOTING_METHOD, CHILD_METHOD, cutoff_time, LOGS);
 
         write_all_records_alt(LOGS, s, T, K, VOTING_METHOD, CHILD_METHOD);
 
@@ -1030,16 +1328,18 @@ void wrapper(){
 void ascii_wrapper(){
   
   std::string VOTING_METHOD = "";
-  std::string CHILD_METHOD = "conscious";
+  std::string CHILD_METHOD = "combined";
   std::vector<std::string> V_METHODS = {"range", "borda", "condorcet", "combined_approval"};
+
+  // std::vector<std::string> V_METHODS = {"range",};
   heuristic h = h_functor(0);
-  size_t  K = INT_MAX,
+  size_t  K = 50,
           T = 5,
           source,
           target;
   // END PARAMETERS
   // OPTIONAL
-  size_t cutoff_time = 180000; // in milliseconds
+  size_t cutoff_time = INT_MAX; // in milliseconds // we calculate the failure rate post
 
   std::string instance_file = "dao-uniform-5.txt";
   std::unordered_map<std::string, std::vector<std::vector<size_t>>> query = load_asci_queries(instance_file);
@@ -1059,6 +1359,8 @@ void ascii_wrapper(){
     std::cout << v << std::endl;
     std::vector<struct::log> LOGS;
 
+  
+    size_t j = 1;
     for(auto &inst: query){
       std::string map_file = inst.first; 
       std::vector<std::vector<size_t>> source_target = inst.second;
@@ -1069,29 +1371,35 @@ void ascii_wrapper(){
       load_ascii_file(map_file, edge_list, node_list, graph_size);
       AdjMatrix adj_matrix(graph_size, edge_list);
     
+      size_t k = 1;
       for(auto &i: source_target){
+        std::cout << v << " (" << j << "/156) (" << k << "/5)" << std::endl;
         source = i[0];
         target = i[1];
         struct::log a(source, target);      
 
         if(CHILD_METHOD == "combined"){
-          UNCAPPED_VBEA_COMBINED(a, adj_matrix, node_list, h, source, target, VOTING_METHOD, cutoff_time, K, T, true);
+          VBEA_COMBINED(a, adj_matrix, node_list, h, source, target, VOTING_METHOD, cutoff_time, K, T, true);
         } else{
-          UNCAPPED_VBEA_CONSCIOUS(a, adj_matrix, node_list, h, source, target, VOTING_METHOD, cutoff_time, K, T, true);
+          // UNCAPPED_VBEA_CONSCIOUS(a, adj_matrix, node_list, h, source, target, VOTING_METHOD, cutoff_time, K, T, true);
+          VBEA_CONSCIOUS(a, adj_matrix, node_list, h, source, target, VOTING_METHOD, cutoff_time, K, T, true);
         }
 
         LOGS.push_back(a);
+        k++;
       }
+      j++;
 
-      write_all_records_alt(LOGS, "", T, K, VOTING_METHOD, CHILD_METHOD);
     }
+      write_all_records_alt(LOGS, "DAO", T, K, VOTING_METHOD, CHILD_METHOD);
+
   }
 }
 
 int main(int argc, char **arg){
 
 
-  // inst_maker();
+  // wrapper();
   // return 0;
 
   ascii_wrapper();
@@ -1166,7 +1474,7 @@ int main(int argc, char **arg){
 
     std::vector<struct::log> LOGS;
 
-    road_instnaces_runner(query_file, graph_size, edge_list, node_list, K, T, VOTING_METHOD, cutoff_time, LOGS);
+    road_instnaces_runner(query_file, graph_size, edge_list, node_list, K, T, VOTING_METHOD, CHILD_METHOD, cutoff_time, LOGS);
 
     write_all_records_alt(LOGS, map_name, T, K, VOTING_METHOD, CHILD_METHOD);
 

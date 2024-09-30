@@ -189,7 +189,8 @@ NodePtr WEIGHTED_ASTAR::operator()(const size_t source, const size_t target, heu
                                         node_list[source]->y,
                                         node_list[source]->id,
                                         std::vector<double>(b, 0),
-                                        h(node_list[source], node_list[target]));
+                                        h(node_list[source], 
+                                        node_list[target]));
   open.push_back(node);
   std::push_heap(open.begin(), open.end(), order);
 

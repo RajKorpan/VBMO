@@ -434,9 +434,6 @@ void write_matrix(std::ostream &out_file, const std::vector<std::vector<double>>
 void write_record(std::ostream &out_file, const struct::log &r) {
   out_file << "{";
   
-  // out_file << "\"map-id\": " << "\"" << r.file_name << "\"";
-  // out_file << ", ";
-
   out_file << "\"source\": " << r.source;
   out_file << ", ";
 
@@ -536,7 +533,7 @@ void write_all_records(const std::vector<struct::log> &logs, std::string file_na
 }
 
 void write_all_records_alt(const std::vector<struct::log> &logs, std::string file_name, const size_t T, const size_t K, const std::string voting_method, const std::string child_method){
-    std::ofstream out_file(file_name + "-" + voting_method + "-" + child_method + "edges-" + std::to_string(K) +  ".json");
+  std::ofstream out_file(file_name + "-" + voting_method + "-" + child_method + "-" + std::to_string(K) +  ".json");
 
   std::cout << "writting data...";
 
