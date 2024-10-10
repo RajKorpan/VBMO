@@ -426,7 +426,6 @@ void write_matrix(std::ostream &out_file, const std::vector<std::vector<double>>
     for(int i = 1; i < matrix.size(); i++){
       out_file << ", "; write_array(out_file, matrix[i]);
     }
-
     out_file << "]";
   }
 }
@@ -480,7 +479,7 @@ void write_record(std::ostream &out_file, const struct::log &r) {
     out_file << "\"gen" << i << "-norm-front\": "; write_matrix(out_file, r.norm_fronts[i]);
     out_file << ", ";
 
-    out_file << "\"gen" << i << "-raw-d-score\": "; write_array(out_file, r.raw_d_scores[0]);
+    out_file << "\"gen" << i << "-raw-d-score\": "; write_array(out_file, r.raw_d_scores[i]);
     out_file << ", ";
 
     out_file << "\"gen" << i << "-norm-d-score\": "; write_array(out_file, r.norm_d_scores[i]);
@@ -510,28 +509,6 @@ void write_record(std::ostream &out_file, const struct::log &r) {
             
 }
 
-void write_all_records(const std::vector<struct::log> &logs, std::string file_name){
-  std::ofstream out_file(file_name + ".json");
-
-  std::cout << "writting data...";
-
-
-  // also other information like T, K, etc.
-  out_file << "{\"data\": [";
-
-  write_record(out_file, logs[0]);
-  for(int i = 1; i < logs.size(); i++){
-    out_file << ", ";
-    write_record(out_file, logs[i]);
-  }
-
-  out_file << "]}";
-
-  out_file.close();
-
-  std::cout << "DONE" << std::endl;
-}
-
 void write_all_records_alt(const std::vector<struct::log> &logs, std::string file_name, const size_t T, const size_t K, const std::string voting_method, const std::string child_method){
   std::ofstream out_file(file_name + "-" + voting_method + "-" + child_method + "-" + std::to_string(K) +  ".json");
 
@@ -544,9 +521,8 @@ void write_all_records_alt(const std::vector<struct::log> &logs, std::string fil
     out_file << ", ";
     write_record(out_file, logs[i]);
   }
-
-
   out_file  << "], " 
+
             << "\"T\": " << T << ", "
             << "\"K\": " << K << ", "
             << "\"voting_method\": " << "\"" <<  voting_method << "\"" << "}";

@@ -163,13 +163,19 @@ void UNCAPPED_VBEA_COMBINED(struct::log &LOG, const AdjMatrix &adj_matrix, std::
 
       return ;
     } else {  
-      LOG.run_times.push_back(end_t);
       LOG.fronts.push_back(front);
       LOG.norm_fronts.push_back(normalized_front);
+
       LOG.norm_d_scores.push_back(d_score);
+      LOG.raw_d_scores.push_back(calculate_d_score(front));
+
       LOG.winner.push_back(front[vote_results[0]]);
       LOG.norm_winner.push_back(normalized_front[vote_results[0]]);
       LOG.winner_norm_d_score.push_back(d_score[vote_results[0]]);
+      LOG.winner_raw_d_score.push_back(LOG.raw_d_scores.back()[vote_results[0]]);
+
+      LOG.run_times.push_back(end_t);
+
     }
   }
 }
@@ -293,6 +299,8 @@ void UNCAPPED_VBEA_CONSCIOUS(struct::log &LOG, const AdjMatrix &adj_matrix, std:
     LOG.winner_raw_d_score.push_back(LOG.raw_d_scores.back()[vote_results[0]]);
 
     LOG.run_times.push_back(end_t);
+
+
   }
 
   // BEGIN GEN i
@@ -357,13 +365,18 @@ void UNCAPPED_VBEA_CONSCIOUS(struct::log &LOG, const AdjMatrix &adj_matrix, std:
 
       return ;
     } else {  
-      LOG.run_times.push_back(end_t);
       LOG.fronts.push_back(front);
       LOG.norm_fronts.push_back(normalized_front);
+
       LOG.norm_d_scores.push_back(d_score);
+      LOG.raw_d_scores.push_back(calculate_d_score(front));
+
       LOG.winner.push_back(front[vote_results[0]]);
       LOG.norm_winner.push_back(normalized_front[vote_results[0]]);
       LOG.winner_norm_d_score.push_back(d_score[vote_results[0]]);
+      LOG.winner_raw_d_score.push_back(LOG.raw_d_scores.back()[vote_results[0]]);
+
+      LOG.run_times.push_back(end_t);
     }
   }
 }
@@ -576,6 +589,7 @@ void VBEA_COMBINED(struct::log &LOG, const AdjMatrix &adj_matrix, std::vector<No
   }
   
   remove_duplicates(front);
+  front = non_dominated_filter(front);
   normalized_front = normalize_matrix(front);
   d_score = calculate_d_score(normalized_front);
   vote_results = vote(voting_method, normalized_front, d_score);
@@ -690,31 +704,35 @@ void VBEA_COMBINED(struct::log &LOG, const AdjMatrix &adj_matrix, std::vector<No
       std::cout << "TIME LIMIT REACHED" << std::endl;
       // FILL LOG with sentinal values
       for(int i = LOG.fronts.size() ; i < T; i++){
-        LOG.run_times.push_back(-1);
         LOG.fronts.push_back({});
         LOG.norm_fronts.push_back({});
+
         LOG.norm_d_scores.push_back({-1});
         LOG.raw_d_scores.push_back({-1});
-        LOG.winner.push_back({});
-        LOG.winner_norm_d_score.push_back({});
-        LOG.winner_raw_d_score.push_back({});
+
+        LOG.winner.push_back({-1});
+        LOG.norm_winner.push_back({-1});
+        LOG.winner_norm_d_score.push_back(-1);
+        LOG.winner_raw_d_score.push_back(i);
 
         LOG.run_times.push_back(-1);
-
       }
 
       return ;
     } else {  
-      LOG.run_times.push_back(end_t);
       LOG.fronts.push_back(front);
       LOG.norm_fronts.push_back(normalized_front);
+
       LOG.norm_d_scores.push_back(d_score);
+      LOG.raw_d_scores.push_back(calculate_d_score(front));
+
       LOG.winner.push_back(front[vote_results[0]]);
       LOG.norm_winner.push_back(normalized_front[vote_results[0]]);
       LOG.winner_norm_d_score.push_back(d_score[vote_results[0]]);
-
+      LOG.winner_raw_d_score.push_back(LOG.raw_d_scores.back()[vote_results[0]]);
 
       LOG.run_times.push_back(end_t);
+
     }
   }
   
@@ -727,7 +745,6 @@ void VBEA_CONSCIOUS(struct::log &LOG, const AdjMatrix &adj_matrix, std::vector<N
   int end_t;
   int total_t = 0;
   int b = adj_matrix.get_obj_count();
-
   // BEGIN GEN 0
   ASTAR A(adj_matrix, node_list);
   WEIGHTED_ASTAR WA(adj_matrix, node_list);
@@ -736,7 +753,6 @@ void VBEA_CONSCIOUS(struct::log &LOG, const AdjMatrix &adj_matrix, std::vector<N
   std::vector<double> d_score,
                       norm_d_score;
   std::vector<int> vote_results;
-
 
   for(int i = 0; i < b; i++){
     std::cout << i << std::endl;
@@ -757,6 +773,7 @@ void VBEA_CONSCIOUS(struct::log &LOG, const AdjMatrix &adj_matrix, std::vector<N
   }
   
   remove_duplicates(front);
+  front = non_dominated_filter(front);
   normalized_front = normalize_matrix(front);
   d_score = calculate_d_score(normalized_front);
   vote_results = vote(voting_method, normalized_front, d_score);
@@ -823,9 +840,6 @@ void VBEA_CONSCIOUS(struct::log &LOG, const AdjMatrix &adj_matrix, std::vector<N
     }
     
     std::swap(temp,front); // front now only contains at most the top K candidates
-    // std::cout << "f: " << front.size() << std::endl
-    //           << "w: " << weight_sets.size() << std::endl;
-    //creating child population
 
     WEIGHTED_ASTAR WA(adj_matrix, node_list);
     auto order = node_order(more_than_specific(0));
@@ -886,13 +900,16 @@ void VBEA_CONSCIOUS(struct::log &LOG, const AdjMatrix &adj_matrix, std::vector<N
 
       return ;
     } else {  
-      LOG.run_times.push_back(end_t);
       LOG.fronts.push_back(front);
       LOG.norm_fronts.push_back(normalized_front);
+
       LOG.norm_d_scores.push_back(d_score);
+      LOG.raw_d_scores.push_back(calculate_d_score(front));
+
       LOG.winner.push_back(front[vote_results[0]]);
       LOG.norm_winner.push_back(normalized_front[vote_results[0]]);
       LOG.winner_norm_d_score.push_back(d_score[vote_results[0]]);
+      LOG.winner_raw_d_score.push_back(LOG.raw_d_scores.back()[vote_results[0]]);
 
       LOG.run_times.push_back(end_t);
 
@@ -1066,8 +1083,10 @@ void road_instnaces_runner(const std::string query_file, size_t graph_size, std:
     struct::log a(source, target); 
 
     if(child_method == "combined"){
+      // UNCAPPED_VBEA_COMBINED(a, adj_matrix, node_list, h, source, target, voting_method, cutoff_time, K, T, true);
       VBEA_COMBINED(a, adj_matrix, node_list, h, source, target, voting_method, cutoff_time, K, T, true);
     } else {
+      // UNCAPPED_VBEA_CONSCIOUS(a, adj_matrix, node_list, h, source, target, voting_method, cutoff_time, K, T, true);
       VBEA_CONSCIOUS(a, adj_matrix, node_list, h, source, target, voting_method, cutoff_time, K, T, true);
     }
 
@@ -1241,12 +1260,30 @@ void inst_maker(){
   out_file.close();
 }
 
+void dao_inst_order(){
+  std::string instance_file = "dao-uniform-5.txt";
+
+  std::unordered_map<std::string, std::vector<std::vector<size_t>>> query = load_asci_queries(instance_file);
+
+  std::ofstream out_file("dao-inst-order.txt");
+
+
+  for(auto &m : query){
+    out_file << m.first << std::endl;
+  }
+
+  out_file.close();
+
+
+  
+}
+
 void wrapper(){
   std::string VOTING_METHOD;
   std::string HEURISTIC = "haversine";
   std::string CHILD_METHOD = "conscious";
   // std::vector<std::string> ALL_VOTING_METHODS = {"borda"};
-  std::vector<std::string> ALL_VOTING_METHODS = {"borda", "range", "condorcet", "combined_approval"};
+  std::vector<std::string> ALL_VOTING_METHODS = {"combined_approval"};
 
   size_t  K = 20,
           T = 5,
@@ -1255,12 +1292,11 @@ void wrapper(){
   bool visualize = true;
   // END PARAMETERS
   // OPTIONAL
-  size_t cutoff_time = 300000; // in milliseconds
-  // size_t cutoff_time = INT_MAX;
+  // size_t cutoff_time = 300000; // in milliseconds
+  size_t cutoff_time = INT_MAX;
   // END OPTIONAL
 
-  std::vector<std::string> suffixs = {"BAY", "COL", "NY"};
-  // std::vector<std::string> suffixs = {"FLA"};
+  std::vector<std::string> suffixs = {"COL"};
 
   std::string prefix = "USA-ROAD/USA-ROAD-";
 
@@ -1294,6 +1330,7 @@ void wrapper(){
       }
 
       std::cout << "child method: " << CHILD_METHOD << std::endl;
+      std::cout << "voting method: " << VOTING_METHOD << std::endl;
 
       std::cout << "building graph...";
       load_gr_files(obj_files, edge_list, graph_size);
@@ -1301,13 +1338,13 @@ void wrapper(){
       std::cout << " Done." << std::endl;
 
       //add thrid and delay objective if they don't exist
-       // bool has_third = false, has_delay = false;
-       // for(auto &f: obj_files){
-       //   if(f == "USA-ROAD/USA-ROAD-" + s + "/USA-road-3." + s + ".gr"){ has_third = true;}
-       //   if(f == "USA-ROAD/USA-ROAD-" + s + "/USA-road-DELAY."+ s + ".gr"){ has_delay = true;}
-       // }
-       // if(!has_third){add_third_objective(s, edge_list, node_list);}
-       // if(!has_delay){add_delay_objective(s, edge_list, node_list);} 
+       bool has_third = false, has_delay = false;
+       for(auto &f: obj_files){
+         if(f == "USA-ROAD/USA-ROAD-" + s + "/USA-road-3." + s + ".gr"){ has_third = true;}
+         if(f == "USA-ROAD/USA-ROAD-" + s + "/USA-road-DELAY."+ s + ".gr"){ has_delay = true;}
+       }
+       if(!has_third){add_third_objective(s, edge_list, node_list);}
+       if(!has_delay){add_delay_objective(s, edge_list, node_list);} 
      
 
         std::string query_file = "USA-ROAD/instances/" + s + "_instances.txt";
@@ -1317,7 +1354,6 @@ void wrapper(){
         road_instnaces_runner(query_file, graph_size, edge_list, node_list, K, T, VOTING_METHOD, CHILD_METHOD, cutoff_time, LOGS);
 
         write_all_records_alt(LOGS, s, T, K, VOTING_METHOD, CHILD_METHOD);
-
 
       } // end map for loop
   }
@@ -1329,11 +1365,12 @@ void ascii_wrapper(){
   
   std::string VOTING_METHOD = "";
   std::string CHILD_METHOD = "combined";
-  std::vector<std::string> V_METHODS = {"range", "borda", "condorcet", "combined_approval"};
+  std::vector<std::string> V_METHODS = {"condorcet", "combined_approval"};
+  // std::vector<std::string> V_METHODS = {"range"};
 
-  // std::vector<std::string> V_METHODS = {"range",};
+
   heuristic h = h_functor(0);
-  size_t  K = 50,
+  size_t  K = INT_MAX,
           T = 5,
           source,
           target;
@@ -1342,24 +1379,12 @@ void ascii_wrapper(){
   size_t cutoff_time = INT_MAX; // in milliseconds // we calculate the failure rate post
 
   std::string instance_file = "dao-uniform-5.txt";
-  std::unordered_map<std::string, std::vector<std::vector<size_t>>> query = load_asci_queries(instance_file);
-  // for(auto &inst: query){
-  //   std::cout << inst.first << std::endl;
-  //   std::vector<std::vector<size_t>> source_target = inst.second;
-  //   for(auto &i: source_target){
-  //     source = i[0];
-  //     target = i[1];
-  //     std::cout << source << " " << target << std::endl;
-  //   }
-  // }
-  
+  std::unordered_map<std::string, std::vector<std::vector<size_t>>> query = load_asci_queries(instance_file);  
 
   for(auto &v: V_METHODS){
     VOTING_METHOD = v;
     std::cout << v << std::endl;
-    std::vector<struct::log> LOGS;
-
-  
+    std::vector<struct::log> LOGS;  
     size_t j = 1;
     for(auto &inst: query){
       std::string map_file = inst.first; 
@@ -1379,10 +1404,10 @@ void ascii_wrapper(){
         struct::log a(source, target);      
 
         if(CHILD_METHOD == "combined"){
-          VBEA_COMBINED(a, adj_matrix, node_list, h, source, target, VOTING_METHOD, cutoff_time, K, T, true);
+          UNCAPPED_VBEA_COMBINED(a, adj_matrix, node_list, h, source, target, VOTING_METHOD, cutoff_time, K, T, true);
+          // VBEA_COMBINED(a, adj_matrix, node_list, h, source, target, VOTING_METHOD, cutoff_time, K, T, true);
         } else{
-          // UNCAPPED_VBEA_CONSCIOUS(a, adj_matrix, node_list, h, source, target, VOTING_METHOD, cutoff_time, K, T, true);
-          VBEA_CONSCIOUS(a, adj_matrix, node_list, h, source, target, VOTING_METHOD, cutoff_time, K, T, true);
+          UNCAPPED_VBEA_COMBINED(a, adj_matrix, node_list, h, source, target, VOTING_METHOD, cutoff_time, K, T, true);
         }
 
         LOGS.push_back(a);
@@ -1392,15 +1417,12 @@ void ascii_wrapper(){
 
     }
       write_all_records_alt(LOGS, "DAO", T, K, VOTING_METHOD, CHILD_METHOD);
-
   }
 }
 
 int main(int argc, char **arg){
 
 
-  // wrapper();
-  // return 0;
 
   ascii_wrapper();
   return 0;

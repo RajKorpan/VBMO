@@ -356,6 +356,7 @@ NodePtr WEIGHTED_ASTAR::operator()(const size_t source, const size_t target, heu
 
 
     if(node->id == target){ //motify to retrace path
+      return node;
       // trace back code
       // node_list[target]->parent = node;
 
