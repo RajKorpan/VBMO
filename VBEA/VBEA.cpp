@@ -1364,13 +1364,13 @@ void wrapper(){
 void ascii_wrapper(){
   
   std::string VOTING_METHOD = "";
-  std::string CHILD_METHOD = "combined";
-  std::vector<std::string> V_METHODS = {"condorcet", "combined_approval"};
+  std::string CHILD_METHOD = "conscious";
+  std::vector<std::string> V_METHODS = {"borda"};
   // std::vector<std::string> V_METHODS = {"range"};
 
 
   heuristic h = h_functor(0);
-  size_t  K = INT_MAX,
+  size_t  K = 50,
           T = 5,
           source,
           target;
@@ -1407,7 +1407,7 @@ void ascii_wrapper(){
           UNCAPPED_VBEA_COMBINED(a, adj_matrix, node_list, h, source, target, VOTING_METHOD, cutoff_time, K, T, true);
           // VBEA_COMBINED(a, adj_matrix, node_list, h, source, target, VOTING_METHOD, cutoff_time, K, T, true);
         } else{
-          UNCAPPED_VBEA_COMBINED(a, adj_matrix, node_list, h, source, target, VOTING_METHOD, cutoff_time, K, T, true);
+          VBEA_CONSCIOUS(a, adj_matrix, node_list, h, source, target, VOTING_METHOD, cutoff_time, K, T, true);
         }
 
         LOGS.push_back(a);
