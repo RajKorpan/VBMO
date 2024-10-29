@@ -430,6 +430,10 @@ void write_matrix(std::ostream &out_file, const std::vector<std::vector<double>>
   }
 }
 
+void write_record_alt(std::ostream &out_file, const struct::log &r) {
+  
+}
+
 void write_record(std::ostream &out_file, const struct::log &r) {
   out_file << "{";
   
@@ -437,6 +441,9 @@ void write_record(std::ostream &out_file, const struct::log &r) {
   out_file << ", ";
 
   out_file << "\"target\": " << r.target;
+  out_file << ", ";
+
+  out_file << "\"map-id\": " << r.map_name;
   out_file << ", ";
 
 // FRONTS
@@ -525,8 +532,12 @@ void write_all_records_alt(const std::vector<struct::log> &logs, std::string fil
 
             << "\"T\": " << T << ", "
             << "\"K\": " << K << ", "
+            << "\"child_method\": " << "\"" << child_method << "\"" << ", "
             << "\"voting_method\": " << "\"" <<  voting_method << "\"" << "}";
 
+
+  out_file.close();
+  std::cout << "done." << std::endl;
 }
 
 
@@ -989,21 +1000,30 @@ void write_logs(std::string MAP_NAME, const std::string VOTE_METHOD, const std::
 
     std::ofstream out_file(".json");
 
-    std::cout << "writting data...";
+    std::cout << "Writting data...";
 
     out_file << "{"
              << "\"map\": " << "\"" << VOTE_METHOD << "\"" <<  ", "
-             << "\"merge strategy\": " << "\"" << CHILD_METHOD << "\"" << ", ";
-            
-        out_file << "\"data\": [";
+             << "\"merge strategy\": " << "\"" << CHILD_METHOD << "\"" << ", "
+             << "\"K\"" << "\"";
+
+    out_file << "\"data\": [";
+
     write_record(out_file, LOGS[0]);
     for(int i = 1; i < LOGS.size(); i++){
         out_file << ", ";
         write_record(out_file, LOGS[i]);
     }
+
     out_file << "]";
 
     out_file << "}";
+
+
+    std::cout << "done." << std::endl;
+
+
+    out_file.close();
   
 }
 

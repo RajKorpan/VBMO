@@ -68,6 +68,7 @@ void get_nodes_ASCII(const std::string ASCII_FILE, std::vector<NodePtr> &out_nod
 struct log{
   std::string     voting_method,      // range, borda, concorcet, etc..
                   child_method,       // either weighted combined or conscious
+                  map_name,           // only for DAO?
                   source,
                   target;
 
@@ -83,11 +84,10 @@ struct log{
                                                 winner_norm_d_score;
 
   std::vector<int>                              run_times;
-  // std::vector<std::vector<size_t>>              trace; // series of nodes that was used in tracing the path
 
   // all other data members are written during run time
-  log(const size_t source_, const size_t target_)
-  :fronts({}), source(std::to_string(source_)), target(std::to_string(target_)) {}
+  log(const size_t source_, const size_t target_, const std::string map_name_)
+  :source(std::to_string(source_)), target(std::to_string(target_)), map_name(map_name_) {}
 };
 
 void write_array(std::ostream &out_file, const std::vector<double> &vec);
